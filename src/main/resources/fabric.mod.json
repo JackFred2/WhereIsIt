@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "randomadditions",
+  "version": "${version}",
+
+  "name": "Random Additions",
+  "description": "Small tweaks to make the game feel better.",
+  "authors": [
+    "JackFred"
+  ],
+  "contact": {
+    "sources": "https://github.com/JackFred2/RandomAdditions"
+  },
+
+  "license": "MIT",
+  "icon": "assets/randomadditions/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "red.jackf.randomadditions.RandomAdditions"
+    ]
+  },
+  "mixins": [
+    "randomadditions.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.8.2",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}
