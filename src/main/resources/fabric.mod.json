@@ -19,6 +19,9 @@
   "entrypoints": {
     "main": [
       "red.jackf.randomadditions.RandomAdditions"
+    ],
+    "client": [
+      "red.jackf.randomadditions.RandomAdditionsClient"
     ]
   },
   "mixins": [
