@@ -7,6 +7,7 @@
         "MixinHandledScreen"
     ],
     "client": [
+        "MixinWorldRenderer",
         "ExampleMixin"
     ],
     "injectors": {
