@@ -17,7 +17,7 @@ import java.util.Queue;
 import static red.jackf.randomadditions.RandomAdditions.id;
 
 public class RandomAdditionsClient implements ClientModInitializer {
-    public static final int FOUND_ITEMS_LIFESPAN = 60;
+    public static final int FOUND_ITEMS_LIFESPAN = 120;
 
     public static class FoundItemPos {
         public BlockPos pos;
@@ -46,9 +46,6 @@ public class RandomAdditionsClient implements ClientModInitializer {
             BlockPos pos = packetByteBuf.readBlockPos();
             packetContext.getTaskQueue().execute(() -> {
                 //packetContext.getPlayer().sendMessage(new LiteralText(pos.toShortString()), false);
-                if (MinecraftClient.getInstance().currentScreen instanceof HandledScreen) {
-                    MinecraftClient.getInstance().currentScreen.onClose();
-                }
                 FOUND_ITEM_POSITIONS.add(new FoundItemPos(pos, packetContext.getPlayer().world.getTime()));
             });
         });

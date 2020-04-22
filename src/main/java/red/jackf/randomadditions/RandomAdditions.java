@@ -7,6 +7,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -41,10 +42,13 @@ public class RandomAdditions implements ModInitializer {
 					ServerWorld world = (ServerWorld) packetContext.getPlayer().getEntityWorld();
 					Set<Item> findSet = new HashSet<>();
 					findSet.add(toFind);
+
+					boolean closeScreen = false;
+
 					for (int y = Math.max(-FIND_ITEM_RADIUS + basePos.getY(), 0); y < Math.min(FIND_ITEM_RADIUS + 1 + basePos.getY(), world.getDimensionHeight()); y++) {
-						for (int x = -FIND_ITEM_RADIUS; x < FIND_ITEM_RADIUS + 1; x++) {
-							for (int z = -FIND_ITEM_RADIUS; z < FIND_ITEM_RADIUS + 1; z++) {
-								BlockPos checkPos = basePos.add(x, y, z);
+						for (int x = -FIND_ITEM_RADIUS + basePos.getX(); x < FIND_ITEM_RADIUS + 1 + basePos.getX(); x++) {
+							for (int z = -FIND_ITEM_RADIUS + basePos.getZ(); z < FIND_ITEM_RADIUS + 1 + basePos.getZ(); z++) {
+								BlockPos checkPos = new BlockPos(x, y, z);
 								BlockEntity be = world.getBlockEntity(checkPos);
 								if (be instanceof Inventory) {
 									Inventory inv = (Inventory) be;
@@ -52,10 +56,16 @@ public class RandomAdditions implements ModInitializer {
 										PacketByteBuf passedData = new PacketByteBuf(Unpooled.buffer());
 										passedData.writeBlockPos(checkPos);
 										ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, passedData);
+
+										closeScreen = true;
 									}
 								}
 							}
 						}
+					}
+
+					if (closeScreen) {
+						((ServerPlayerEntity) packetContext.getPlayer()).closeHandledScreen();
 					}
 
 				});

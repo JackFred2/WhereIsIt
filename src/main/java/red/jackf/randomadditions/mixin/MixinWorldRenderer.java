@@ -1,7 +1,7 @@
 package red.jackf.randomadditions.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
@@ -17,11 +17,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import red.jackf.randomadditions.RandomAdditionsClient;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.OptionalDouble;
 
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
+
+    private static RenderLayer layer = RenderLayer.of("blockoutline",
+            VertexFormats.POSITION_COLOR,
+            1, 256,
+            RenderLayer.MultiPhaseParameters.builder()
+                    .lineWidth(new RenderPhase.LineWidth(OptionalDouble.empty()))
+                    .depthTest(new RenderPhase.DepthTest("pass", 519))
+                    .build(false)
+            );
 
     @Shadow
     private static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
@@ -33,9 +42,8 @@ public class MixinWorldRenderer {
 
     @Shadow private ClientWorld world;
 
-    @Shadow @Final private MinecraftClient client;
-
-    @Inject(method= "render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V", at=@At("RETURN"))
+    @Inject(method= "render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V",
+            at=@At(value = "TAIL"))
     public void renderFoundItemOverlay(MatrixStack matrices,
                                        float tickDelta,
                                        long limitTime,
@@ -48,24 +56,33 @@ public class MixinWorldRenderer {
         this.world.getProfiler().swap("rc_founditems");
         Vec3d cameraPos = camera.getPos();
         List<RandomAdditionsClient.FoundItemPos> toRemove = new ArrayList<>();
-        Iterator<RandomAdditionsClient.FoundItemPos> iter = RandomAdditionsClient.FOUND_ITEM_POSITIONS.iterator();
-        while (iter.hasNext()) {
-            RandomAdditionsClient.FoundItemPos pos = iter.next();
+        VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
+        RenderSystem.disableDepthTest();
+        RenderSystem.pushMatrix();
+
+        for (RandomAdditionsClient.FoundItemPos pos : RandomAdditionsClient.FOUND_ITEM_POSITIONS) {
+            long timeDiff = this.world.getTime() - pos.time;
             drawShapeOutline(matrices,
-                    this.bufferBuilders.getEntityVertexConsumers().getBuffer(RenderLayer.getLines()),
-                    this.world.getBlockState(pos.pos).getOutlineShape(this.world, pos.pos, ShapeContext.of(this.client.player)),
+                    immediate.getBuffer(layer),
+                    //VoxelShapes.fullCube(),
+                    this.world.getBlockState(pos.pos).getOutlineShape(this.world, pos.pos, ShapeContext.of(camera.getFocusedEntity())),
                     pos.pos.getX() - cameraPos.x,
                     pos.pos.getY() - cameraPos.y,
                     pos.pos.getZ() - cameraPos.z,
                     0.0f,
                     1.0f,
                     0.0f,
-                    0.4f
-                    );
-            if (this.world.getTime() - pos.time > RandomAdditionsClient.FOUND_ITEMS_LIFESPAN) {
+                    0.7f
+            );
+            if (timeDiff > RandomAdditionsClient.FOUND_ITEMS_LIFESPAN) {
                 toRemove.add(pos);
             }
         }
+
+        immediate.draw(layer);
+        RenderSystem.popMatrix();
+        RenderSystem.enableDepthTest();
+
         for (RandomAdditionsClient.FoundItemPos pos : toRemove)
             RandomAdditionsClient.FOUND_ITEM_POSITIONS.remove(pos);
     }
