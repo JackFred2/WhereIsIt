@@ -6,8 +6,8 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-archivesBaseName = "RandomConcepts"
-version = 0.2
+archivesBaseName = "WhereIsIt"
+version = 1.0
 group = "red.jackf"
 
 minecraft {

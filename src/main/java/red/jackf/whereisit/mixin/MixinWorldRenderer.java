@@ -73,7 +73,7 @@ public class MixinWorldRenderer {
             drawShapeOutline(matrices,
                     immediate.getBuffer(WII_RenderLayer),
                     //VoxelShapes.fullCube(),
-                    this.world.getBlockState(pos.pos).getOutlineShape(this.world, pos.pos, ShapeContext.of(camera.getFocusedEntity())),
+                    pos.shape,
                     pos.pos.getX() - cameraPos.x,
                     pos.pos.getY() - cameraPos.y,
                     pos.pos.getZ() - cameraPos.z,
