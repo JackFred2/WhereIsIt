@@ -3,6 +3,7 @@ package red.jackf.whereisit;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
@@ -13,6 +14,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,8 +32,17 @@ public class WhereIsIt implements ModInitializer {
 	public static final Identifier FOUND_ITEMS_PACKET_ID = id("found_item_s2c");
 	private static final int FIND_ITEM_RADIUS = 12;
 
+	public static boolean REILoaded = false;
+
+	private static final Logger LOGGER = LogManager.getLogger();
+
 	@Override
 	public void onInitialize() {
+		if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
+			REILoaded = true;
+			LOGGER.info("REI Loaded");
+		}
+
 		ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {
 			Identifier itemId = packetByteBuf.readIdentifier();
 			Item toFind = Registry.ITEM.get(itemId);
