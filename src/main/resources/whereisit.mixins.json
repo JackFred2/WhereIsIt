@@ -1,14 +1,13 @@
 {
     "required": true,
     "minVersion": "0.8",
-    "package": "red.jackf.randomadditions.mixin",
+    "package": "red.jackf.whereisit.mixin",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
         "MixinHandledScreen"
     ],
     "client": [
-        "MixinWorldRenderer",
-        "ExampleMixin"
+        "MixinWorldRenderer"
     ],
     "injectors": {
         "defaultRequire": 1

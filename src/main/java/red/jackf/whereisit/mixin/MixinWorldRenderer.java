@@ -1,4 +1,4 @@
-package red.jackf.randomadditions.mixin;
+package red.jackf.whereisit.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.ShapeContext;
@@ -14,21 +14,29 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import red.jackf.randomadditions.RandomAdditionsClient;
+import red.jackf.whereisit.WhereIsItClient;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
+import static red.jackf.whereisit.WhereIsItClient.FOUND_ITEMS_LIFESPAN;
+
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
 
-    private static RenderLayer layer = RenderLayer.of("blockoutline",
+    private static final RenderPhase.Transparency WII_Transparency = new RenderPhase.Transparency("wii_translucent_transparency", () -> {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+    }, RenderSystem::disableBlend);
+
+    private static final RenderLayer WII_RenderLayer = RenderLayer.of("wii_blockoutline",
             VertexFormats.POSITION_COLOR,
             1, 256,
             RenderLayer.MultiPhaseParameters.builder()
                     .lineWidth(new RenderPhase.LineWidth(OptionalDouble.empty()))
                     .depthTest(new RenderPhase.DepthTest("pass", 519))
+                    .transparency(WII_Transparency)
                     .build(false)
             );
 
@@ -53,17 +61,17 @@ public class MixinWorldRenderer {
                                        LightmapTextureManager lightmapTextureManager,
                                        Matrix4f matrix4f,
                                        CallbackInfo ci) {
-        this.world.getProfiler().swap("rc_founditems");
+        this.world.getProfiler().swap("wii_founditems");
         Vec3d cameraPos = camera.getPos();
-        List<RandomAdditionsClient.FoundItemPos> toRemove = new ArrayList<>();
+        List<WhereIsItClient.FoundItemPos> toRemove = new ArrayList<>();
         VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
         RenderSystem.disableDepthTest();
         RenderSystem.pushMatrix();
 
-        for (RandomAdditionsClient.FoundItemPos pos : RandomAdditionsClient.FOUND_ITEM_POSITIONS) {
+        for (WhereIsItClient.FoundItemPos pos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
             long timeDiff = this.world.getTime() - pos.time;
             drawShapeOutline(matrices,
-                    immediate.getBuffer(layer),
+                    immediate.getBuffer(WII_RenderLayer),
                     //VoxelShapes.fullCube(),
                     this.world.getBlockState(pos.pos).getOutlineShape(this.world, pos.pos, ShapeContext.of(camera.getFocusedEntity())),
                     pos.pos.getX() - cameraPos.x,
@@ -72,18 +80,18 @@ public class MixinWorldRenderer {
                     0.0f,
                     1.0f,
                     0.0f,
-                    0.7f
+                    (FOUND_ITEMS_LIFESPAN - timeDiff) / (float) FOUND_ITEMS_LIFESPAN
             );
-            if (timeDiff > RandomAdditionsClient.FOUND_ITEMS_LIFESPAN) {
+            if (timeDiff >= FOUND_ITEMS_LIFESPAN) {
                 toRemove.add(pos);
             }
         }
 
-        immediate.draw(layer);
+        immediate.draw(WII_RenderLayer);
         RenderSystem.popMatrix();
         RenderSystem.enableDepthTest();
 
-        for (RandomAdditionsClient.FoundItemPos pos : toRemove)
-            RandomAdditionsClient.FOUND_ITEM_POSITIONS.remove(pos);
+        for (WhereIsItClient.FoundItemPos pos : toRemove)
+            WhereIsItClient.FOUND_ITEM_POSITIONS.remove(pos);
     }
 }

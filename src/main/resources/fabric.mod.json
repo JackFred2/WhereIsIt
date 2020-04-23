@@ -1,31 +1,28 @@
 {
   "schemaVersion": 1,
-  "id": "randomadditions",
+  "id": "whereisit",
   "version": "${version}",
 
-  "name": "Random Additions",
-  "description": "Small tweaks to make the game feel better.",
+  "name": "Where Is It",
+  "description": "Find an item in nearby inventories.",
   "authors": [
     "JackFred"
   ],
-  "contact": {
-    "sources": "https://github.com/JackFred2/RandomAdditions"
-  },
 
   "license": "MIT",
-  "icon": "assets/randomadditions/icon.png",
+  "icon": "assets/whereisit/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "red.jackf.randomadditions.RandomAdditions"
+      "red.jackf.whereisit.WhereIsIt"
     ],
     "client": [
-      "red.jackf.randomadditions.RandomAdditionsClient"
+      "red.jackf.whereisit.WhereIsItClient"
     ]
   },
   "mixins": [
-    "randomadditions.mixins.json"
+    "whereisit.mixins.json"
   ],
 
   "depends": {

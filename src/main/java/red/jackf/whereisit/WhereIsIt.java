@@ -1,4 +1,4 @@
-package red.jackf.randomadditions;
+package red.jackf.whereisit;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
@@ -6,21 +6,19 @@ import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
-public class RandomAdditions implements ModInitializer {
-	public static final String MODID = "randomadditions";
+public class WhereIsIt implements ModInitializer {
+	public static final String MODID = "whereisit";
 
 	public static Identifier id(String path) {
 		return new Identifier(MODID, path);
@@ -34,8 +32,8 @@ public class RandomAdditions implements ModInitializer {
 	public void onInitialize() {
 		ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {
 			Identifier itemId = packetByteBuf.readIdentifier();
-			if (Registry.ITEM.containsId(itemId)) {
-				Item toFind = Registry.ITEM.get(itemId);
+			Item toFind = Registry.ITEM.get(itemId);
+			if (toFind != Items.AIR) {
 				packetContext.getTaskQueue().execute(() -> {
 
 					BlockPos basePos = packetContext.getPlayer().getBlockPos();
