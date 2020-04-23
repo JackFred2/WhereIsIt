@@ -40,7 +40,7 @@ public class WhereIsIt implements ModInitializer {
 	public void onInitialize() {
 		if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
 			REILoaded = true;
-			LOGGER.info("REI Loaded");
+			LOGGER.info("[Where Is It] REI Found");
 		}
 
 		ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {

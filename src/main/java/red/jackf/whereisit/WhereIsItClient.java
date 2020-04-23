@@ -1,5 +1,6 @@
 package red.jackf.whereisit;
 
+import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
@@ -7,10 +8,14 @@ import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.block.EntityShapeContext;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -61,5 +66,12 @@ public class WhereIsItClient implements ClientModInitializer {
                 ));
             });
         });
+    }
+
+    public static void sendItemFindPacket(@NotNull Item item) {
+        System.out.println("Finding " + item.toString());
+        PacketByteBuf findItemRequest = new PacketByteBuf(Unpooled.buffer());
+        findItemRequest.writeIdentifier(Registry.ITEM.getId(item));
+        ClientSidePacketRegistry.INSTANCE.sendToServer(WhereIsIt.FIND_ITEM_PACKET_ID, findItemRequest);
     }
 }
