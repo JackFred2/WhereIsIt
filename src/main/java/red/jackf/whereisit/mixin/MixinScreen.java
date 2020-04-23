@@ -27,7 +27,7 @@ public abstract class MixinScreen {
 
                  if (itemToFind != null) {
                      WhereIsItClient.sendItemFindPacket(itemToFind);
-                     cir.setReturnValue(true);
+                     //cir.setReturnValue(true);
                  }
              }
          }

@@ -22,7 +22,7 @@ public abstract class MixinHandledScreen {
         if (WhereIsItClient.FIND_ITEMS.matchesKey(keyCode, scanCode)) {
             if (wii_getFocusedSlot() != null && wii_getFocusedSlot().hasStack()) {
                 WhereIsItClient.sendItemFindPacket(wii_getFocusedSlot().getStack().getItem());
-                cir.setReturnValue(true);
+                //cir.setReturnValue(true);
             }
         }
     }
