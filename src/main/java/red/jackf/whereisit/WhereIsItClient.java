@@ -2,6 +2,8 @@ package red.jackf.whereisit;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
@@ -21,6 +23,7 @@ import java.util.*;
 
 import static red.jackf.whereisit.WhereIsIt.id;
 
+@Environment(EnvType.CLIENT)
 public class WhereIsItClient implements ClientModInitializer {
     public static final int FOUND_ITEMS_LIFESPAN = 140;
     private static final ShapeContext SHAPE_CONTEXT = new EntityShapeContext(false, -1.7976931348623157E308D,Items.AIR) {

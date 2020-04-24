@@ -1,5 +1,7 @@
 package red.jackf.whereisit.mixin;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
@@ -13,6 +15,7 @@ import red.jackf.whereisit.WhereIsItClient;
 
 // Where REI/non-HandledScreen features are processed
 
+@Environment(EnvType.CLIENT)
 @Mixin(Screen.class)
 public abstract class MixinScreen {
     @Inject(method= "keyPressed", at=@At("TAIL"))

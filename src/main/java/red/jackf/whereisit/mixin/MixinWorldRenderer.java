@@ -1,6 +1,8 @@
 package red.jackf.whereisit.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,8 +24,10 @@ import java.util.OptionalDouble;
 
 import static red.jackf.whereisit.WhereIsItClient.FOUND_ITEMS_LIFESPAN;
 
+@Environment(EnvType.CLIENT)
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
+    private List<WhereIsItClient.FoundItemPos> rc_outlinesToRemove = new ArrayList<>();
 
     private static final RenderPhase.Transparency WII_Transparency = new RenderPhase.Transparency("wii_translucent_transparency", () -> {
         RenderSystem.enableBlend();
@@ -63,10 +67,9 @@ public class MixinWorldRenderer {
                                        CallbackInfo ci) {
         this.world.getProfiler().swap("wii_founditems");
         Vec3d cameraPos = camera.getPos();
-        List<WhereIsItClient.FoundItemPos> toRemove = new ArrayList<>();
         VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
         RenderSystem.disableDepthTest();
-        RenderSystem.pushMatrix();
+        matrices.push();
 
         for (WhereIsItClient.FoundItemPos pos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
             long timeDiff = this.world.getTime() - pos.time;
@@ -83,15 +86,17 @@ public class MixinWorldRenderer {
                     (FOUND_ITEMS_LIFESPAN - timeDiff) / (float) FOUND_ITEMS_LIFESPAN
             );
             if (timeDiff >= FOUND_ITEMS_LIFESPAN) {
-                toRemove.add(pos);
+                rc_outlinesToRemove.add(pos);
             }
         }
 
         immediate.draw(WII_RenderLayer);
-        RenderSystem.popMatrix();
+        matrices.pop();
         RenderSystem.enableDepthTest();
 
-        for (WhereIsItClient.FoundItemPos pos : toRemove)
+        for (WhereIsItClient.FoundItemPos pos : rc_outlinesToRemove)
             WhereIsItClient.FOUND_ITEM_POSITIONS.remove(pos);
+
+        rc_outlinesToRemove.clear();
     }
 }
