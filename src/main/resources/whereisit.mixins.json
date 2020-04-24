@@ -8,6 +8,7 @@
         "MixinScreen"
     ],
     "client": [
+        "MixinDebugHud",
         "MixinWorldRenderer"
     ],
     "injectors": {

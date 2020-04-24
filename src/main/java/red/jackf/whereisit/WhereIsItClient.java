@@ -9,11 +9,15 @@ import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.block.EntityShapeContext;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
@@ -45,6 +49,7 @@ public class WhereIsItClient implements ClientModInitializer {
     }
 
     public static final List<FoundItemPos> FOUND_ITEM_POSITIONS = new ArrayList<>();
+    public static final Map<VoxelShape, List<Box>> CACHED_SHAPES = new HashMap<>();
 
     public static final FabricKeyBinding FIND_ITEMS = FabricKeyBinding.Builder.create(
                     id("find_items"),
@@ -72,9 +77,24 @@ public class WhereIsItClient implements ClientModInitializer {
     }
 
     public static void sendItemFindPacket(@NotNull Item item) {
-        System.out.println("Finding " + item.toString());
+        WhereIsIt.log("Looking for " + item.toString());
         PacketByteBuf findItemRequest = new PacketByteBuf(Unpooled.buffer());
         findItemRequest.writeIdentifier(Registry.ITEM.getId(item));
         ClientSidePacketRegistry.INSTANCE.sendToServer(WhereIsIt.FIND_ITEM_PACKET_ID, findItemRequest);
+    }
+
+    public static void optimizedDrawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
+        Matrix4f matrix4f = matrixStack.peek().getModel();
+        if (!CACHED_SHAPES.containsKey(voxelShape)) {
+            //WhereIsIt.log("Adding new cached shape");
+            List<Box> boxes = new LinkedList<>();
+            voxelShape.forEachEdge((x1, y1, z1, x2, y2, z2) -> boxes.add(new Box(x1, y1, z1, x2, y2, z2)));
+            CACHED_SHAPES.put(voxelShape, boxes);
+        }
+
+        for (Box box : CACHED_SHAPES.get(voxelShape)) {
+            vertexConsumer.vertex(matrix4f, (float)(box.x1 + d), (float)(box.y1 + e), (float)(box.z1 + f)).color(g, h, i, j).next();
+            vertexConsumer.vertex(matrix4f, (float)(box.x2 + d), (float)(box.y2 + e), (float)(box.z2 + f)).color(g, h, i, j).next();
+        }
     }
 }

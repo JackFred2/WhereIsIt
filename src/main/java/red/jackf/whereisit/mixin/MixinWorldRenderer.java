@@ -23,11 +23,12 @@ import java.util.List;
 import java.util.OptionalDouble;
 
 import static red.jackf.whereisit.WhereIsItClient.FOUND_ITEMS_LIFESPAN;
+import static red.jackf.whereisit.WhereIsItClient.optimizedDrawShapeOutline;
 
 @Environment(EnvType.CLIENT)
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
-    private List<WhereIsItClient.FoundItemPos> rc_outlinesToRemove = new ArrayList<>();
+    private final List<WhereIsItClient.FoundItemPos> wii_outlinesToRemove = new ArrayList<>();
 
     private static final RenderPhase.Transparency WII_Transparency = new RenderPhase.Transparency("wii_translucent_transparency", () -> {
         RenderSystem.enableBlend();
@@ -44,10 +45,8 @@ public class MixinWorldRenderer {
                     .build(false)
             );
 
-    @Shadow
-    private static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
-
-    }
+    //@Shadow
+    //private static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
 
 
     @Shadow @Final private BufferBuilderStorage bufferBuilders;
@@ -71,22 +70,33 @@ public class MixinWorldRenderer {
         RenderSystem.disableDepthTest();
         matrices.push();
 
-        for (WhereIsItClient.FoundItemPos pos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
-            long timeDiff = this.world.getTime() - pos.time;
-            drawShapeOutline(matrices,
+        for (WhereIsItClient.FoundItemPos foundPos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
+            long timeDiff = this.world.getTime() - foundPos.time;
+            /*drawShapeOutline(matrices,
                     immediate.getBuffer(WII_RenderLayer),
                     //VoxelShapes.fullCube(),
-                    pos.shape,
-                    pos.pos.getX() - cameraPos.x,
-                    pos.pos.getY() - cameraPos.y,
-                    pos.pos.getZ() - cameraPos.z,
+                    foundPos.shape,
+                    foundPos.pos.getX() - cameraPos.x,
+                    foundPos.pos.getY() - cameraPos.y,
+                    foundPos.pos.getZ() - cameraPos.z,
+                    0.0f,
+                    1.0f,
+                    0.0f,
+                    (FOUND_ITEMS_LIFESPAN - timeDiff) / (float) FOUND_ITEMS_LIFESPAN
+            );*/
+            optimizedDrawShapeOutline(matrices,
+                    immediate.getBuffer(WII_RenderLayer),
+                    foundPos.shape,
+                    foundPos.pos.getX() - cameraPos.x,
+                    foundPos.pos.getY() - cameraPos.y,
+                    foundPos.pos.getZ() - cameraPos.z,
                     0.0f,
                     1.0f,
                     0.0f,
                     (FOUND_ITEMS_LIFESPAN - timeDiff) / (float) FOUND_ITEMS_LIFESPAN
             );
             if (timeDiff >= FOUND_ITEMS_LIFESPAN) {
-                rc_outlinesToRemove.add(pos);
+                wii_outlinesToRemove.add(foundPos);
             }
         }
 
@@ -94,9 +104,9 @@ public class MixinWorldRenderer {
         matrices.pop();
         RenderSystem.enableDepthTest();
 
-        for (WhereIsItClient.FoundItemPos pos : rc_outlinesToRemove)
+        for (WhereIsItClient.FoundItemPos pos : wii_outlinesToRemove)
             WhereIsItClient.FOUND_ITEM_POSITIONS.remove(pos);
 
-        rc_outlinesToRemove.clear();
+        wii_outlinesToRemove.clear();
     }
 }

@@ -36,11 +36,15 @@ public class WhereIsIt implements ModInitializer {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
+	protected static void log(String str) {
+		LOGGER.info("[Where Is It] " + str);
+	}
+
 	@Override
 	public void onInitialize() {
 		if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
 			REILoaded = true;
-			LOGGER.info("[Where Is It] REI Found");
+			log("REI Found");
 		}
 
 		ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {
