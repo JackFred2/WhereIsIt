@@ -19,6 +19,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class WhereIsIt implements ModInitializer {
@@ -60,6 +62,8 @@ public class WhereIsIt implements ModInitializer {
 
 					boolean closeScreen = false;
 
+					List<BlockPos> positions = new LinkedList<>();
+
 					for (int y = Math.max(-FIND_ITEM_RADIUS + basePos.getY(), 0); y < Math.min(FIND_ITEM_RADIUS + 1 + basePos.getY(), world.getDimensionHeight()); y++) {
 						for (int x = -FIND_ITEM_RADIUS + basePos.getX(); x < FIND_ITEM_RADIUS + 1 + basePos.getX(); x++) {
 							for (int z = -FIND_ITEM_RADIUS + basePos.getZ(); z < FIND_ITEM_RADIUS + 1 + basePos.getZ(); z++) {
@@ -68,15 +72,20 @@ public class WhereIsIt implements ModInitializer {
 								if (be instanceof Inventory) {
 									Inventory inv = (Inventory) be;
 									if (inv.containsAny(findSet)) {
-										PacketByteBuf passedData = new PacketByteBuf(Unpooled.buffer());
-										passedData.writeBlockPos(checkPos);
-										ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, passedData);
-
+										positions.add(checkPos);
 										closeScreen = true;
 									}
 								}
 							}
 						}
+					}
+					if (positions.size() > 0) {
+						PacketByteBuf passedData = new PacketByteBuf(Unpooled.buffer());
+						passedData.writeInt(positions.size());
+						for (BlockPos pos : positions) {
+							passedData.writeBlockPos(pos);
+						}
+						ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, passedData);
 					}
 
 					if (closeScreen) {

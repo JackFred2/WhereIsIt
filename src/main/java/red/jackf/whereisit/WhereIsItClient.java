@@ -63,15 +63,20 @@ public class WhereIsItClient implements ClientModInitializer {
         KeyBindingRegistry.INSTANCE.register(FIND_ITEMS);
 
         ClientSidePacketRegistry.INSTANCE.register(WhereIsIt.FOUND_ITEMS_PACKET_ID, (packetContext, packetByteBuf) -> {
-            BlockPos pos = packetByteBuf.readBlockPos();
+            int foundCount = packetByteBuf.readInt();
+            List<BlockPos> positions = new LinkedList<>();
+            for (int i = 0; i < foundCount; i++)
+                positions.add(packetByteBuf.readBlockPos());
+
             packetContext.getTaskQueue().execute(() -> {
                 //packetContext.getPlayer().sendMessage(new LiteralText(pos.toShortString()), false);
                 World world = packetContext.getPlayer().world;
-                FOUND_ITEM_POSITIONS.add(new FoundItemPos(
-                        pos,
-                        world.getTime(),
-                        world.getBlockState(pos).getOutlineShape(world, pos, SHAPE_CONTEXT)
-                ));
+                for (BlockPos pos : positions)
+                    FOUND_ITEM_POSITIONS.add(new FoundItemPos(
+                            pos,
+                            world.getTime(),
+                            world.getBlockState(pos).getOutlineShape(world, pos, SHAPE_CONTEXT)
+                    ));
             });
         });
     }
