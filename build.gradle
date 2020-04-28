@@ -24,10 +24,10 @@ dependencies {
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
-	modImplementation "me.shedaniel:RoughlyEnoughItems:4.2.0-unstable"
-	modImplementation "io.github.prospector:modmenu:1.11.2+build.6"
-	modCompile "me.sargunvohra.mcmods:autoconfig1u:3.0.1-unstable"
-	include "me.sargunvohra.mcmods:autoconfig1u:3.0.1-unstable"
+	modImplementation "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
+	modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
+	modCompile "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
+	include "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
 }
 
 processResources {
