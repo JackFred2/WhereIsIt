@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import red.jackf.whereisit.REIHandler;
+import red.jackf.whereisit.compat.REIHandler;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.WhereIsItClient;
 

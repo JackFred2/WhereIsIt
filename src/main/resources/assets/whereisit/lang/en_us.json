@@ -1,3 +1,4 @@
 {
-    "key.whereisit.find_items": "Find Nearby Items"
+    "key.whereisit.find_items": "Find Nearby Items",
+    "text.autoconfig.whereisit.option.radius": "Item search radius"
 }

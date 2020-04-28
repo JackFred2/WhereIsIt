@@ -1,6 +1,8 @@
 package red.jackf.whereisit;
 
 import io.netty.buffer.Unpooled;
+import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
+import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
@@ -30,9 +32,10 @@ public class WhereIsIt implements ModInitializer {
 		return new Identifier(MODID, path);
 	}
 
+	protected static WhereIsItConfig CONFIG;
+
 	public static final Identifier FIND_ITEM_PACKET_ID = id("find_item_c2s");
 	public static final Identifier FOUND_ITEMS_PACKET_ID = id("found_item_s2c");
-	private static final int FIND_ITEM_RADIUS = 12;
 
 	public static boolean REILoaded = false;
 
@@ -49,6 +52,10 @@ public class WhereIsIt implements ModInitializer {
 			log("REI Found");
 		}
 
+		AutoConfig.register(WhereIsItConfig.class, GsonConfigSerializer::new);
+
+		CONFIG = AutoConfig.getConfigHolder(WhereIsItConfig.class).getConfig();
+
 		ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {
 			Identifier itemId = packetByteBuf.readIdentifier();
 			Item toFind = Registry.ITEM.get(itemId);
@@ -64,9 +71,11 @@ public class WhereIsIt implements ModInitializer {
 
 					List<BlockPos> positions = new LinkedList<>();
 
-					for (int y = Math.max(-FIND_ITEM_RADIUS + basePos.getY(), 0); y < Math.min(FIND_ITEM_RADIUS + 1 + basePos.getY(), world.getDimensionHeight()); y++) {
-						for (int x = -FIND_ITEM_RADIUS + basePos.getX(); x < FIND_ITEM_RADIUS + 1 + basePos.getX(); x++) {
-							for (int z = -FIND_ITEM_RADIUS + basePos.getZ(); z < FIND_ITEM_RADIUS + 1 + basePos.getZ(); z++) {
+					final int radius = WhereIsIt.CONFIG.radius;
+
+					for (int y = Math.max(-radius + basePos.getY(), 0); y < Math.min(radius + 1 + basePos.getY(), world.getDimensionHeight()); y++) {
+						for (int x = -radius + basePos.getX(); x < radius + 1 + basePos.getX(); x++) {
+							for (int z = -radius + basePos.getZ(); z < radius + 1 + basePos.getZ(); z++) {
 								BlockPos checkPos = new BlockPos(x, y, z);
 								BlockEntity be = world.getBlockEntity(checkPos);
 								if (be instanceof Inventory) {

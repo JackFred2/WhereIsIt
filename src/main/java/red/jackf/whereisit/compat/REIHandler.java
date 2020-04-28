@@ -1,4 +1,4 @@
-package red.jackf.whereisit;
+package red.jackf.whereisit.compat;
 
 import me.shedaniel.rei.api.EntryStack;
 import me.shedaniel.rei.gui.ContainerScreenOverlay;
