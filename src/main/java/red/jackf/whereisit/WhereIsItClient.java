@@ -29,7 +29,6 @@ import static red.jackf.whereisit.WhereIsIt.id;
 
 @Environment(EnvType.CLIENT)
 public class WhereIsItClient implements ClientModInitializer {
-    public static final int FOUND_ITEMS_LIFESPAN = 140;
     private static final ShapeContext SHAPE_CONTEXT = new EntityShapeContext(false, -1.7976931348623157E308D,Items.AIR) {
         public boolean isAbove(VoxelShape shape, BlockPos pos, boolean defaultValue) {
             return defaultValue;

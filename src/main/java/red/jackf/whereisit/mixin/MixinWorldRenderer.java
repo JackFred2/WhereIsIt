@@ -3,26 +3,24 @@ package red.jackf.whereisit.mixin;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.WhereIsItClient;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
-import static red.jackf.whereisit.WhereIsItClient.FOUND_ITEMS_LIFESPAN;
 import static red.jackf.whereisit.WhereIsItClient.optimizedDrawShapeOutline;
 
 @Environment(EnvType.CLIENT)
@@ -70,6 +68,10 @@ public class MixinWorldRenderer {
         RenderSystem.disableDepthTest();
         matrices.push();
 
+        float r = WhereIsIt.CONFIG.outlineR / 255f;
+        float g = WhereIsIt.CONFIG.outlineG / 255f;
+        float b = WhereIsIt.CONFIG.outlineB / 255f;
+
         for (WhereIsItClient.FoundItemPos foundPos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
             long timeDiff = this.world.getTime() - foundPos.time;
             /*drawShapeOutline(matrices,
@@ -90,12 +92,12 @@ public class MixinWorldRenderer {
                     foundPos.pos.getX() - cameraPos.x,
                     foundPos.pos.getY() - cameraPos.y,
                     foundPos.pos.getZ() - cameraPos.z,
-                    0.0f,
-                    1.0f,
-                    0.0f,
-                    (FOUND_ITEMS_LIFESPAN - timeDiff) / (float) FOUND_ITEMS_LIFESPAN
+                    r,
+                    g,
+                    b,
+                    (WhereIsIt.CONFIG.fadeOutTime - timeDiff) / (float) WhereIsIt.CONFIG.fadeOutTime
             );
-            if (timeDiff >= FOUND_ITEMS_LIFESPAN) {
+            if (timeDiff >= WhereIsIt.CONFIG.fadeOutTime) {
                 wii_outlinesToRemove.add(foundPos);
             }
         }

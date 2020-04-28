@@ -32,7 +32,7 @@ public class WhereIsIt implements ModInitializer {
 		return new Identifier(MODID, path);
 	}
 
-	protected static WhereIsItConfig CONFIG;
+	public static WhereIsItConfig CONFIG;
 
 	public static final Identifier FIND_ITEM_PACKET_ID = id("find_item_c2s");
 	public static final Identifier FOUND_ITEMS_PACKET_ID = id("found_item_s2c");
@@ -71,7 +71,7 @@ public class WhereIsIt implements ModInitializer {
 
 					List<BlockPos> positions = new LinkedList<>();
 
-					final int radius = WhereIsIt.CONFIG.radius;
+					final int radius = WhereIsIt.CONFIG.searchRadius;
 
 					for (int y = Math.max(-radius + basePos.getY(), 0); y < Math.min(radius + 1 + basePos.getY(), world.getDimensionHeight()); y++) {
 						for (int x = -radius + basePos.getX(); x < radius + 1 + basePos.getX(); x++) {
