@@ -6,7 +6,7 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-archivesBaseName = "WhereIsIt-20w18a"
+archivesBaseName = "WhereIsIt-20w20a"
 version = "1.4.2"
 group = "red.jackf"
 
