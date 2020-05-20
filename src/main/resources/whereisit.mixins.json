@@ -4,12 +4,12 @@
     "package": "red.jackf.whereisit.mixin",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
-        "MixinHandledScreen",
-        "MixinScreen"
     ],
     "client": [
         "MixinDebugHud",
-        "MixinWorldRenderer"
+        "MixinWorldRenderer",
+        "MixinHandledScreen",
+        "MixinScreen"
     ],
     "injectors": {
         "defaultRequire": 1

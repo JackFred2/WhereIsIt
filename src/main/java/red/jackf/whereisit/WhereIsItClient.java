@@ -89,8 +89,8 @@ public class WhereIsItClient implements ClientModInitializer {
         }
 
         for (Box box : CACHED_SHAPES.get(voxelShape)) {
-            vertexConsumer.vertex(matrix4f, (float)(box.x1 + d), (float)(box.y1 + e), (float)(box.z1 + f)).color(g, h, i, j).next();
-            vertexConsumer.vertex(matrix4f, (float)(box.x2 + d), (float)(box.y2 + e), (float)(box.z2 + f)).color(g, h, i, j).next();
+            vertexConsumer.vertex(matrix4f, (float)(box.minX + d), (float)(box.minY + e), (float)(box.minZ + f)).color(g, h, i, j).next();
+            vertexConsumer.vertex(matrix4f, (float)(box.maxX + d), (float)(box.maxY + e), (float)(box.maxZ + f)).color(g, h, i, j).next();
         }
     }
 }
