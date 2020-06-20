@@ -68,9 +68,9 @@ public class MixinWorldRenderer {
         RenderSystem.disableDepthTest();
         matrices.push();
 
-        float r = WhereIsIt.CONFIG.outlineR / 255f;
-        float g = WhereIsIt.CONFIG.outlineG / 255f;
-        float b = WhereIsIt.CONFIG.outlineB / 255f;
+        float r = ((WhereIsIt.CONFIG.colour >> 16) & 0xff) / 255f;
+        float g = ((WhereIsIt.CONFIG.colour >> 8) & 0xff) / 255f;
+        float b = ((WhereIsIt.CONFIG.colour) & 0xff) / 255f;
 
         for (WhereIsItClient.FoundItemPos foundPos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
             long timeDiff = this.world.getTime() - foundPos.time;
