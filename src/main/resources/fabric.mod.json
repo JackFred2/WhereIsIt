@@ -26,6 +26,9 @@
     ],
     "modmenu": [
       "red.jackf.whereisit.compat.ModMenuHandler"
+    ],
+    "whereisit": [
+      "red.jackf.whereisit.VanillaItemBehaviors"
     ]
   },
   "mixins": [
@@ -38,6 +41,6 @@
     "minecraft": "1.16.x"
   },
   "suggests": {
-    "flamingo": "*"
+    "roughlyenoughitems": "*"
   }
 }
