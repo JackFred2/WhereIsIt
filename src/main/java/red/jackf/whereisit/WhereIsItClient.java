@@ -1,6 +1,5 @@
 package red.jackf.whereisit;
 
-import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,14 +10,14 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import red.jackf.whereisit.network.FoundS2C;
+import red.jackf.whereisit.network.SearchC2S;
 
 import java.util.*;
 
@@ -31,11 +30,13 @@ public class WhereIsItClient implements ClientModInitializer {
         public BlockPos pos;
         public long time;
         public VoxelShape shape;
+        public FoundType type;
 
-        protected FoundItemPos(BlockPos pos, long time, VoxelShape shape) {
+        protected FoundItemPos(BlockPos pos, long time, VoxelShape shape, FoundType type) {
             this.pos = pos;
             this.time = time;
             this.shape = shape;
+            this.type = type;
         }
     }
 
@@ -43,30 +44,28 @@ public class WhereIsItClient implements ClientModInitializer {
     public static final Map<VoxelShape, List<Box>> CACHED_SHAPES = new HashMap<>();
 
     public static final FabricKeyBinding FIND_ITEMS = FabricKeyBinding.Builder.create(
-                    id("find_items"),
-                    InputUtil.Type.KEYSYM,
-                    89,
-                    "key.categories.inventory"
-               ).build();
+        id("find_items"),
+        InputUtil.Type.KEYSYM,
+        89,
+        "key.categories.inventory"
+    ).build();
 
     @Override
     public void onInitializeClient() {
         KeyBindingRegistry.INSTANCE.register(FIND_ITEMS);
 
         ClientSidePacketRegistry.INSTANCE.register(WhereIsIt.FOUND_ITEMS_PACKET_ID, (packetContext, packetByteBuf) -> {
-            int foundCount = packetByteBuf.readInt();
-            List<BlockPos> positions = new LinkedList<>();
-            for (int i = 0; i < foundCount; i++)
-                positions.add(packetByteBuf.readBlockPos());
+            Map<BlockPos, FoundType> results = FoundS2C.read(packetByteBuf);
 
             packetContext.getTaskQueue().execute(() -> {
                 //packetContext.getPlayer().sendMessage(new LiteralText(pos.toShortString()), false);
                 World world = packetContext.getPlayer().world;
-                for (BlockPos pos : positions)
+                for (Map.Entry<BlockPos, FoundType> entry : results.entrySet())
                     FOUND_ITEM_POSITIONS.add(new FoundItemPos(
-                            pos,
-                            world.getTime(),
-                            world.getBlockState(pos).getOutlineShape(world, pos)
+                        entry.getKey(),
+                        world.getTime(),
+                        world.getBlockState(entry.getKey()).getOutlineShape(world, entry.getKey()),
+                        entry.getValue()
                     ));
             });
         });
@@ -74,9 +73,8 @@ public class WhereIsItClient implements ClientModInitializer {
 
     public static void sendItemFindPacket(@NotNull Item item) {
         WhereIsIt.log("Looking for " + item.toString());
-        PacketByteBuf findItemRequest = new PacketByteBuf(Unpooled.buffer());
-        findItemRequest.writeIdentifier(Registry.ITEM.getId(item));
-        ClientSidePacketRegistry.INSTANCE.sendToServer(WhereIsIt.FIND_ITEM_PACKET_ID, findItemRequest);
+        SearchC2S packet = new SearchC2S(item);
+        ClientSidePacketRegistry.INSTANCE.sendToServer(WhereIsIt.FIND_ITEM_PACKET_ID, packet);
     }
 
     public static void optimizedDrawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
@@ -89,8 +87,8 @@ public class WhereIsItClient implements ClientModInitializer {
         }
 
         for (Box box : CACHED_SHAPES.get(voxelShape)) {
-            vertexConsumer.vertex(matrix4f, (float)(box.minX + d), (float)(box.minY + e), (float)(box.minZ + f)).color(g, h, i, j).next();
-            vertexConsumer.vertex(matrix4f, (float)(box.maxX + d), (float)(box.maxY + e), (float)(box.maxZ + f)).color(g, h, i, j).next();
+            vertexConsumer.vertex(matrix4f, (float) (box.minX + d), (float) (box.minY + e), (float) (box.minZ + f)).color(g, h, i, j).next();
+            vertexConsumer.vertex(matrix4f, (float) (box.maxX + d), (float) (box.maxY + e), (float) (box.maxZ + f)).color(g, h, i, j).next();
         }
     }
 }

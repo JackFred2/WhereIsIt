@@ -37,7 +37,7 @@ public class VanillaItemBehaviors implements WhereIsItEntrypoint {
                 if (be instanceof Inventory) {
                     return InventoryUtils.invContains((Inventory) be, searchingFor);
                 }
-                return false;
+                return FoundType.NOT_FOUND;
             })
         );
     }

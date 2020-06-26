@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import red.jackf.whereisit.FoundType;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.WhereIsItClient;
 
@@ -72,21 +73,26 @@ public class MixinWorldRenderer {
         float g = ((WhereIsIt.CONFIG.colour >> 8) & 0xff) / 255f;
         float b = ((WhereIsIt.CONFIG.colour) & 0xff) / 255f;
 
+        float rAlt = ((WhereIsIt.CONFIG.alternateColour >> 16) & 0xff) / 255f;
+        float gAlt = ((WhereIsIt.CONFIG.alternateColour >> 8) & 0xff) / 255f;
+        float bAlt = ((WhereIsIt.CONFIG.alternateColour) & 0xff) / 255f;
+
         for (WhereIsItClient.FoundItemPos foundPos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
             long timeDiff = this.world.getTime() - foundPos.time;
-            /*drawShapeOutline(matrices,
+            if (foundPos.type == FoundType.FOUND_DEEP) {
+                optimizedDrawShapeOutline(matrices,
                     immediate.getBuffer(WII_RenderLayer),
-                    //VoxelShapes.fullCube(),
                     foundPos.shape,
                     foundPos.pos.getX() - cameraPos.x,
                     foundPos.pos.getY() - cameraPos.y,
                     foundPos.pos.getZ() - cameraPos.z,
-                    0.0f,
-                    1.0f,
-                    0.0f,
-                    (FOUND_ITEMS_LIFESPAN - timeDiff) / (float) FOUND_ITEMS_LIFESPAN
-            );*/
-            optimizedDrawShapeOutline(matrices,
+                    rAlt,
+                    gAlt,
+                    bAlt,
+                    (WhereIsIt.CONFIG.fadeOutTime - timeDiff) / (float) WhereIsIt.CONFIG.fadeOutTime
+                );
+            } else {
+                optimizedDrawShapeOutline(matrices,
                     immediate.getBuffer(WII_RenderLayer),
                     foundPos.shape,
                     foundPos.pos.getX() - cameraPos.x,
@@ -96,7 +102,8 @@ public class MixinWorldRenderer {
                     g,
                     b,
                     (WhereIsIt.CONFIG.fadeOutTime - timeDiff) / (float) WhereIsIt.CONFIG.fadeOutTime
-            );
+                );
+            }
             if (timeDiff >= WhereIsIt.CONFIG.fadeOutTime) {
                 wii_outlinesToRemove.add(foundPos);
             }

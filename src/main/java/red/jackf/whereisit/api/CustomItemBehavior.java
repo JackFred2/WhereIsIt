@@ -2,6 +2,7 @@ package red.jackf.whereisit.api;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import red.jackf.whereisit.FoundType;
 
 /**
  * Defines a custom behavior for an item when searching for 'sub-items'.

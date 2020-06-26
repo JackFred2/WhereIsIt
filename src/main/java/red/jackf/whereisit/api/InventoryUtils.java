@@ -3,6 +3,7 @@ package red.jackf.whereisit.api;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import red.jackf.whereisit.FoundType;
 import red.jackf.whereisit.WhereIsIt;
 
 import java.util.function.Predicate;
@@ -18,19 +19,19 @@ public abstract class InventoryUtils {
      * @param searchingFor The item being searched for.
      * @return Whether the inventory contains any instances of {@code searchingFor}.
      */
-    public static boolean invContains(Inventory inv, Item searchingFor) {
+    public static FoundType invContains(Inventory inv, Item searchingFor) {
         for (int i = 0; i < inv.size(); i++) {
             ItemStack stack = inv.getStack(i);
             if (stack.getItem() == searchingFor) {
-                return true;
-            } else if (!stack.isEmpty()) {
+                return FoundType.FOUND;
+            } else if (!stack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch) {
                 for (Predicate<ItemStack> predicate : WhereIsIt.itemBehaviors.keySet()) {
                     if (predicate.test(stack) && WhereIsIt.itemBehaviors.get(predicate).containsItem(searchingFor, stack)) {
-                        return true;
+                        return FoundType.FOUND_DEEP;
                     }
                 }
             }
         }
-        return false;
+        return FoundType.NOT_FOUND;
     }
 }

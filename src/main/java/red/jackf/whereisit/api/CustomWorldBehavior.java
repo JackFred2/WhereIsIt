@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import red.jackf.whereisit.FoundType;
 
 /**
  * Defines a custom behavior for a block or block entity.
@@ -17,5 +18,5 @@ public interface CustomWorldBehavior {
      * @param world        The world the position is in.
      * @return Whether the position contains any instances of `searchingFor`.
      */
-    boolean containsItem(Item searchingFor, BlockState state, BlockPos pos, ServerWorld world);
+    FoundType containsItem(Item searchingFor, BlockState state, BlockPos pos, ServerWorld world);
 }

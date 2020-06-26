@@ -26,113 +26,113 @@ import org.apache.logging.log4j.Logger;
 import red.jackf.whereisit.api.CustomItemBehavior;
 import red.jackf.whereisit.api.CustomWorldBehavior;
 import red.jackf.whereisit.api.WhereIsItEntrypoint;
+import red.jackf.whereisit.network.FoundS2C;
+import red.jackf.whereisit.network.SearchC2S;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class WhereIsIt implements ModInitializer {
-	public static final String MODID = "whereisit";
+    public static final String MODID = "whereisit";
 
-	public static Identifier id(String path) {
-		return new Identifier(MODID, path);
-	}
-	protected static void log(String str) {
-		LOGGER.info("[Where Is It] " + str);
-	}
+    public static Identifier id(String path) {
+        return new Identifier(MODID, path);
+    }
 
-	public static WhereIsItConfig CONFIG;
+    protected static void log(String str) {
+        LOGGER.info("[Where Is It] " + str);
+    }
 
-	public static final Identifier FIND_ITEM_PACKET_ID = id("find_item_c2s");
-	public static final Identifier FOUND_ITEMS_PACKET_ID = id("found_item_s2c");
+    public static WhereIsItConfig CONFIG;
 
-	public static boolean REILoaded = false;
+    public static final Identifier FIND_ITEM_PACKET_ID = id("find_item_c2s");
+    public static final Identifier FOUND_ITEMS_PACKET_ID = id("found_item_s2c");
 
-	private static final Logger LOGGER = LogManager.getLogger();
+    public static boolean REILoaded = false;
 
-	public static final Map<Predicate<ItemStack>, CustomItemBehavior> itemBehaviors = new HashMap<>();
-	public static final Map<Predicate<BlockState>, CustomWorldBehavior> worldBehaviors = new HashMap<>();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-	@Override
-	public void onInitialize() {
-		if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
-			REILoaded = true;
-			log("REI Found");
-		}
+    public static final Map<Predicate<ItemStack>, CustomItemBehavior> itemBehaviors = new HashMap<>();
+    public static final Map<Predicate<BlockState>, CustomWorldBehavior> worldBehaviors = new HashMap<>();
 
-		AutoConfig.register(WhereIsItConfig.class, GsonConfigSerializer::new);
+    @Override
+    public void onInitialize() {
+        if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
+            REILoaded = true;
+            log("REI Found");
+        }
 
-		CONFIG = AutoConfig.getConfigHolder(WhereIsItConfig.class).getConfig();
+        AutoConfig.register(WhereIsItConfig.class, GsonConfigSerializer::new);
 
-		// Plugins
-		List<EntrypointContainer<WhereIsItEntrypoint>> entrypointContainers = FabricLoader.getInstance().getEntrypointContainers("whereisit", WhereIsItEntrypoint.class);
-		entrypointContainers.sort(Comparator.comparingInt(e -> e.getEntrypoint().getPriority()));
-		StringBuilder pluginList = new StringBuilder();
-		for (EntrypointContainer<WhereIsItEntrypoint> entrypointContainer : entrypointContainers) {
-			try {
-				WhereIsItEntrypoint entrypoint = entrypointContainer.getEntrypoint();
-				entrypoint.setupItemBehaviors(itemBehaviors);
-				entrypoint.setupWorldBehaviors(worldBehaviors);
-				pluginList.append(entrypointContainer.getProvider().getMetadata().getId() + ", ");
-			} catch (Exception ex) {
-				log("Error loading plugin from " + entrypointContainer.getProvider().getMetadata().getId() + ": " + ex.getLocalizedMessage());
-			}
-		}
-		log("Loaded plugins: " + pluginList.toString().substring(0, pluginList.length() - 2));
+        CONFIG = AutoConfig.getConfigHolder(WhereIsItConfig.class).getConfig();
 
-		ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {
-			Identifier itemId = packetByteBuf.readIdentifier();
-			Item toFind = Registry.ITEM.get(itemId);
-			if (toFind != Items.AIR) {
-				packetContext.getTaskQueue().execute(() -> {
+        // Plugins
+        List<EntrypointContainer<WhereIsItEntrypoint>> entrypointContainers = FabricLoader.getInstance().getEntrypointContainers("whereisit", WhereIsItEntrypoint.class);
+        entrypointContainers.sort(Comparator.comparingInt(e -> e.getEntrypoint().getPriority()));
+        StringBuilder pluginList = new StringBuilder();
+        for (EntrypointContainer<WhereIsItEntrypoint> entrypointContainer : entrypointContainers) {
+            try {
+                WhereIsItEntrypoint entrypoint = entrypointContainer.getEntrypoint();
+                entrypoint.setupItemBehaviors(itemBehaviors);
+                entrypoint.setupWorldBehaviors(worldBehaviors);
+                pluginList.append(entrypointContainer.getProvider().getMetadata().getId()).append(", ");
+            } catch (Exception ex) {
+                log("Error loading plugin from " + entrypointContainer.getProvider().getMetadata().getId() + ": " + ex.getLocalizedMessage());
+            }
+        }
+        log("Loaded plugins: " + pluginList.toString().substring(0, pluginList.length() - 2));
 
-					BlockPos basePos = packetContext.getPlayer().getBlockPos();
-					ServerWorld world = (ServerWorld) packetContext.getPlayer().getEntityWorld();
+        ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {
+            Item toFind = SearchC2S.read(packetByteBuf);
+            if (toFind != Items.AIR) {
+                packetContext.getTaskQueue().execute(() -> {
 
-					boolean closeScreen = false;
+                    BlockPos basePos = packetContext.getPlayer().getBlockPos();
+                    ServerWorld world = (ServerWorld) packetContext.getPlayer().getEntityWorld();
 
-					List<BlockPos> positions = new LinkedList<>();
+                    boolean closeScreen = false;
 
-					final int radius = WhereIsIt.CONFIG.searchRadius;
+                    Map<BlockPos, FoundType> positions = new HashMap<>();
 
-					BlockPos.Mutable checkPos = new BlockPos.Mutable();
+                    final int radius = WhereIsIt.CONFIG.searchRadius;
 
-					for (int y = Math.max(-radius + basePos.getY(), 0); y < Math.min(radius + 1 + basePos.getY(), world.getDimensionHeight()); y++) {
-						for (int x = -radius + basePos.getX(); x < radius + 1 + basePos.getX(); x++) {
-							for (int z = -radius + basePos.getZ(); z < radius + 1 + basePos.getZ(); z++) {
-								checkPos.set(x, y, z);
-								BlockState state = world.getBlockState(checkPos);
-								try {
-									for (Predicate<BlockState> predicate : worldBehaviors.keySet()) {
-										if (predicate.test(state) &&
-											worldBehaviors.get(predicate).containsItem(toFind, state, checkPos, world)) {
-											positions.add(checkPos.toImmutable());
-											closeScreen = true;
-											break;
-										}
-									}
-								} catch (Exception ex) {
-									log("Error searching for item: " + ex.getLocalizedMessage());
-								}
-							}
-						}
-					}
+                    BlockPos.Mutable checkPos = new BlockPos.Mutable();
 
-					if (positions.size() > 0) {
-						PacketByteBuf passedData = new PacketByteBuf(Unpooled.buffer());
-						passedData.writeInt(positions.size());
-						for (BlockPos pos : positions) {
-							passedData.writeBlockPos(pos);
-						}
-						ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, passedData);
-					}
+                    for (int y = Math.max(-radius + basePos.getY(), 0); y < Math.min(radius + 1 + basePos.getY(), world.getDimensionHeight()); y++) {
+                        for (int x = -radius + basePos.getX(); x < radius + 1 + basePos.getX(); x++) {
+                            for (int z = -radius + basePos.getZ(); z < radius + 1 + basePos.getZ(); z++) {
+                                checkPos.set(x, y, z);
+                                BlockState state = world.getBlockState(checkPos);
+                                try {
+                                    for (Predicate<BlockState> predicate : worldBehaviors.keySet()) {
+                                        if (predicate.test(state)) {
+                                            FoundType result = worldBehaviors.get(predicate).containsItem(toFind, state, checkPos, world);
+                                            if (result != FoundType.NOT_FOUND) {
+                                                positions.put(checkPos.toImmutable(), result);
+                                                closeScreen = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                } catch (Exception ex) {
+                                    log("Error searching for item: " + ex.getLocalizedMessage());
+                                }
+                            }
+                        }
+                    }
 
-					if (closeScreen) {
-						((ServerPlayerEntity) packetContext.getPlayer()).closeHandledScreen();
-					}
+                    if (positions.size() > 0) {
+                        FoundS2C packet = new FoundS2C(positions);
+                        ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, packet);
+                    }
 
-				});
-			}
-		}));
-	}
+                    if (closeScreen) {
+                        ((ServerPlayerEntity) packetContext.getPlayer()).closeHandledScreen();
+                    }
+
+                });
+            }
+        }));
+    }
 }
