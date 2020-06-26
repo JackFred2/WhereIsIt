@@ -72,7 +72,7 @@ public class WhereIsItClient implements ClientModInitializer {
     }
 
     public static void sendItemFindPacket(@NotNull Item item) {
-        WhereIsIt.log("Looking for " + item.toString());
+        //WhereIsIt.log("Looking for " + item.toString());
         SearchC2S packet = new SearchC2S(item);
         ClientSidePacketRegistry.INSTANCE.sendToServer(WhereIsIt.FIND_ITEM_PACKET_ID, packet);
     }
