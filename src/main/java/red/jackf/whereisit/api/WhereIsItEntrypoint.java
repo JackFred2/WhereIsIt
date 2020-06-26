@@ -1,10 +1,12 @@
 package red.jackf.whereisit.api;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 /**
@@ -29,12 +31,13 @@ public interface WhereIsItEntrypoint {
      * Set up custom block behaviors for blocks in world.
      * Intended for blocks that hold items in world that do not implement {@link net.minecraft.inventory.Inventory}
      *
-     * @param behaviors The map of behaviors to append to. The Predicate is where you would check that the block
-     *                  could potentially hold an item.
+     * @param behaviors The map of behaviors to append to. The BiPredicate is where you would check that the block
+     *                  could potentially hold an item, and is called with the BlockState and BlockEntity (which could
+     *                  be null).
      */
 
     @ApiStatus.OverrideOnly
-    default void setupWorldBehaviors(Map<Predicate<BlockState>, CustomWorldBehavior> behaviors) {
+    default void setupWorldBehaviors(Map<BiPredicate<BlockState, BlockEntity>, CustomWorldBehavior> behaviors) {
     }
 
     /**

@@ -30,6 +30,7 @@ import red.jackf.whereisit.network.FoundS2C;
 import red.jackf.whereisit.network.SearchC2S;
 
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -54,7 +55,7 @@ public class WhereIsIt implements ModInitializer {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static final Map<Predicate<ItemStack>, CustomItemBehavior> itemBehaviors = new HashMap<>();
-    public static final Map<Predicate<BlockState>, CustomWorldBehavior> worldBehaviors = new HashMap<>();
+    public static final Map<BiPredicate<BlockState, BlockEntity>, CustomWorldBehavior> worldBehaviors = new HashMap<>();
 
     @Override
     public void onInitialize() {
@@ -104,9 +105,10 @@ public class WhereIsIt implements ModInitializer {
                             for (int z = -radius + basePos.getZ(); z < radius + 1 + basePos.getZ(); z++) {
                                 checkPos.set(x, y, z);
                                 BlockState state = world.getBlockState(checkPos);
+                                BlockEntity entity = world.getBlockEntity(checkPos);
                                 try {
-                                    for (Predicate<BlockState> predicate : worldBehaviors.keySet()) {
-                                        if (predicate.test(state)) {
+                                    for (BiPredicate<BlockState, BlockEntity> predicate : worldBehaviors.keySet()) {
+                                        if (predicate.test(state, entity)) {
                                             FoundType result = worldBehaviors.get(predicate).containsItem(toFind, state, checkPos, world);
                                             if (result != FoundType.NOT_FOUND) {
                                                 positions.put(checkPos.toImmutable(), result);

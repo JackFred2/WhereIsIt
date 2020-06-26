@@ -21,17 +21,18 @@ import red.jackf.whereisit.api.WhereIsItEntrypoint;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class VanillaItemBehaviors implements WhereIsItEntrypoint {
 
     @Override
-    public void setupWorldBehaviors(Map<Predicate<BlockState>, CustomWorldBehavior> behaviors) {
+    public void setupWorldBehaviors(Map<BiPredicate<BlockState, BlockEntity>, CustomWorldBehavior> behaviors) {
 
         // Behaviors for standard inventories - Chests, hoppers, anything that implements
         // {@link net.minecraft.inventory.Inventory}
         behaviors.put(
-            (blockState -> blockState.getBlock() instanceof BlockWithEntity),
+            ((blockState, blockEntity) -> blockEntity instanceof Inventory),
             ((searchingFor, state, pos, world) -> {
                 BlockEntity be = world.getBlockEntity(pos);
                 if (be instanceof Inventory) {
