@@ -31,7 +31,7 @@
       "red.jackf.whereisit.compat.ModMenuHandler"
     ],
     "whereisit": [
-      "red.jackf.whereisit.VanillaItemBehaviors"
+      "red.jackf.whereisit.compat.VanillaItemBehaviors"
     ]
   },
   "mixins": [

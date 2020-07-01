@@ -21,14 +21,19 @@ public abstract class InventoryUtils {
      */
     public static FoundType invContains(Inventory inv, Item searchingFor) {
         for (int i = 0; i < inv.size(); i++) {
-            ItemStack stack = inv.getStack(i);
-            if (stack.getItem() == searchingFor) {
-                return FoundType.FOUND;
-            } else if (!stack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch) {
-                for (Predicate<ItemStack> predicate : WhereIsIt.itemBehaviors.keySet()) {
-                    if (predicate.test(stack) && WhereIsIt.itemBehaviors.get(predicate).containsItem(searchingFor, stack)) {
-                        return FoundType.FOUND_DEEP;
-                    }
+            FoundType result = itemContains(inv.getStack(i), searchingFor);
+            if (result != FoundType.NOT_FOUND) return result;
+        }
+        return FoundType.NOT_FOUND;
+    }
+
+    public static FoundType itemContains(ItemStack item, Item searchingFor) {
+        if (item.getItem() == searchingFor) {
+            return FoundType.FOUND;
+        } else if (!item.isEmpty() && WhereIsIt.CONFIG.doDeepSearch) {
+            for (Predicate<ItemStack> predicate : WhereIsIt.itemBehaviors.keySet()) {
+                if (predicate.test(item) && WhereIsIt.itemBehaviors.get(predicate).containsItem(searchingFor, item)) {
+                    return FoundType.FOUND_DEEP;
                 }
             }
         }

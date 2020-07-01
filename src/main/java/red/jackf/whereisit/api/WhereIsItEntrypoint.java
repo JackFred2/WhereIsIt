@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
+import red.jackf.whereisit.compat.VanillaItemBehaviors;
 
 import java.util.Map;
 import java.util.function.BiPredicate;
@@ -11,7 +12,7 @@ import java.util.function.Predicate;
 
 /**
  * Entrypoint for a plugin.
- * @see red.jackf.whereisit.VanillaItemBehaviors VanillaItemBehaviors.
+ * @see VanillaItemBehaviors VanillaItemBehaviors.
  */
 public interface WhereIsItEntrypoint {
 

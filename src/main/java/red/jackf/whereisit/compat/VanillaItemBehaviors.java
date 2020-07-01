@@ -1,9 +1,11 @@
-package red.jackf.whereisit;
+package red.jackf.whereisit.compat;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.LecternBlock;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.LecternBlockEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.BlockItem;
@@ -13,6 +15,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.collection.DefaultedList;
+import red.jackf.whereisit.FoundType;
 import red.jackf.whereisit.api.CustomItemBehavior;
 import red.jackf.whereisit.api.CustomWorldBehavior;
 import red.jackf.whereisit.api.InventoryUtils;
@@ -37,6 +40,19 @@ public class VanillaItemBehaviors implements WhereIsItEntrypoint {
                 BlockEntity be = world.getBlockEntity(pos);
                 if (be instanceof Inventory) {
                     return InventoryUtils.invContains((Inventory) be, searchingFor);
+                }
+                return FoundType.NOT_FOUND;
+            })
+        );
+
+        // Lecterns
+        behaviors.put(
+            ((blockState, blockEntity) -> blockState.getBlock() instanceof LecternBlock && blockState.get(LecternBlock.HAS_BOOK)),
+            ((searchingFor, state, pos, world) -> {
+                BlockEntity be = world.getBlockEntity(pos);
+                if (be instanceof LecternBlockEntity) {
+                    System.out.println("Lectern");
+                    return InventoryUtils.itemContains(((LecternBlockEntity) be).getBook(), searchingFor);
                 }
                 return FoundType.NOT_FOUND;
             })
