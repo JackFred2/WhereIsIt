@@ -20,7 +20,7 @@ public class Searcher {
 
     public Map<BlockPos, FoundType> searchWorld(BlockPos basePos, ServerWorld world, Item toFind) {
         Map<BlockPos, FoundType> positions = new HashMap<>();
-        final int radius = WhereIsIt.CONFIG.searchRadius;
+        final int radius = WhereIsIt.CONFIG.getSearchRadius();
         BlockPos.Mutable checkPos = new BlockPos.Mutable();
 
         int minChunkX = (-radius + basePos.getX()) >> 4;
@@ -71,7 +71,7 @@ public class Searcher {
     public FoundType searchItemStack(ItemStack itemStack, Item toFind) {
         if (itemStack.getItem() == toFind) {
             return FoundType.FOUND;
-        } else if (!itemStack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch) {
+        } else if (!itemStack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch()) {
             for (ItemBehavior behavior : itemBehaviors) {
                 if (behavior.getTest().test(itemStack) && behavior.getAction().containsItem(itemStack, toFind)) {
                     return FoundType.FOUND_DEEP;

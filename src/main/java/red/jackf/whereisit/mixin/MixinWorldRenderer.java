@@ -69,13 +69,13 @@ public class MixinWorldRenderer {
         RenderSystem.disableDepthTest();
         matrices.push();
 
-        float r = ((WhereIsIt.CONFIG.colour >> 16) & 0xff) / 255f;
-        float g = ((WhereIsIt.CONFIG.colour >> 8) & 0xff) / 255f;
-        float b = ((WhereIsIt.CONFIG.colour) & 0xff) / 255f;
+        float r = ((WhereIsIt.CONFIG.getColour() >> 16) & 0xff) / 255f;
+        float g = ((WhereIsIt.CONFIG.getColour() >> 8) & 0xff) / 255f;
+        float b = ((WhereIsIt.CONFIG.getColour()) & 0xff) / 255f;
 
-        float rAlt = ((WhereIsIt.CONFIG.alternateColour >> 16) & 0xff) / 255f;
-        float gAlt = ((WhereIsIt.CONFIG.alternateColour >> 8) & 0xff) / 255f;
-        float bAlt = ((WhereIsIt.CONFIG.alternateColour) & 0xff) / 255f;
+        float rAlt = ((WhereIsIt.CONFIG.getAlternateColour() >> 16) & 0xff) / 255f;
+        float gAlt = ((WhereIsIt.CONFIG.getAlternateColour() >> 8) & 0xff) / 255f;
+        float bAlt = ((WhereIsIt.CONFIG.getAlternateColour()) & 0xff) / 255f;
 
         for (WhereIsItClient.FoundItemPos foundPos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
             long timeDiff = this.world.getTime() - foundPos.time;
@@ -89,7 +89,7 @@ public class MixinWorldRenderer {
                     rAlt,
                     gAlt,
                     bAlt,
-                    (WhereIsIt.CONFIG.fadeOutTime - timeDiff) / (float) WhereIsIt.CONFIG.fadeOutTime
+                    (WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime()
                 );
             } else {
                 optimizedDrawShapeOutline(matrices,
@@ -101,10 +101,10 @@ public class MixinWorldRenderer {
                     r,
                     g,
                     b,
-                    (WhereIsIt.CONFIG.fadeOutTime - timeDiff) / (float) WhereIsIt.CONFIG.fadeOutTime
+                    (WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime()
                 );
             }
-            if (timeDiff >= WhereIsIt.CONFIG.fadeOutTime) {
+            if (timeDiff >= WhereIsIt.CONFIG.getFadeoutTime()) {
                 wii_outlinesToRemove.add(foundPos);
             }
         }

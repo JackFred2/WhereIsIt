@@ -85,7 +85,7 @@ public class WhereIsIt implements ModInitializer {
 
                     Map<BlockPos, FoundType> positions = SEARCHER.searchWorld(basePos, world, toFind);
 
-                    packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
+                    if (WhereIsIt.CONFIG.printSearchTime()) packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
 
                     if (positions.size() > 0) {
                         FoundS2C packet = new FoundS2C(positions);

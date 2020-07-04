@@ -6,30 +6,54 @@ import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
 import net.minecraft.util.math.MathHelper;
 
 @Config(name = WhereIsIt.MODID)
+@Config.Gui.Background("minecraft:textures/block/barrel_top.png")
 public class WhereIsItConfig implements ConfigData {
-    @ConfigEntry.BoundedDiscrete(max = 16)
-    public int searchRadius = 12;
+    @ConfigEntry.Category("clientOptions")
+    @ConfigEntry.Gui.TransitiveObject
+    public Client clientOptions = new Client();
 
-    @ConfigEntry.Gui.Tooltip
-    public boolean doDeepSearch = true;
+    @ConfigEntry.Category("serverOptions")
+    @ConfigEntry.Gui.TransitiveObject
+    public Server serverOptions = new Server();
 
-    @ConfigEntry.BoundedDiscrete(max = 300, min = 10)
-    @ConfigEntry.Gui.Tooltip
-    public int fadeOutTime = 140;
+    public int getFadeoutTime() { return clientOptions.fadeOutTime; }
+    public int getColour() { return clientOptions.colour; }
+    public int getAlternateColour() { return clientOptions.alternateColour; }
 
-    @ConfigEntry.ColorPicker
-    @ConfigEntry.Gui.Tooltip
-    public int colour = 0x4fff4f;
+    public int getSearchRadius() { return serverOptions.searchRadius; }
+    public boolean doDeepSearch() { return serverOptions.doDeepSearch; }
+    public boolean printSearchTime() { return serverOptions.printSearchTime; }
 
-    @ConfigEntry.ColorPicker
-    @ConfigEntry.Gui.Tooltip
-    public int alternateColour = 0xff4fff;
+    static class Client {
+        @ConfigEntry.BoundedDiscrete(max = 300, min = 10)
+        @ConfigEntry.Gui.Tooltip
+        public int fadeOutTime = 140;
+
+        @ConfigEntry.ColorPicker
+        @ConfigEntry.Gui.Tooltip
+        public int colour = 0x4fff4f;
+
+        @ConfigEntry.ColorPicker
+        @ConfigEntry.Gui.Tooltip
+        public int alternateColour = 0xff4fff;
+    }
+
+    static class Server {
+        @ConfigEntry.BoundedDiscrete(max = 16)
+        public int searchRadius = 12;
+
+        @ConfigEntry.Gui.Tooltip
+        public boolean doDeepSearch = true;
+
+        public boolean printSearchTime = false;
+    }
 
     @Override
     public void validatePostLoad() {
-        searchRadius = MathHelper.clamp(searchRadius, 0, 16);
-        colour = MathHelper.clamp(colour, 0x000000, 0xffffff);
-        alternateColour = MathHelper.clamp(alternateColour, 0x000000, 0xffffff);
-        fadeOutTime = MathHelper.clamp(fadeOutTime, 0, 300);
+        clientOptions.colour = MathHelper.clamp(clientOptions.colour, 0x000000, 0xffffff);
+        clientOptions.alternateColour = MathHelper.clamp(clientOptions.alternateColour, 0x000000, 0xffffff);
+        clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 0, 300);
+
+        serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 0, 16);
     }
 }
