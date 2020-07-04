@@ -103,7 +103,6 @@ public class WhereIsIt implements ModInitializer {
 
                     long beforeTime = System.nanoTime();
 
-                    for (int i = 0; i < 5000; i++)
                     for (int y = Math.max(-radius + basePos.getY(), 0); y < Math.min(radius + 1 + basePos.getY(), world.getDimensionHeight()); y++) {
                         for (int x = -radius + basePos.getX(); x < radius + 1 + basePos.getX(); x++) {
                             for (int z = -radius + basePos.getZ(); z < radius + 1 + basePos.getZ(); z++) {
@@ -127,7 +126,7 @@ public class WhereIsIt implements ModInitializer {
                         }
                     }
 
-                    //packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
+                    packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
 
                     if (positions.size() > 0) {
                         FoundS2C packet = new FoundS2C(positions);
