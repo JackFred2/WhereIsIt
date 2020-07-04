@@ -14,9 +14,9 @@ import red.jackf.whereisit.FoundType;
 public interface CustomItemBehavior {
 
     /**
-     * @param searchingFor The identifier that is currently being searched for.
      * @param item The custom item that is being searched. (Ex: Shulker Box).
+     * @param searchingFor The item that is currently being searched for.
      * @return Whether `item` contains any instances of `searchingFor`.
      */
-    boolean containsItem(Item searchingFor, ItemStack item);
+    boolean containsItem(ItemStack item, Item searchingFor);
 }

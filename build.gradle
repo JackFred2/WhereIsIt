@@ -7,7 +7,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = "WhereIsIt-${project.minecraft_version}"
-version = "1.7.3"
+version = "1.7.4"
 group = "red.jackf"
 
 minecraft {

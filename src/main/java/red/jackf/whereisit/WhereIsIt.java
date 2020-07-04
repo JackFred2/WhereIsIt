@@ -24,6 +24,9 @@ import java.util.*;
 
 public class WhereIsIt implements ModInitializer {
     public static final String MODID = "whereisit";
+    public static WhereIsItConfig CONFIG;
+    private static final Logger LOGGER = LogManager.getLogger();
+    public static Searcher SEARCHER;
 
     public static Identifier id(String path) {
         return new Identifier(MODID, path);
@@ -33,14 +36,12 @@ public class WhereIsIt implements ModInitializer {
         LOGGER.info(str);
     }
 
-    public static WhereIsItConfig CONFIG;
 
     public static final Identifier FIND_ITEM_PACKET_ID = id("find_item_c2s");
     public static final Identifier FOUND_ITEMS_PACKET_ID = id("found_item_s2c");
 
     public static boolean REILoaded = false;
 
-    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void onInitialize() {
@@ -52,6 +53,7 @@ public class WhereIsIt implements ModInitializer {
         AutoConfig.register(WhereIsItConfig.class, GsonConfigSerializer::new);
 
         CONFIG = AutoConfig.getConfigHolder(WhereIsItConfig.class).getConfig();
+        SEARCHER = new Searcher();
 
         // Plugins
         List<EntrypointContainer<WhereIsItEntrypoint>> entrypointContainers = FabricLoader.getInstance().getEntrypointContainers("whereisit", WhereIsItEntrypoint.class);
@@ -60,8 +62,8 @@ public class WhereIsIt implements ModInitializer {
         for (EntrypointContainer<WhereIsItEntrypoint> entrypointContainer : entrypointContainers) {
             try {
                 WhereIsItEntrypoint entrypoint = entrypointContainer.getEntrypoint();
-                entrypoint.setupItemBehaviors(Searcher.itemBehaviors);
-                entrypoint.setupWorldBehaviors(Searcher.worldBehaviors);
+                entrypoint.setupItemBehaviors(SEARCHER);
+                entrypoint.setupWorldBehaviors(SEARCHER);
                 pluginList.append(entrypointContainer.getProvider().getMetadata().getId()).append(", ");
             } catch (Exception ex) {
                 log("Error loading plugin from " + entrypointContainer.getProvider().getMetadata().getId() + ": " + ex.getLocalizedMessage());
@@ -79,7 +81,7 @@ public class WhereIsIt implements ModInitializer {
 
                     long beforeTime = System.nanoTime();
 
-                    Map<BlockPos, FoundType> positions = Searcher.search(basePos, world, toFind);
+                    Map<BlockPos, FoundType> positions = SEARCHER.searchWorld(basePos, world, toFind);
 
                     packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
 
