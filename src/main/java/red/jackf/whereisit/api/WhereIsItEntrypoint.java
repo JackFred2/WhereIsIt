@@ -25,20 +25,18 @@ public interface WhereIsItEntrypoint {
 
     @ApiStatus.OverrideOnly
     default void setupItemBehaviors(Map<Predicate<ItemStack>, CustomItemBehavior> behaviors) {
-
     }
 
     /**
      * Set up custom block behaviors for blocks in world.
      * Intended for blocks that hold items in world that do not implement {@link net.minecraft.inventory.Inventory}
      *
-     * @param behaviors The map of behaviors to append to. The BiPredicate is where you would check that the block
-     *                  could potentially hold an item, and is called with the BlockState and BlockEntity (which could
-     *                  be null).
+     * @param behaviors The map of behaviors to append to. The key is a predicate, giving the BlockState of the position,
+     *                  and should return true if it could potentially hold an item.
      */
 
     @ApiStatus.OverrideOnly
-    default void setupWorldBehaviors(Map<BiPredicate<BlockState, BlockEntity>, CustomWorldBehavior> behaviors) {
+    default void setupWorldBehaviors(Map<Predicate<BlockState>, CustomWorldBehavior> behaviors) {
     }
 
     /**

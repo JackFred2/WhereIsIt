@@ -1,57 +1,67 @@
 package red.jackf.whereisit.compat;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.LecternBlock;
-import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.LecternBlockEntity;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.util.collection.DefaultedList;
 import red.jackf.whereisit.FoundType;
 import red.jackf.whereisit.api.CustomItemBehavior;
 import red.jackf.whereisit.api.CustomWorldBehavior;
 import red.jackf.whereisit.api.InventoryUtils;
 import red.jackf.whereisit.api.WhereIsItEntrypoint;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class VanillaItemBehaviors implements WhereIsItEntrypoint {
+    private static final Map<BlockState, Boolean> validInventoryLookups = new HashMap<>();
+    private static final Map<BlockState, Boolean> validInventoryProviderLookups = new HashMap<>();
+    private static final Map<BlockState, Boolean> validLecternLookups = new HashMap<>();
 
     @Override
-    public void setupWorldBehaviors(Map<BiPredicate<BlockState, BlockEntity>, CustomWorldBehavior> behaviors) {
+    public void setupWorldBehaviors(Map<Predicate<BlockState>, CustomWorldBehavior> behaviors) {
 
         // Behaviors for standard inventories - Chests, hoppers, anything that implements
         // {@link net.minecraft.inventory.Inventory}
         behaviors.put(
-            ((blockState, blockEntity) -> blockEntity instanceof Inventory),
-            ((searchingFor, state, pos, world) -> {
+            blockState ->
+                validInventoryLookups.computeIfAbsent(blockState,
+                    (blockState1 -> blockState1.getBlock() instanceof BlockWithEntity)),
+            (searchingFor, state, pos, world) -> {
                 BlockEntity be = world.getBlockEntity(pos);
                 if (be instanceof Inventory) {
                     return InventoryUtils.invContains((Inventory) be, searchingFor);
                 }
                 return FoundType.NOT_FOUND;
-            })
+            }
+        );
+
+        // Behaviors for miscellaneous inventories - Compostors, LinkedStorage chests
+        // Anything that implements {@link net.minecraft.block.InventoryProvider}
+        behaviors.put(
+            blockState ->
+                validInventoryProviderLookups.computeIfAbsent(blockState,
+                    (blockState1 -> blockState1.getBlock() instanceof InventoryProvider)),
+            (searchingFor, state, pos, world) -> {
+                Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
+                if (inv == null) return FoundType.NOT_FOUND;
+                return InventoryUtils.invContains(inv, searchingFor);
+            }
         );
 
         // Lecterns
         behaviors.put(
-            ((blockState, blockEntity) -> blockState.getBlock() instanceof LecternBlock && blockState.get(LecternBlock.HAS_BOOK)),
+            blockState ->
+                validLecternLookups.computeIfAbsent(blockState,
+                    blockState1 -> blockState.getBlock() instanceof LecternBlock && blockState1.get(LecternBlock.HAS_BOOK)),
             ((searchingFor, state, pos, world) -> {
                 BlockEntity be = world.getBlockEntity(pos);
                 if (be instanceof LecternBlockEntity) {
-                    System.out.println("Lectern");
                     return InventoryUtils.itemContains(((LecternBlockEntity) be).getBook(), searchingFor);
                 }
                 return FoundType.NOT_FOUND;
@@ -78,5 +88,10 @@ public class VanillaItemBehaviors implements WhereIsItEntrypoint {
                 return false;
             })
         );
+    }
+
+    @Override
+    public int getPriority() {
+        return -1000;
     }
 }

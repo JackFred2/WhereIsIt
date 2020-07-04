@@ -66,7 +66,7 @@ jar {
 repositories {
 	maven {
 		name = "CottonMC"
-		url = "http://server.bbkr.space:8081/artifactory/libs-release"
+		url = "http://server.bbkr.space/artifactory/libs-release"
 	}
 	jcenter()
 }

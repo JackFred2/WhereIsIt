@@ -1,13 +1,13 @@
 {
     "key.whereisit.find_items": "Find Nearby Items",
-    "text.autoconfig.whereisit.option.searchRadius": "Item search radius",
+    "text.autoconfig.whereisit.option.searchRadius": "Item Search Radius",
     "text.autoconfig.whereisit.option.doDeepSearch": "Do Deep Searching",
     "text.autoconfig.whereisit.option.doDeepSearch.@Tooltip": "Whether to search items in inventories (Shulker Boxes).",
-    "text.autoconfig.whereisit.option.colour": "Block outline colour",
+    "text.autoconfig.whereisit.option.colour": "Block Outline Colour",
     "text.autoconfig.whereisit.option.colour.@Tooltip": "Shown when an item is found.",
-    "text.autoconfig.whereisit.option.alternateColour": "Alternate block outline colour",
+    "text.autoconfig.whereisit.option.alternateColour": "Alternate Block Outline Colour",
     "text.autoconfig.whereisit.option.alternateColour.@Tooltip": "Shown when an item is found in a deep search.",
-    "text.autoconfig.whereisit.option.fadeOutTime": "Fade out time",
+    "text.autoconfig.whereisit.option.fadeOutTime": "Fade Out Time",
     "text.autoconfig.whereisit.option.fadeOutTime.@Tooltip": "Time for the outline to fade out in ticks.",
     "text.autoconfig.whereisit.title": "Where Is It Config"
 }

@@ -27,12 +27,18 @@ public abstract class InventoryUtils {
         return FoundType.NOT_FOUND;
     }
 
-    public static FoundType itemContains(ItemStack item, Item searchingFor) {
-        if (item.getItem() == searchingFor) {
+    /**
+     * Check an ItemStack to see if it matches `searchingFor`, recursively checking items for inventories.
+     * @param itemStack - the stack being searched.
+     * @param searchingFor - The item being searched for
+     * @return Whether the item was found, and how it was found.
+     */
+    public static FoundType itemContains(ItemStack itemStack, Item searchingFor) {
+        if (itemStack.getItem() == searchingFor) {
             return FoundType.FOUND;
-        } else if (!item.isEmpty() && WhereIsIt.CONFIG.doDeepSearch) {
+        } else if (!itemStack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch) {
             for (Predicate<ItemStack> predicate : WhereIsIt.itemBehaviors.keySet()) {
-                if (predicate.test(item) && WhereIsIt.itemBehaviors.get(predicate).containsItem(searchingFor, item)) {
+                if (predicate.test(itemStack) && WhereIsIt.itemBehaviors.get(predicate).containsItem(searchingFor, itemStack)) {
                     return FoundType.FOUND_DEEP;
                 }
             }
