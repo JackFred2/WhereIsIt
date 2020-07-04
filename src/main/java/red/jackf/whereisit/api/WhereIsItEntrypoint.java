@@ -14,25 +14,14 @@ import java.util.function.Predicate;
 public interface WhereIsItEntrypoint {
 
     /**
-     * Set up custom item behaviors for items in chest.
-     * Intended for items with inventories such as shulker boxes, backpacks, etc.
-     *
-     * @param searcher The searcher object to use - call {@link red.jackf.whereisit.Searcher#addItemBehavior(Predicate, CustomItemBehavior)}
+     * Set up custom item and world behaviors to search.
+     * @param searcher The searcher object to use -
+     *                 call {@link red.jackf.whereisit.Searcher#addItemBehavior(Predicate, CustomItemBehavior)} and
+     *                 call {@link red.jackf.whereisit.Searcher#addWorldBehavior(Predicate, CustomWorldBehavior)}
      */
 
     @ApiStatus.OverrideOnly
-    default void setupItemBehaviors(Searcher searcher) {
-    }
-
-    /**
-     * Set up custom block behaviors for blocks in world.
-     * Intended for blocks that hold items in world that do not implement {@link net.minecraft.inventory.Inventory}
-     *
-     * @param searcher The searcher object to use - call {@link red.jackf.whereisit.Searcher#addWorldBehavior(Predicate, CustomWorldBehavior)}
-     */
-
-    @ApiStatus.OverrideOnly
-    default void setupWorldBehaviors(Searcher searcher) {
+    default void setupBehaviors(Searcher searcher) {
     }
 
     /**

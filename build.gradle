@@ -13,6 +13,16 @@ group = "red.jackf"
 minecraft {
 }
 
+// Custom Repos
+repositories {
+	maven {
+		name = "CottonMC"
+		url = "http://server.bbkr.space/artifactory/libs-release"
+	}
+	maven { url = 'https://jitpack.io' }
+	jcenter()
+}
+
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -24,10 +34,18 @@ dependencies {
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
-	modImplementation "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
-	modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
+	modCompile "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
+	modCompile "io.github.prospector:modmenu:${project.modmenu_version}"
+
 	modCompile "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
 	include "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
+
+	modCompile "io.github.cottonmc:UniversalComponents:${project.universal_components_version}"
+	include "io.github.cottonmc:UniversalComponents:${project.universal_components_version}"
+
+	modCompile "io.github.OnyxStudios:Cardinal-Components-API:${project.cardinal_components_version}"
+	include "io.github.OnyxStudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components_version}"
+	include "io.github.OnyxStudios.Cardinal-Components-API:cardinal-components-item:${project.cardinal_components_version}"
 }
 
 processResources {
@@ -60,15 +78,6 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 jar {
 	from "LICENSE"
-}
-
-// Custom Repos
-repositories {
-	maven {
-		name = "CottonMC"
-		url = "http://server.bbkr.space/artifactory/libs-release"
-	}
-	jcenter()
 }
 
 

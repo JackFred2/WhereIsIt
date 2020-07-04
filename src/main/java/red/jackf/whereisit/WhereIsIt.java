@@ -55,6 +55,7 @@ public class WhereIsIt implements ModInitializer {
         CONFIG = AutoConfig.getConfigHolder(WhereIsItConfig.class).getConfig();
         SEARCHER = new Searcher();
 
+
         // Plugins
         List<EntrypointContainer<WhereIsItEntrypoint>> entrypointContainers = FabricLoader.getInstance().getEntrypointContainers("whereisit", WhereIsItEntrypoint.class);
         entrypointContainers.sort(Comparator.comparingInt(e -> e.getEntrypoint().getPriority()));
@@ -62,8 +63,7 @@ public class WhereIsIt implements ModInitializer {
         for (EntrypointContainer<WhereIsItEntrypoint> entrypointContainer : entrypointContainers) {
             try {
                 WhereIsItEntrypoint entrypoint = entrypointContainer.getEntrypoint();
-                entrypoint.setupItemBehaviors(SEARCHER);
-                entrypoint.setupWorldBehaviors(SEARCHER);
+                entrypoint.setupBehaviors(SEARCHER);
                 pluginList.append(entrypointContainer.getProvider().getMetadata().getId()).append(", ");
             } catch (Exception ex) {
                 log("Error loading plugin from " + entrypointContainer.getProvider().getMetadata().getId() + ": " + ex.getLocalizedMessage());
@@ -71,6 +71,8 @@ public class WhereIsIt implements ModInitializer {
         }
         log("Loaded plugins: " + pluginList.toString().substring(0, pluginList.length() - 2));
 
+
+        // Actual searching code
         ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {
             Item toFind = SearchC2S.read(packetByteBuf);
             if (toFind != Items.AIR) {

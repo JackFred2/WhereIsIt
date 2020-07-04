@@ -20,7 +20,7 @@ import red.jackf.whereisit.api.WhereIsItEntrypoint;
 public class VanillaItemBehaviors implements WhereIsItEntrypoint {
 
     @Override
-    public void setupWorldBehaviors(Searcher searcher) {
+    public void setupBehaviors(Searcher searcher) {
 
         // Behaviors for standard inventories - Chests, hoppers, anything that implements
         // {@link net.minecraft.inventory.Inventory}
@@ -59,12 +59,8 @@ public class VanillaItemBehaviors implements WhereIsItEntrypoint {
                 return FoundType.NOT_FOUND;
             })
         );
-    }
 
-    @Override
-    public void setupItemBehaviors(Searcher searcher) {
-
-        // Shulker Box
+        // Shulker Box in inventories
         searcher.addItemBehavior(
             (itemStack -> itemStack.getItem() instanceof BlockItem && ((BlockItem) (itemStack.getItem())).getBlock() instanceof ShulkerBoxBlock),
             ((stack, searchingFor) -> {
