@@ -4,6 +4,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import red.jackf.whereisit.FoundType;
+import red.jackf.whereisit.Searcher;
 import red.jackf.whereisit.WhereIsIt;
 
 import java.util.function.Predicate;
@@ -37,8 +38,8 @@ public abstract class InventoryUtils {
         if (itemStack.getItem() == searchingFor) {
             return FoundType.FOUND;
         } else if (!itemStack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch) {
-            for (Predicate<ItemStack> predicate : WhereIsIt.itemBehaviors.keySet()) {
-                if (predicate.test(itemStack) && WhereIsIt.itemBehaviors.get(predicate).containsItem(searchingFor, itemStack)) {
+            for (Predicate<ItemStack> predicate : Searcher.itemBehaviors.keySet()) {
+                if (predicate.test(itemStack) && Searcher.itemBehaviors.get(predicate).containsItem(searchingFor, itemStack)) {
                     return FoundType.FOUND_DEEP;
                 }
             }

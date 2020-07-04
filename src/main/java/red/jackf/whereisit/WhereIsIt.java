@@ -1,39 +1,26 @@
 package red.jackf.whereisit;
 
-import io.netty.buffer.Unpooled;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
-import me.shedaniel.rei.api.REIPluginEntry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import red.jackf.whereisit.api.CustomItemBehavior;
-import red.jackf.whereisit.api.CustomWorldBehavior;
 import red.jackf.whereisit.api.WhereIsItEntrypoint;
 import red.jackf.whereisit.network.FoundS2C;
 import red.jackf.whereisit.network.SearchC2S;
 
 import java.util.*;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public class WhereIsIt implements ModInitializer {
     public static final String MODID = "whereisit";
@@ -42,7 +29,7 @@ public class WhereIsIt implements ModInitializer {
         return new Identifier(MODID, path);
     }
 
-    protected static void log(String str) {
+    public static void log(String str) {
         LOGGER.info(str);
     }
 
@@ -54,9 +41,6 @@ public class WhereIsIt implements ModInitializer {
     public static boolean REILoaded = false;
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    public static final Map<Predicate<ItemStack>, CustomItemBehavior> itemBehaviors = new HashMap<>();
-    public static final Map<Predicate<BlockState>, CustomWorldBehavior> worldBehaviors = new HashMap<>();
 
     @Override
     public void onInitialize() {
@@ -76,8 +60,8 @@ public class WhereIsIt implements ModInitializer {
         for (EntrypointContainer<WhereIsItEntrypoint> entrypointContainer : entrypointContainers) {
             try {
                 WhereIsItEntrypoint entrypoint = entrypointContainer.getEntrypoint();
-                entrypoint.setupItemBehaviors(itemBehaviors);
-                entrypoint.setupWorldBehaviors(worldBehaviors);
+                entrypoint.setupItemBehaviors(Searcher.itemBehaviors);
+                entrypoint.setupWorldBehaviors(Searcher.worldBehaviors);
                 pluginList.append(entrypointContainer.getProvider().getMetadata().getId()).append(", ");
             } catch (Exception ex) {
                 log("Error loading plugin from " + entrypointContainer.getProvider().getMetadata().getId() + ": " + ex.getLocalizedMessage());
@@ -93,47 +77,15 @@ public class WhereIsIt implements ModInitializer {
                     BlockPos basePos = packetContext.getPlayer().getBlockPos();
                     ServerWorld world = (ServerWorld) packetContext.getPlayer().getEntityWorld();
 
-                    boolean closeScreen = false;
-
-                    Map<BlockPos, FoundType> positions = new HashMap<>();
-
-                    final int radius = WhereIsIt.CONFIG.searchRadius;
-
-                    BlockPos.Mutable checkPos = new BlockPos.Mutable();
-
                     long beforeTime = System.nanoTime();
 
-                    for (int y = Math.max(-radius + basePos.getY(), 0); y < Math.min(radius + 1 + basePos.getY(), world.getDimensionHeight()); y++) {
-                        for (int x = -radius + basePos.getX(); x < radius + 1 + basePos.getX(); x++) {
-                            for (int z = -radius + basePos.getZ(); z < radius + 1 + basePos.getZ(); z++) {
-                                checkPos.set(x, y, z);
-                                BlockState state = world.getBlockState(checkPos);
-                                try {
-                                    for (Map.Entry<Predicate<BlockState>, CustomWorldBehavior> entry : worldBehaviors.entrySet()) {
-                                        if (entry.getKey().test(state)) {
-                                            FoundType result = entry.getValue().containsItem(toFind, state, checkPos, world);
-                                            if (result != FoundType.NOT_FOUND) {
-                                                positions.put(checkPos.toImmutable(), result);
-                                                closeScreen = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                } catch (Exception ex) {
-                                    log("Error searching for item: " + ex.toString() + "|" + Arrays.toString(ex.getStackTrace()));
-                                }
-                            }
-                        }
-                    }
+                    Map<BlockPos, FoundType> positions = Searcher.search(basePos, world, toFind);
 
                     packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
 
                     if (positions.size() > 0) {
                         FoundS2C packet = new FoundS2C(positions);
                         ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, packet);
-                    }
-
-                    if (closeScreen) {
                         ((ServerPlayerEntity) packetContext.getPlayer()).closeHandledScreen();
                     }
 
