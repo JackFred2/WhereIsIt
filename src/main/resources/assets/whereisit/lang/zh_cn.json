@@ -4,6 +4,9 @@
     "text.autoconfig.whereisit.option.serverOptions.searchRadius": "物品搜索范围",
     "text.autoconfig.whereisit.option.serverOptions.doDeepSearch": "进行深度搜索",
     "text.autoconfig.whereisit.option.serverOptions.doDeepSearch.@Tooltip": "是否搜索容器内的物品 (潜影盒)",
+    "text.autoconfig.whereisit.option.serverOptions.printSearchTime": "Print Search Time",
+    "text.autoconfig.whereisit.option.serverOptions.cooldownTicks": "Search Cooldown Period",
+    "text.autoconfig.whereisit.option.serverOptions.cooldownTicks.@Tooltip": "Minimum ticks between search requests per person",
     "text.autoconfig.whereisit.category.clientOptions": "Client Options",
     "text.autoconfig.whereisit.option.clientOptions.colour": "方块轮廓颜色",
     "text.autoconfig.whereisit.option.clientOptions.colour.@Tooltip": "找到物品时显示的颜色.",
@@ -11,5 +14,6 @@
     "text.autoconfig.whereisit.option.clientOptions.alternateColour.@Tooltip": "深度搜索时找打物品时显示的颜色",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime": "淡出时间",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@Tooltip": "轮廓淡出时间(单位为刻)",
-    "text.autoconfig.whereisit.title": "Where Is It 配置"
+    "text.autoconfig.whereisit.title": "Where Is It 配置",
+    "whereisit.slowDown": "[Where Is It] Slow down!"
 }

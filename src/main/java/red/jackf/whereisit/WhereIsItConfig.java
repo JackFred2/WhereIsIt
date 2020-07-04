@@ -23,6 +23,7 @@ public class WhereIsItConfig implements ConfigData {
     public int getSearchRadius() { return serverOptions.searchRadius; }
     public boolean doDeepSearch() { return serverOptions.doDeepSearch; }
     public boolean printSearchTime() { return serverOptions.printSearchTime; }
+    public int getCooldown() { return serverOptions.cooldownTicks; }
 
     static class Client {
         @ConfigEntry.BoundedDiscrete(max = 300, min = 10)
@@ -39,13 +40,17 @@ public class WhereIsItConfig implements ConfigData {
     }
 
     static class Server {
-        @ConfigEntry.BoundedDiscrete(max = 16)
+        @ConfigEntry.BoundedDiscrete(max = 16, min = 4)
         public int searchRadius = 12;
 
         @ConfigEntry.Gui.Tooltip
         public boolean doDeepSearch = true;
 
         public boolean printSearchTime = false;
+
+        @ConfigEntry.BoundedDiscrete(max = 50, min = 0)
+        @ConfigEntry.Gui.Tooltip
+        public int cooldownTicks = 10;
     }
 
     @Override
@@ -55,5 +60,6 @@ public class WhereIsItConfig implements ConfigData {
         clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 0, 300);
 
         serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 0, 16);
+        serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.searchRadius, 0, 50);
     }
 }

@@ -8,9 +8,12 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
@@ -36,9 +39,10 @@ public class WhereIsIt implements ModInitializer {
         LOGGER.info(str);
     }
 
-
     public static final Identifier FIND_ITEM_PACKET_ID = id("find_item_c2s");
     public static final Identifier FOUND_ITEMS_PACKET_ID = id("found_item_s2c");
+
+    private static final Map<UUID, Long> rateLimitMap = new HashMap<>();
 
     public static boolean REILoaded = false;
 
@@ -83,16 +87,19 @@ public class WhereIsIt implements ModInitializer {
 
                     long beforeTime = System.nanoTime();
 
-                    Map<BlockPos, FoundType> positions = SEARCHER.searchWorld(basePos, world, toFind);
-
-                    if (WhereIsIt.CONFIG.printSearchTime()) packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
-
-                    if (positions.size() > 0) {
-                        FoundS2C packet = new FoundS2C(positions);
-                        ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, packet);
-                        ((ServerPlayerEntity) packetContext.getPlayer()).closeHandledScreen();
+                    if (world.getTime() >= rateLimitMap.getOrDefault(packetContext.getPlayer().getUuid(), 0L) + WhereIsIt.CONFIG.getCooldown()) {
+                        Map<BlockPos, FoundType> positions = SEARCHER.searchWorld(basePos, world, toFind);
+                        if (positions.size() > 0) {
+                            FoundS2C packet = new FoundS2C(positions);
+                            ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, packet);
+                            ((ServerPlayerEntity) packetContext.getPlayer()).closeHandledScreen();
+                        }
+                        rateLimitMap.put(packetContext.getPlayer().getUuid(), world.getTime());
+                    } else {
+                        packetContext.getPlayer().sendMessage(new TranslatableText("whereisit.slowDown").formatted(Formatting.YELLOW), false);
                     }
 
+                    if (WhereIsIt.CONFIG.printSearchTime()) packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
                 });
             }
         }));
