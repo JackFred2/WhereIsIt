@@ -12,6 +12,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -19,11 +20,14 @@ import java.util.List;
 @SuppressWarnings("UnstableApiUsage")
 @Environment(EnvType.CLIENT)
 public class REIHandler {
-    private REIHandler() {};
+    private REIHandler() {
+    }
 
-    public static Item findREIItems(double mouseX, double mouseY) {
+    ;
+
+    public static ItemStack findREIItems(double mouseX, double mouseY) {
         // Big List
-        Item item = tryFindItem(ContainerScreenOverlay.getEntryListWidget().children(), mouseX, mouseY);
+        ItemStack item = tryFindItem(ContainerScreenOverlay.getEntryListWidget().children(), mouseX, mouseY);
         if (item != null) return item;
 
         // Favourites
@@ -33,7 +37,7 @@ public class REIHandler {
         }
 
         if (MinecraftClient.getInstance().currentScreen instanceof RecipeViewingScreen
-         || MinecraftClient.getInstance().currentScreen instanceof VillagerRecipeViewingScreen) {
+            || MinecraftClient.getInstance().currentScreen instanceof VillagerRecipeViewingScreen) {
             item = tryFindItem((MinecraftClient.getInstance().currentScreen).children(), mouseX, mouseY);
             if (item != null) return item;
         }
@@ -42,7 +46,7 @@ public class REIHandler {
     }
 
     @Nullable
-    private static Item tryFindItem(@Nullable List<? extends Element> elements, double mouseX, double mouseY) {
+    private static ItemStack tryFindItem(@Nullable List<? extends Element> elements, double mouseX, double mouseY) {
         if (elements == null) return null;
         for (Element element : elements) {
             if (element instanceof Widget) {
@@ -51,7 +55,7 @@ public class REIHandler {
                     EntryWidget entryWidget = (EntryWidget) widget;
                     for (EntryStack entryStack : entryWidget.getEntries()) {
                         if (entryStack instanceof ItemEntryStack) {
-                            return entryStack.getItem();
+                            return entryStack.getItemStack();
                         }
                     }
                 }

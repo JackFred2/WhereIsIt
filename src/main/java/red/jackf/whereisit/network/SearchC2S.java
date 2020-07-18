@@ -1,20 +1,53 @@
 package red.jackf.whereisit.network;
 
 import io.netty.buffer.Unpooled;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.item.Item;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SearchC2S extends PacketByteBuf {
-    public SearchC2S(@NotNull Item toFind) {
+    public SearchC2S(@NotNull Item toFind, boolean matchNbt, @Nullable CompoundTag nbtCompound) {
         super(Unpooled.buffer());
         this.writeIdentifier(Registry.ITEM.getId(toFind));
+        this.writeBoolean(matchNbt);
+        if (matchNbt) {
+            this.writeCompoundTag(nbtCompound);
+        }
     }
 
-    public static Item read(PacketByteBuf buf) {
-        return Registry.ITEM.get(buf.readIdentifier());
+    public static Context read(PacketByteBuf buf) {
+        Item item = Registry.ITEM.get(buf.readIdentifier());
+        boolean matchNbt = buf.readBoolean();
+        CompoundTag tag = matchNbt ? buf.readCompoundTag() : null;
+        return new Context(item, matchNbt, tag);
+    }
+
+    public static class Context {
+        private final Item item;
+        private final boolean matchNbt;
+        @Nullable
+        private final CompoundTag tag;
+
+        public Context(Item item, boolean matchNbt, @Nullable CompoundTag tag) {
+            this.item = item;
+            this.matchNbt = matchNbt;
+            this.tag = tag;
+        }
+
+        public Item getItem() {
+            return item;
+        }
+
+        public boolean matchNbt() {
+            return matchNbt;
+        }
+
+        @Nullable
+        public CompoundTag getTag() {
+            return tag;
+        }
     }
 }

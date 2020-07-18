@@ -2,14 +2,12 @@ package red.jackf.whereisit.api;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import red.jackf.whereisit.FoundType;
 
 /**
  * Defines a custom behavior for an item when searching for 'sub-items'.
  * Intended for items with inventories such as Shulker Boxes, Backpacks, Strongboxes etc.
- *
- * These are not ran by default for {@link red.jackf.whereisit.api.CustomWorldBehavior}s , and must be ran for each item
- * separately.
  */
 public interface CustomItemBehavior {
 
@@ -18,5 +16,5 @@ public interface CustomItemBehavior {
      * @param searchingFor The item that is currently being searched for.
      * @return Whether `item` contains any instances of `searchingFor`.
      */
-    boolean containsItem(ItemStack item, Item searchingFor);
+    boolean containsItem(ItemStack item, Item searchingFor, CompoundTag searchingForNbt);
 }

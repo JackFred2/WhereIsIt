@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,21 +19,21 @@ import red.jackf.whereisit.WhereIsItClient;
 @Environment(EnvType.CLIENT)
 @Mixin(Screen.class)
 public abstract class MixinScreen {
-    @Inject(method= "keyPressed", at=@At("TAIL"))
+    @Inject(method = "keyPressed", at = @At("TAIL"))
     private void handleModdedKeys(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-         if (WhereIsItClient.FIND_ITEMS.matchesKey(keyCode, scanCode)) {
-             if (WhereIsIt.REILoaded) {
-                 double gameScale = (double) MinecraftClient.getInstance().getWindow().getScaledWidth() / (double) MinecraftClient.getInstance().getWindow().getWidth();
-                 double mouseX = MinecraftClient.getInstance().mouse.getX() * gameScale;
-                 double mouseY = MinecraftClient.getInstance().mouse.getY() * gameScale;
+        if (WhereIsItClient.FIND_ITEMS.matchesKey(keyCode, scanCode)) {
+            if (WhereIsIt.REILoaded) {
+                double gameScale = (double) MinecraftClient.getInstance().getWindow().getScaledWidth() / (double) MinecraftClient.getInstance().getWindow().getWidth();
+                double mouseX = MinecraftClient.getInstance().mouse.getX() * gameScale;
+                double mouseY = MinecraftClient.getInstance().mouse.getY() * gameScale;
 
-                 Item itemToFind = REIHandler.findREIItems(mouseX, mouseY);
+                ItemStack itemToFind = REIHandler.findREIItems(mouseX, mouseY);
 
-                 if (itemToFind != null) {
-                     WhereIsItClient.sendItemFindPacket(itemToFind);
-                     //cir.setReturnValue(true);
-                 }
-             }
-         }
+                if (itemToFind != null) {
+                    WhereIsItClient.sendItemFindPacket(itemToFind.getItem(), Screen.hasShiftDown(), itemToFind.getTag());
+                    //cir.setReturnValue(true);
+                }
+            }
+        }
     }
 }

@@ -27,10 +27,10 @@ public class VanillaItemBehaviors implements WhereIsItEntrypoint {
         searcher.addWorldBehavior(
             blockState ->
                 blockState.getBlock() instanceof BlockWithEntity,
-            (searchingFor, state, pos, world) -> {
+            (searchingFor, searchingForNbt, state, pos, world) -> {
                 BlockEntity be = world.getBlockEntity(pos);
                 if (be instanceof Inventory) {
-                    return InventoryUtils.invContains((Inventory) be, searchingFor);
+                    return InventoryUtils.invContains((Inventory) be, searchingFor, searchingForNbt, true);
                 }
                 return FoundType.NOT_FOUND;
             }
@@ -41,20 +41,20 @@ public class VanillaItemBehaviors implements WhereIsItEntrypoint {
         searcher.addWorldBehavior(
             blockState ->
                 blockState.getBlock() instanceof InventoryProvider,
-            (searchingFor, state, pos, world) -> {
+            (searchingFor, searchingForNbt, state, pos, world) -> {
                 Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
                 if (inv == null) return FoundType.NOT_FOUND;
-                return InventoryUtils.invContains(inv, searchingFor);
+                return InventoryUtils.invContains(inv, searchingFor, searchingForNbt, true);
             }
         );
 
         // Lecterns
         searcher.addWorldBehavior(
             blockState -> blockState.getBlock() instanceof LecternBlock && blockState.get(LecternBlock.HAS_BOOK),
-            ((searchingFor, state, pos, world) -> {
+            ((searchingFor, searchingForNbt, state, pos, world) -> {
                 BlockEntity be = world.getBlockEntity(pos);
                 if (be instanceof LecternBlockEntity) {
-                    return WhereIsIt.SEARCHER.searchItemStack(((LecternBlockEntity) be).getBook(), searchingFor);
+                    return WhereIsIt.SEARCHER.searchItemStack(((LecternBlockEntity) be).getBook(), searchingFor, searchingForNbt, true);
                 }
                 return FoundType.NOT_FOUND;
             })
@@ -63,12 +63,13 @@ public class VanillaItemBehaviors implements WhereIsItEntrypoint {
         // Shulker Box in inventories
         searcher.addItemBehavior(
             (itemStack -> itemStack.getItem() instanceof BlockItem && ((BlockItem) (itemStack.getItem())).getBlock() instanceof ShulkerBoxBlock),
-            ((stack, searchingFor) -> {
+            ((stack, searchingFor, searchingForNbt) -> {
                 CompoundTag tag = stack.getSubTag("BlockEntityTag");
                 if (tag != null && tag.contains("Items", 9)) {
                     ListTag items = tag.getList("Items", 10);
                     for (int i = 0; i < items.size(); i++) {
-                        if (ItemStack.fromTag(items.getCompound(i)).getItem() == searchingFor) {
+                        ItemStack containedStack = ItemStack.fromTag(items.getCompound(i));
+                        if (containedStack.getItem() == searchingFor && (searchingForNbt == null || searchingForNbt.equals(containedStack.getTag()))) {
                             return true;
                         }
                     }

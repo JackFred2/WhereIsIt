@@ -10,6 +10,7 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Matrix4f;
@@ -71,9 +72,9 @@ public class WhereIsItClient implements ClientModInitializer {
         });
     }
 
-    public static void sendItemFindPacket(@NotNull Item item) {
+    public static void sendItemFindPacket(@NotNull Item item, boolean matchNbt, CompoundTag tag) {
         //WhereIsIt.log("Looking for " + item.toString());
-        SearchC2S packet = new SearchC2S(item);
+        SearchC2S packet = new SearchC2S(item, matchNbt, tag);
         ClientSidePacketRegistry.INSTANCE.sendToServer(WhereIsIt.FIND_ITEM_PACKET_ID, packet);
     }
 

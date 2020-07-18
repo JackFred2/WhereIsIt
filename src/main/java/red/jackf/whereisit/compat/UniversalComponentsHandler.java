@@ -6,13 +6,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import red.jackf.whereisit.FoundType;
+import red.jackf.whereisit.api.InventoryUtils;
 
 import java.util.Optional;
 
 public class UniversalComponentsHandler {
-    public static boolean searchItem(ItemStack item, Item searchingFor) {
+    public static boolean searchItem(ItemStack item, Item searchingFor, CompoundTag searchingForNbt) {
         Optional<InventoryComponent> comp = UniversalComponents.INVENTORY_COMPONENT.maybeGet(item);
-        return comp.isPresent() && comp.get().contains(searchingFor);
+        return comp.isPresent() && InventoryUtils.invContains(comp.get().asInventory(), searchingFor, searchingForNbt, false) != FoundType.NOT_FOUND;
     }
 
     public static boolean hasInvComponent(ItemStack item) {

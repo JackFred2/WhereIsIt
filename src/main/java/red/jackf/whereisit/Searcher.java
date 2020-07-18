@@ -3,6 +3,7 @@ package red.jackf.whereisit;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
@@ -18,7 +19,7 @@ public class Searcher {
     private final List<ItemBehavior> itemBehaviors = new LinkedList<>();
     private final List<WorldBehavior> worldBehaviors = new LinkedList<>();
 
-    public Map<BlockPos, FoundType> searchWorld(BlockPos basePos, ServerWorld world, Item toFind) {
+    public Map<BlockPos, FoundType> searchWorld(BlockPos basePos, ServerWorld world, Item toFind, CompoundTag toFindTag) {
         Map<BlockPos, FoundType> positions = new HashMap<>();
         final int radius = WhereIsIt.CONFIG.getSearchRadius();
         BlockPos.Mutable checkPos = new BlockPos.Mutable();
@@ -50,7 +51,7 @@ public class Searcher {
                             try {
                                 for (WorldBehavior entry : worldBehaviors) {
                                     if (entry.getTest().test(state)) {
-                                        FoundType result = entry.getAction().containsItem(toFind, state, checkPos, world);
+                                        FoundType result = entry.getAction().containsItem(toFind, toFindTag, state, checkPos, world);
                                         if (result != FoundType.NOT_FOUND) {
                                             positions.put(checkPos.toImmutable(), result);
                                             break;
@@ -68,12 +69,12 @@ public class Searcher {
         return positions;
     }
 
-    public FoundType searchItemStack(ItemStack itemStack, Item toFind) {
-        if (itemStack.getItem() == toFind) {
+    public FoundType searchItemStack(ItemStack itemStack, Item toFind, CompoundTag nbtToFind, boolean deepSearch) {
+        if (itemStack.getItem() == toFind && (nbtToFind == null || nbtToFind.equals(itemStack.getTag()))) {
             return FoundType.FOUND;
-        } else if (!itemStack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch()) {
+        } else if (!itemStack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch() && deepSearch) {
             for (ItemBehavior behavior : itemBehaviors) {
-                if (behavior.getTest().test(itemStack) && behavior.getAction().containsItem(itemStack, toFind)) {
+                if (behavior.getTest().test(itemStack) && behavior.getAction().containsItem(itemStack, toFind, nbtToFind)) {
                     return FoundType.FOUND_DEEP;
                 }
             }

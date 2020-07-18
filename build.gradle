@@ -19,8 +19,11 @@ repositories {
 		name = "CottonMC"
 		url = "http://server.bbkr.space/artifactory/libs-release"
 	}
-	maven { url = 'https://jitpack.io' }
+	maven { url = "https://maven.fabricmc.net" }
 	jcenter()
+
+	// cardinal components
+	maven { url = 'https://jitpack.io' }
 }
 
 dependencies {
@@ -43,9 +46,9 @@ dependencies {
 	modCompile "io.github.cottonmc:UniversalComponents:${project.universal_components_version}"
 	include "io.github.cottonmc:UniversalComponents:${project.universal_components_version}"
 
-	modCompile "io.github.OnyxStudios:Cardinal-Components-API:${project.cardinal_components_version}"
-	include "io.github.OnyxStudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components_version}"
-	include "io.github.OnyxStudios.Cardinal-Components-API:cardinal-components-item:${project.cardinal_components_version}"
+	modCompile "io.github.onyxstudios:Cardinal-Components-API:${project.cardinal_components_version}"
+	include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components_version}"
+	include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:${project.cardinal_components_version}"
 }
 
 processResources {

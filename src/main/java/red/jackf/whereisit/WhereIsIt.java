@@ -78,7 +78,8 @@ public class WhereIsIt implements ModInitializer {
 
         // Actual searching code
         ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {
-            Item toFind = SearchC2S.read(packetByteBuf);
+            SearchC2S.Context searchContext = SearchC2S.read(packetByteBuf);
+            Item toFind = searchContext.getItem();
             if (toFind != Items.AIR) {
                 packetContext.getTaskQueue().execute(() -> {
 
@@ -88,7 +89,7 @@ public class WhereIsIt implements ModInitializer {
                     long beforeTime = System.nanoTime();
 
                     if (world.getTime() >= rateLimitMap.getOrDefault(packetContext.getPlayer().getUuid(), 0L) + WhereIsIt.CONFIG.getCooldown()) {
-                        Map<BlockPos, FoundType> positions = SEARCHER.searchWorld(basePos, world, toFind);
+                        Map<BlockPos, FoundType> positions = SEARCHER.searchWorld(basePos, world, toFind, searchContext.getTag());
                         if (positions.size() > 0) {
                             FoundS2C packet = new FoundS2C(positions);
                             ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, packet);
@@ -99,7 +100,8 @@ public class WhereIsIt implements ModInitializer {
                         packetContext.getPlayer().sendMessage(new TranslatableText("whereisit.slowDown").formatted(Formatting.YELLOW), false);
                     }
 
-                    if (WhereIsIt.CONFIG.printSearchTime()) packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
+                    if (WhereIsIt.CONFIG.printSearchTime())
+                        packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
                 });
             }
         }));
