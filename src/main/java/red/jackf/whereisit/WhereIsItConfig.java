@@ -60,6 +60,6 @@ public class WhereIsItConfig implements ConfigData {
         clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 0, 300);
 
         serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 0, 16);
-        serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.searchRadius, 0, 50);
+        serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
     }
 }
