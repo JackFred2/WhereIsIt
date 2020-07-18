@@ -44,11 +44,6 @@ dependencies {
 	include "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
 
 	modCompile "io.github.cottonmc:UniversalComponents:${project.universal_components_version}"
-	include "io.github.cottonmc:UniversalComponents:${project.universal_components_version}"
-
-	modCompile "io.github.onyxstudios:Cardinal-Components-API:${project.cardinal_components_version}"
-	include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components_version}"
-	include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:${project.cardinal_components_version}"
 }
 
 processResources {

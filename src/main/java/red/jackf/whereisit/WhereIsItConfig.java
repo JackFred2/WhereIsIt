@@ -50,7 +50,7 @@ public class WhereIsItConfig implements ConfigData {
 
         @ConfigEntry.BoundedDiscrete(max = 50, min = 0)
         @ConfigEntry.Gui.Tooltip
-        public int cooldownTicks = 10;
+        public int cooldownTicks = 5;
     }
 
     @Override

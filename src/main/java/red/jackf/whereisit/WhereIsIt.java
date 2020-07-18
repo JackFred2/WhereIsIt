@@ -2,6 +2,8 @@ package red.jackf.whereisit;
 
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
@@ -88,7 +90,7 @@ public class WhereIsIt implements ModInitializer {
 
                     long beforeTime = System.nanoTime();
 
-                    if (world.getTime() >= rateLimitMap.getOrDefault(packetContext.getPlayer().getUuid(), 0L) + WhereIsIt.CONFIG.getCooldown()) {
+                    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT || world.getTime() >= rateLimitMap.getOrDefault(packetContext.getPlayer().getUuid(), 0L) + WhereIsIt.CONFIG.getCooldown()) {
                         Map<BlockPos, FoundType> positions = SEARCHER.searchWorld(basePos, world, toFind, searchContext.getTag());
                         if (positions.size() > 0) {
                             FoundS2C packet = new FoundS2C(positions);
