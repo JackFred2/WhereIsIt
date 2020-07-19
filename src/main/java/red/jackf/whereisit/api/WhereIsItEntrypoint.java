@@ -15,6 +15,7 @@ public interface WhereIsItEntrypoint {
 
     /**
      * Set up custom item and world behaviors to search.
+     *
      * @param searcher The searcher object to use -
      *                 call {@link red.jackf.whereisit.Searcher#addItemBehavior(Predicate, CustomItemBehavior)} and
      *                 call {@link red.jackf.whereisit.Searcher#addWorldBehavior(Predicate, CustomWorldBehavior)}

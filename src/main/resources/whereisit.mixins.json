@@ -1,17 +1,18 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "package": "red.jackf.whereisit.mixin",
-    "compatibilityLevel": "JAVA_8",
-    "mixins": [
-    ],
-    "client": [
-        "MixinDebugHud",
-        "MixinWorldRenderer",
-        "MixinHandledScreen",
-        "MixinScreen"
-    ],
-    "injectors": {
-        "defaultRequire": 1
+  "required": true,
+  "minVersion": "0.8",
+  "package": "red.jackf.whereisit.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "MixinDebugHud",
+    "MixinHandledScreen",
+    "MixinScreen",
+    "MixinWorldRenderer",
+    "AccessorRenderPhase"
+  ],
+  "injectors": {
+    "defaultRequire": 1
   }
 }

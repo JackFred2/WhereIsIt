@@ -2,13 +2,9 @@ package red.jackf.whereisit.api;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import red.jackf.whereisit.FoundType;
-import red.jackf.whereisit.Searcher;
 import red.jackf.whereisit.WhereIsIt;
-
-import java.util.function.Predicate;
 
 /**
  * A collection of utilities for searching inventories.

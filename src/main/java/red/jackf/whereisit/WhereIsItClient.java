@@ -3,9 +3,9 @@ package red.jackf.whereisit;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
-import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -44,16 +44,16 @@ public class WhereIsItClient implements ClientModInitializer {
     public static final List<FoundItemPos> FOUND_ITEM_POSITIONS = new ArrayList<>();
     public static final Map<VoxelShape, List<Box>> CACHED_SHAPES = new HashMap<>();
 
-    public static final FabricKeyBinding FIND_ITEMS = FabricKeyBinding.Builder.create(
-        id("find_items"),
+    public static final KeyBinding FIND_ITEMS = new KeyBinding(
+        id("find_items").toString(),
         InputUtil.Type.KEYSYM,
         89,
         "key.categories.inventory"
-    ).build();
+    );
 
     @Override
     public void onInitializeClient() {
-        KeyBindingRegistry.INSTANCE.register(FIND_ITEMS);
+        KeyBindingHelper.registerKeyBinding(FIND_ITEMS);
 
         ClientSidePacketRegistry.INSTANCE.register(WhereIsIt.FOUND_ITEMS_PACKET_ID, (packetContext, packetByteBuf) -> {
             Map<BlockPos, FoundType> results = FoundS2C.read(packetByteBuf);

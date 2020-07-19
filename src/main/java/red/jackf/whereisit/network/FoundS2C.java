@@ -1,9 +1,6 @@
 package red.jackf.whereisit.network;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import red.jackf.whereisit.FoundType;

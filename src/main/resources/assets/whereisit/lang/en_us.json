@@ -14,6 +14,7 @@
     "text.autoconfig.whereisit.option.clientOptions.alternateColour.@Tooltip": "Shown when an item is found in a deep search.",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime": "Fade Out Time",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@Tooltip": "Time for the outline to fade out in ticks.",
+    "text.autoconfig.whereisit.option.clientOptions.lineWidth": "Block Outline Width",
     "text.autoconfig.whereisit.title": "Where Is It Config",
     "whereisit.slowDown": "[Where Is It] Slow down!"
 }

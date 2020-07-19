@@ -17,10 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import red.jackf.whereisit.FoundType;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.WhereIsItClient;
+import red.jackf.whereisit.client.DynamicLineWidth;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalDouble;
 
 import static red.jackf.whereisit.WhereIsItClient.optimizedDrawShapeOutline;
 
@@ -35,25 +35,28 @@ public class MixinWorldRenderer {
     }, RenderSystem::disableBlend);
 
     private static final RenderLayer WII_RenderLayer = RenderLayer.of("wii_blockoutline",
-            VertexFormats.POSITION_COLOR,
-            1, 256,
-            RenderLayer.MultiPhaseParameters.builder()
-                    .lineWidth(new RenderPhase.LineWidth(OptionalDouble.empty()))
-                    .depthTest(new RenderPhase.DepthTest("pass", 519))
-                    .transparency(WII_Transparency)
-                    .build(false)
-            );
+        VertexFormats.POSITION_COLOR,
+        1, 256,
+        RenderLayer.MultiPhaseParameters.builder()
+            .lineWidth(DynamicLineWidth.get())
+            .depthTest(new RenderPhase.DepthTest("pass", 519))
+            .transparency(WII_Transparency)
+            .build(false)
+    );
 
     //@Shadow
     //private static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
 
 
-    @Shadow @Final private BufferBuilderStorage bufferBuilders;
+    @Shadow
+    @Final
+    private BufferBuilderStorage bufferBuilders;
 
-    @Shadow private ClientWorld world;
+    @Shadow
+    private ClientWorld world;
 
-    @Inject(method= "render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V",
-            at=@At(value = "TAIL"))
+    @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V",
+        at = @At(value = "TAIL"))
     public void renderFoundItemOverlay(MatrixStack matrices,
                                        float tickDelta,
                                        long limitTime,

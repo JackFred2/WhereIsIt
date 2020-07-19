@@ -16,14 +16,38 @@ public class WhereIsItConfig implements ConfigData {
     @ConfigEntry.Gui.TransitiveObject
     public Server serverOptions = new Server();
 
-    public int getFadeoutTime() { return clientOptions.fadeOutTime; }
-    public int getColour() { return clientOptions.colour; }
-    public int getAlternateColour() { return clientOptions.alternateColour; }
+    public int getFadeoutTime() {
+        return clientOptions.fadeOutTime;
+    }
 
-    public int getSearchRadius() { return serverOptions.searchRadius; }
-    public boolean doDeepSearch() { return serverOptions.doDeepSearch; }
-    public boolean printSearchTime() { return serverOptions.printSearchTime; }
-    public int getCooldown() { return serverOptions.cooldownTicks; }
+    public int getColour() {
+        return clientOptions.colour;
+    }
+
+    public int getAlternateColour() {
+        return clientOptions.alternateColour;
+    }
+
+    public int getLineWidth() {
+        return clientOptions.lineWidth;
+    }
+
+    public int getSearchRadius() {
+        return serverOptions.searchRadius;
+    }
+
+
+    public boolean doDeepSearch() {
+        return serverOptions.doDeepSearch;
+    }
+
+    public boolean printSearchTime() {
+        return serverOptions.printSearchTime;
+    }
+
+    public int getCooldown() {
+        return serverOptions.cooldownTicks;
+    }
 
     static class Client {
         @ConfigEntry.BoundedDiscrete(max = 300, min = 10)
@@ -37,6 +61,9 @@ public class WhereIsItConfig implements ConfigData {
         @ConfigEntry.ColorPicker
         @ConfigEntry.Gui.Tooltip
         public int alternateColour = 0xff4fff;
+
+        @ConfigEntry.BoundedDiscrete(max = 10, min = 1)
+        public int lineWidth = 8;
     }
 
     static class Server {

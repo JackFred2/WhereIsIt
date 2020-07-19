@@ -11,7 +11,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,8 +21,6 @@ import java.util.List;
 public class REIHandler {
     private REIHandler() {
     }
-
-    ;
 
     public static ItemStack findREIItems(double mouseX, double mouseY) {
         // Big List
@@ -39,7 +36,7 @@ public class REIHandler {
         if (MinecraftClient.getInstance().currentScreen instanceof RecipeViewingScreen
             || MinecraftClient.getInstance().currentScreen instanceof VillagerRecipeViewingScreen) {
             item = tryFindItem((MinecraftClient.getInstance().currentScreen).children(), mouseX, mouseY);
-            if (item != null) return item;
+            return item;
         }
 
         return null;
