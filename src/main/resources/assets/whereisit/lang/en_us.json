@@ -1,5 +1,5 @@
 {
-    "key.whereisit.find_items": "Find Nearby Items",
+    "whereisit:find_items": "Find Nearby Items",
     "text.autoconfig.whereisit.category.serverOptions": "Server Options",
     "text.autoconfig.whereisit.option.serverOptions.searchRadius": "Item Search Radius",
     "text.autoconfig.whereisit.option.serverOptions.doDeepSearch": "Do Deep Searching",
