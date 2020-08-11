@@ -1,6 +1,6 @@
 package red.jackf.whereisit.compat;
 
-import io.github.cottonmc.component.UniversalComponents;
+/*import io.github.cottonmc.component.UniversalComponents;
 import io.github.cottonmc.component.item.InventoryComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,4 +19,4 @@ public class UniversalComponentsHandler {
     public static boolean hasInvComponent(ItemStack item) {
         return UniversalComponents.INVENTORY_COMPONENT.maybeGet(item).isPresent();
     }
-}
+}*/

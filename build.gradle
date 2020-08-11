@@ -7,7 +7,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = "WhereIsIt-${project.minecraft_version}"
-version = "1.8.2"
+version = "1.8.3"
 group = "red.jackf"
 
 minecraft {
@@ -43,7 +43,7 @@ dependencies {
 	modCompile "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
 	include "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig_version}"
 
-	modCompile "io.github.cottonmc:UniversalComponents:${project.universal_components_version}"
+	//modCompile "io.github.cottonmc:UniversalComponents:${project.universal_components_version}"
 }
 
 processResources {

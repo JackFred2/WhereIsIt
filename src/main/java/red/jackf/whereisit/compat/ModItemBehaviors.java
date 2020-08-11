@@ -10,10 +10,10 @@ public class ModItemBehaviors implements WhereIsItEntrypoint {
     public void setupBehaviors(Searcher searcher) {
         // Universal Components item inventories
         if (FabricLoader.getInstance().isModLoaded("universalcomponents")) {
-            searcher.addItemBehavior(
+            /*searcher.addItemBehavior(
                 UniversalComponentsHandler::hasInvComponent,
                 UniversalComponentsHandler::searchItem
-            );
+            );*/
         }
     }
 }
