@@ -45,7 +45,7 @@ public class WhereIsItClient implements ClientModInitializer {
     public static final Map<VoxelShape, List<Box>> CACHED_SHAPES = new HashMap<>();
 
     public static final KeyBinding FIND_ITEMS = new KeyBinding(
-        id("find_items").toString(),
+        "key.whereisit.finditem",
         InputUtil.Type.KEYSYM,
         89,
         "key.categories.inventory"

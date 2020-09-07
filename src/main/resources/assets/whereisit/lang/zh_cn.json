@@ -1,5 +1,5 @@
 {
-    "whereisit:find_items": "搜索附近的物品",
+    "key.whereisit.finditem": "搜索附近的物品",
     "text.autoconfig.whereisit.category.serverOptions": "Server Options",
     "text.autoconfig.whereisit.option.serverOptions.searchRadius": "物品搜索范围",
     "text.autoconfig.whereisit.option.serverOptions.doDeepSearch": "进行深度搜索",
