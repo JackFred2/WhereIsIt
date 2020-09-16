@@ -1,48 +1,23 @@
 package red.jackf.whereisit.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import red.jackf.whereisit.FoundType;
-import red.jackf.whereisit.WhereIsIt;
-import red.jackf.whereisit.WhereIsItClient;
 import red.jackf.whereisit.client.DynamicLineWidth;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static red.jackf.whereisit.WhereIsItClient.optimizedDrawShapeOutline;
+import red.jackf.whereisit.client.RenderUtils;
 
 @Environment(EnvType.CLIENT)
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
-    private final List<WhereIsItClient.FoundItemPos> wii_outlinesToRemove = new ArrayList<>();
-
-    private static final RenderPhase.Transparency WII_Transparency = new RenderPhase.Transparency("wii_translucent_transparency", () -> {
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-    }, RenderSystem::disableBlend);
-
-    private static final RenderLayer WII_RenderLayer = RenderLayer.of("wii_blockoutline",
-        VertexFormats.POSITION_COLOR,
-        1, 256,
-        RenderLayer.MultiPhaseParameters.builder()
-            .lineWidth(DynamicLineWidth.get())
-            .depthTest(new RenderPhase.DepthTest("pass", 519))
-            .transparency(WII_Transparency)
-            .build(false)
-    );
 
     //@Shadow
     //private static void drawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {}
@@ -67,58 +42,6 @@ public class MixinWorldRenderer {
                                        Matrix4f matrix4f,
                                        CallbackInfo ci) {
         this.world.getProfiler().swap("wii_founditems");
-        Vec3d cameraPos = camera.getPos();
-        VertexConsumerProvider.Immediate immediate = this.bufferBuilders.getEntityVertexConsumers();
-        RenderSystem.disableDepthTest();
-        matrices.push();
-
-        float r = ((WhereIsIt.CONFIG.getColour() >> 16) & 0xff) / 255f;
-        float g = ((WhereIsIt.CONFIG.getColour() >> 8) & 0xff) / 255f;
-        float b = ((WhereIsIt.CONFIG.getColour()) & 0xff) / 255f;
-
-        float rAlt = ((WhereIsIt.CONFIG.getAlternateColour() >> 16) & 0xff) / 255f;
-        float gAlt = ((WhereIsIt.CONFIG.getAlternateColour() >> 8) & 0xff) / 255f;
-        float bAlt = ((WhereIsIt.CONFIG.getAlternateColour()) & 0xff) / 255f;
-
-        for (WhereIsItClient.FoundItemPos foundPos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
-            long timeDiff = this.world.getTime() - foundPos.time;
-            if (foundPos.type == FoundType.FOUND_DEEP) {
-                optimizedDrawShapeOutline(matrices,
-                    immediate.getBuffer(WII_RenderLayer),
-                    foundPos.shape,
-                    foundPos.pos.getX() - cameraPos.x,
-                    foundPos.pos.getY() - cameraPos.y,
-                    foundPos.pos.getZ() - cameraPos.z,
-                    rAlt,
-                    gAlt,
-                    bAlt,
-                    (WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime()
-                );
-            } else {
-                optimizedDrawShapeOutline(matrices,
-                    immediate.getBuffer(WII_RenderLayer),
-                    foundPos.shape,
-                    foundPos.pos.getX() - cameraPos.x,
-                    foundPos.pos.getY() - cameraPos.y,
-                    foundPos.pos.getZ() - cameraPos.z,
-                    r,
-                    g,
-                    b,
-                    (WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime()
-                );
-            }
-            if (timeDiff >= WhereIsIt.CONFIG.getFadeoutTime()) {
-                wii_outlinesToRemove.add(foundPos);
-            }
-        }
-
-        immediate.draw(WII_RenderLayer);
-        matrices.pop();
-        RenderSystem.enableDepthTest();
-
-        for (WhereIsItClient.FoundItemPos pos : wii_outlinesToRemove)
-            WhereIsItClient.FOUND_ITEM_POSITIONS.remove(pos);
-
-        wii_outlinesToRemove.clear();
+        RenderUtils.renderOutlines(matrices, this.bufferBuilders.getEntityVertexConsumers(), camera, this.world.getTime());
     }
 }

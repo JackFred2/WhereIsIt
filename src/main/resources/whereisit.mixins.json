@@ -6,13 +6,15 @@
   "mixins": [
   ],
   "client": [
+    "AccessorRenderPhase",
     "MixinDebugHud",
     "MixinHandledScreen",
     "MixinScreen",
     "MixinWorldRenderer",
-    "AccessorRenderPhase"
+    "MixinCanvasWorldRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "plugin": "red.jackf.whereisit.WhereIsItMixinConfigPlugin"
 }
