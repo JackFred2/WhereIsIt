@@ -67,8 +67,8 @@ public class WhereIsItConfig implements ConfigData {
     }
 
     static class Server {
-        @ConfigEntry.BoundedDiscrete(max = 16, min = 4)
-        public int searchRadius = 12;
+        @ConfigEntry.BoundedDiscrete(max = 24, min = 4)
+        public int searchRadius = 16;
 
         @ConfigEntry.Gui.Tooltip
         public boolean doDeepSearch = true;
@@ -84,9 +84,10 @@ public class WhereIsItConfig implements ConfigData {
     public void validatePostLoad() {
         clientOptions.colour = MathHelper.clamp(clientOptions.colour, 0x000000, 0xffffff);
         clientOptions.alternateColour = MathHelper.clamp(clientOptions.alternateColour, 0x000000, 0xffffff);
-        clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 0, 300);
+        clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 10, 300);
+        clientOptions.lineWidth = MathHelper.clamp(clientOptions.lineWidth, 1, 10);
 
-        serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 0, 16);
+        serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 4, 24);
         serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
     }
 }

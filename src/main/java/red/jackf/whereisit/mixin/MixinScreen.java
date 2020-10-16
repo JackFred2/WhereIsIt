@@ -19,7 +19,7 @@ import red.jackf.whereisit.compat.REIHandler;
 @Mixin(Screen.class)
 public abstract class MixinScreen {
     @Inject(method = "keyPressed", at = @At("TAIL"))
-    private void handleModdedKeys(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    private void whereisit$handleModdedKeys(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (WhereIsItClient.FIND_ITEMS.matchesKey(keyCode, scanCode)) {
             if (WhereIsIt.REILoaded) {
                 double gameScale = (double) MinecraftClient.getInstance().getWindow().getScaledWidth() / (double) MinecraftClient.getInstance().getWindow().getWidth();

@@ -99,8 +99,11 @@ public class WhereIsIt implements ModInitializer {
                         packetContext.getPlayer().sendMessage(new TranslatableText("whereisit.slowDown").formatted(Formatting.YELLOW), false);
                     }
 
-                    if (WhereIsIt.CONFIG.printSearchTime())
-                        packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + (System.nanoTime() - beforeTime) + "ns"), false);
+                    if (WhereIsIt.CONFIG.printSearchTime()) {
+                        long time = (System.nanoTime() - beforeTime);
+                        packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + time + "ns"), false);
+                        WhereIsIt.LOGGER.info("Lookup Time: " + time + "ns");
+                    }
                 });
             }
         }));

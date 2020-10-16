@@ -48,7 +48,7 @@ public class WhereIsItClient implements ClientModInitializer {
         "key.whereisit.finditem",
         InputUtil.Type.KEYSYM,
         89,
-        "key.categories.inventory"
+        "key.categories.whereisit"
     );
 
     @Override

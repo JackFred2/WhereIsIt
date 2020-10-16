@@ -32,7 +32,7 @@ public class MixinWorldRenderer {
 
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V",
         at = @At(value = "TAIL"))
-    public void renderFoundItemOverlay(MatrixStack matrices,
+    public void whereisit$renderFoundItemOverlay(MatrixStack matrices,
                                        float tickDelta,
                                        long limitTime,
                                        boolean renderBlockOutline,
