@@ -26,7 +26,8 @@ public class MixinCanvasWorldRenderer {
     private WorldRendererExt wr;
 
     //@Inject(method = "Lgrondag/canvas/render/CanvasWorldRenderer;renderWorld(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V", at = @At("TAIL"))
-    @Inject(method = "Lgrondag/canvas/render/CanvasWorldRenderer;renderWorld(Lnet/minecraft/class_4587;FJZLnet/minecraft/class_4184;Lnet/minecraft/class_757;Lnet/minecraft/class_765;Lnet/minecraft/class_1159;)V", at = @At("TAIL"), remap = false)
+    @SuppressWarnings("UnresolvedMixinReference")
+    @Inject(method = "renderWorld(Lnet/minecraft/class_4587;FJZLnet/minecraft/class_4184;Lnet/minecraft/class_757;Lnet/minecraft/class_765;Lnet/minecraft/class_1159;)V", at = @At("TAIL"), remap = false)
     public void whereisit$renderOutlines(MatrixStack matrices, float tickDelta, long limitTime, boolean blockOutlines, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
         this.world.getProfiler().swap("wii_founditems");
         RenderUtils.renderOutlines(matrices, wr.canvas_bufferBuilders().getEntityVertexConsumers(), camera, this.world.getTime());

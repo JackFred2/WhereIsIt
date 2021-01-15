@@ -7,7 +7,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = "WhereIsIt-${project.minecraft_version}"
-version = "1.9.1"
+version = "1.9.2"
 group = "red.jackf"
 
 minecraft {
@@ -24,7 +24,12 @@ repositories {
 
 	// cardinal components
 	maven { url = 'https://jitpack.io' }
-	maven { url = "https://www.cursemaven.com" }
+	maven {
+		url "https://www.cursemaven.com"
+		content {
+			includeGroup "curse.maven"
+		}
+	}
 }
 
 dependencies {
@@ -44,7 +49,7 @@ dependencies {
 	modCompile "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig1u_version}"
 	include "me.sargunvohra.mcmods:autoconfig1u:${project.autoconfig1u_version}"
 
-	modCompileOnly("curse.maven:canvas-renderer:3051844")
+	modCompileOnly("curse.maven:canvas-renderer-318440:3155365")
 }
 
 processResources {

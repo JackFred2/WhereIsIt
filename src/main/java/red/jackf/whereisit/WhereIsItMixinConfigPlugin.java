@@ -22,7 +22,8 @@ public class WhereIsItMixinConfigPlugin  implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        boolean canvasLoaded = FabricLoader.getInstance().isModLoaded("canvas");
+        //boolean canvasLoaded = FabricLoader.getInstance().isModLoaded("canvas");
+        boolean canvasLoaded = false; //todo currently doesn't render correctly.
         if (mixinClassName.equals("red.jackf.whereisit.mixin.MixinCanvasWorldRenderer")) {
             return canvasLoaded;
         }
