@@ -49,6 +49,17 @@ public class WhereIsItConfig implements ConfigData {
         return serverOptions.cooldownTicks;
     }
 
+    @Override
+    public void validatePostLoad() {
+        clientOptions.colour = MathHelper.clamp(clientOptions.colour, 0x000000, 0xffffff);
+        clientOptions.alternateColour = MathHelper.clamp(clientOptions.alternateColour, 0x000000, 0xffffff);
+        clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 10, 300);
+        clientOptions.lineWidth = MathHelper.clamp(clientOptions.lineWidth, 1, 10);
+
+        serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 4, 24);
+        serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
+    }
+
     static class Client {
         @ConfigEntry.BoundedDiscrete(max = 300, min = 10)
         @ConfigEntry.Gui.Tooltip
@@ -78,16 +89,5 @@ public class WhereIsItConfig implements ConfigData {
         @ConfigEntry.BoundedDiscrete(max = 50, min = 0)
         @ConfigEntry.Gui.Tooltip
         public int cooldownTicks = 5;
-    }
-
-    @Override
-    public void validatePostLoad() {
-        clientOptions.colour = MathHelper.clamp(clientOptions.colour, 0x000000, 0xffffff);
-        clientOptions.alternateColour = MathHelper.clamp(clientOptions.alternateColour, 0x000000, 0xffffff);
-        clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 10, 300);
-        clientOptions.lineWidth = MathHelper.clamp(clientOptions.lineWidth, 1, 10);
-
-        serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 4, 24);
-        serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
     }
 }

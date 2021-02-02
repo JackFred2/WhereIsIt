@@ -14,13 +14,11 @@ import java.util.List;
 import static red.jackf.whereisit.WhereIsItClient.optimizedDrawShapeOutline;
 
 public abstract class RenderUtils {
-    private static final List<WhereIsItClient.FoundItemPos> outlinesToRemove = new ArrayList<>();
-
     public static final RenderPhase.Transparency RENDER_TRANSPARENCY = new RenderPhase.Transparency("wii_translucent_transparency", () -> {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
     }, RenderSystem::disableBlend);
-
+    private static final List<WhereIsItClient.FoundItemPos> outlinesToRemove = new ArrayList<>();
     private static final RenderLayer RENDER_LAYER = RenderLayer.of("wii_blockoutline",
         VertexFormats.POSITION_COLOR,
         1, 256,

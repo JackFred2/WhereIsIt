@@ -4,13 +4,11 @@ import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
@@ -27,9 +25,13 @@ import java.util.*;
 
 public class WhereIsIt implements ModInitializer {
     public static final String MODID = "whereisit";
-    public static WhereIsItConfig CONFIG;
+    public static final Identifier FIND_ITEM_PACKET_ID = id("find_item_c2s");
+    public static final Identifier FOUND_ITEMS_PACKET_ID = id("found_item_s2c");
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final Map<UUID, Long> rateLimitMap = new HashMap<>();
+    public static WhereIsItConfig CONFIG;
     public static Searcher SEARCHER;
+    public static boolean REILoaded = false;
 
     public static Identifier id(String path) {
         return new Identifier(MODID, path);
@@ -38,14 +40,6 @@ public class WhereIsIt implements ModInitializer {
     public static void log(String str) {
         LOGGER.info(str);
     }
-
-    public static final Identifier FIND_ITEM_PACKET_ID = id("find_item_c2s");
-    public static final Identifier FOUND_ITEMS_PACKET_ID = id("found_item_s2c");
-
-    private static final Map<UUID, Long> rateLimitMap = new HashMap<>();
-
-    public static boolean REILoaded = false;
-
 
     @Override
     public void onInitialize() {

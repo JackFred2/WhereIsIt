@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import red.jackf.whereisit.client.DynamicLineWidth;
 import red.jackf.whereisit.client.RenderUtils;
 
 @Environment(EnvType.CLIENT)
@@ -33,14 +32,14 @@ public class MixinWorldRenderer {
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V",
         at = @At(value = "TAIL"))
     public void whereisit$renderFoundItemOverlay(MatrixStack matrices,
-                                       float tickDelta,
-                                       long limitTime,
-                                       boolean renderBlockOutline,
-                                       Camera camera,
-                                       GameRenderer gameRenderer,
-                                       LightmapTextureManager lightmapTextureManager,
-                                       Matrix4f matrix4f,
-                                       CallbackInfo ci) {
+                                                 float tickDelta,
+                                                 long limitTime,
+                                                 boolean renderBlockOutline,
+                                                 Camera camera,
+                                                 GameRenderer gameRenderer,
+                                                 LightmapTextureManager lightmapTextureManager,
+                                                 Matrix4f matrix4f,
+                                                 CallbackInfo ci) {
         this.world.getProfiler().swap("wii_founditems");
         RenderUtils.renderOutlines(matrices, this.bufferBuilders.getEntityVertexConsumers(), camera, this.world.getTime());
     }
