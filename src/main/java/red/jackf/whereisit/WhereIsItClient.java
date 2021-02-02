@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.render.VertexConsumer;
@@ -55,12 +56,12 @@ public class WhereIsItClient implements ClientModInitializer {
     public void onInitializeClient() {
         KeyBindingHelper.registerKeyBinding(FIND_ITEMS);
 
-        ClientSidePacketRegistry.INSTANCE.register(WhereIsIt.FOUND_ITEMS_PACKET_ID, (packetContext, packetByteBuf) -> {
-            Map<BlockPos, FoundType> results = FoundS2C.read(packetByteBuf);
+        ClientPlayNetworking.registerGlobalReceiver(WhereIsIt.FOUND_ITEMS_PACKET_ID, ((client, handler, buf, responseSender) -> {
+            Map<BlockPos, FoundType> results = FoundS2C.read(buf);
 
-            packetContext.getTaskQueue().execute(() -> {
+            client.execute(() -> {
                 //packetContext.getPlayer().sendMessage(new LiteralText(pos.toShortString()), false);
-                World world = packetContext.getPlayer().world;
+                World world = handler.getWorld();
                 for (Map.Entry<BlockPos, FoundType> entry : results.entrySet())
                     FOUND_ITEM_POSITIONS.add(new FoundItemPos(
                         entry.getKey(),
@@ -69,13 +70,14 @@ public class WhereIsItClient implements ClientModInitializer {
                         entry.getValue()
                     ));
             });
-        });
+        }));
     }
 
     public static void sendItemFindPacket(@NotNull Item item, boolean matchNbt, CompoundTag tag) {
         //WhereIsIt.log("Looking for " + item.toString());
         SearchC2S packet = new SearchC2S(item, matchNbt, tag);
-        ClientSidePacketRegistry.INSTANCE.sendToServer(WhereIsIt.FIND_ITEM_PACKET_ID, packet);
+
+        ClientPlayNetworking.send(WhereIsIt.FIND_ITEM_PACKET_ID, packet);
     }
 
     public static void optimizedDrawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {

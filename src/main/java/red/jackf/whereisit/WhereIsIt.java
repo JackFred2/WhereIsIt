@@ -5,6 +5,7 @@ import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.item.Item;
@@ -72,36 +73,35 @@ public class WhereIsIt implements ModInitializer {
                 log("Error loading plugin from " + entrypointContainer.getProvider().getMetadata().getId() + ": " + ex.getLocalizedMessage());
             }
         }
-        log("Loaded plugins: " + pluginList.toString().substring(0, pluginList.length() - 2));
+        log("Loaded plugins: " + pluginList.substring(0, pluginList.length() - 2));
 
-
-        // Actual searching code
-        ServerSidePacketRegistry.INSTANCE.register(FIND_ITEM_PACKET_ID, ((packetContext, packetByteBuf) -> {
-            SearchC2S.Context searchContext = SearchC2S.read(packetByteBuf);
+        ServerPlayNetworking.registerGlobalReceiver(FIND_ITEM_PACKET_ID, ((server, player, handler, buf, responseSender) -> {
+            SearchC2S.Context searchContext = SearchC2S.read(buf);
             Item toFind = searchContext.getItem();
             if (toFind != Items.AIR) {
-                packetContext.getTaskQueue().execute(() -> {
+                server.execute(() -> {
 
-                    BlockPos basePos = packetContext.getPlayer().getBlockPos();
-                    ServerWorld world = (ServerWorld) packetContext.getPlayer().getEntityWorld();
+                    BlockPos basePos = player.getBlockPos();
+                    ServerWorld world = player.getServerWorld();
 
                     long beforeTime = System.nanoTime();
 
-                    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT || world.getTime() >= rateLimitMap.getOrDefault(packetContext.getPlayer().getUuid(), 0L) + WhereIsIt.CONFIG.getCooldown()) {
+                    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT || world.getTime() >= rateLimitMap.getOrDefault(player.getUuid(), 0L) + WhereIsIt.CONFIG.getCooldown()) {
                         Map<BlockPos, FoundType> positions = SEARCHER.searchWorld(basePos, world, toFind, searchContext.getTag());
                         if (positions.size() > 0) {
                             FoundS2C packet = new FoundS2C(positions);
-                            ServerSidePacketRegistry.INSTANCE.sendToPlayer(packetContext.getPlayer(), FOUND_ITEMS_PACKET_ID, packet);
-                            ((ServerPlayerEntity) packetContext.getPlayer()).closeHandledScreen();
+
+                            ServerPlayNetworking.send(player, FOUND_ITEMS_PACKET_ID, packet);
+                            player.closeHandledScreen();
                         }
-                        rateLimitMap.put(packetContext.getPlayer().getUuid(), world.getTime());
+                        rateLimitMap.put(player.getUuid(), world.getTime());
                     } else {
-                        packetContext.getPlayer().sendMessage(new TranslatableText("whereisit.slowDown").formatted(Formatting.YELLOW), false);
+                        player.sendMessage(new TranslatableText("whereisit.slowDown").formatted(Formatting.YELLOW), false);
                     }
 
                     if (WhereIsIt.CONFIG.printSearchTime()) {
                         long time = (System.nanoTime() - beforeTime);
-                        packetContext.getPlayer().sendMessage(new LiteralText("Lookup Time: " + time + "ns"), false);
+                        player.sendMessage(new LiteralText("Lookup Time: " + time + "ns"), false);
                         WhereIsIt.LOGGER.info("Lookup Time: " + time + "ns");
                     }
                 });
