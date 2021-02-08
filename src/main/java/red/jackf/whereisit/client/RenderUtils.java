@@ -21,7 +21,8 @@ import java.util.List;
 public abstract class RenderUtils {
     private static final List<WhereIsItClient.FoundItemPos> toRemove = new ArrayList<>();
 
-    public static void renderOutlines(WorldRenderContext context) {
+    public static void renderOutlines(WorldRenderContext context, Boolean simpleRendering) {
+        context.world().getProfiler().swap("whereisit");
         Vec3d cameraPos = context.camera().getPos();
 
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -29,8 +30,9 @@ public abstract class RenderUtils {
         RenderSystem.enableAlphaTest();
         RenderSystem.alphaFunc(GL11.GL_GREATER, 0.0f);
         RenderSystem.disableTexture();
-        RenderSystem.enableDepthTest();
+        RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
+
         RenderSystem.pushMatrix();
         RenderSystem.lineWidth(WhereIsIt.CONFIG.getLineWidth());
 
@@ -49,31 +51,39 @@ public abstract class RenderUtils {
             long timeDiff = context.world().getTime() - pos.time;
             float a = (WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime();
 
-            if (pos.type == FoundType.FOUND) GlStateManager.color4f(r, g, b, a);
-            else GlStateManager.color4f(rAlt, gAlt, bAlt, a);
+            // Bright boxes, in front of terrain but blocked by it
+            if (!simpleRendering) {
+                RenderSystem.enableDepthTest();
+
+                if (pos.type == FoundType.FOUND) GlStateManager.color4f(r, g, b, a);
+                else GlStateManager.color4f(rAlt, gAlt, bAlt, a);
+
+                drawShape(tessellator, buffer, pos.shape,
+                    pos.pos.getX() - cameraPos.x,
+                    pos.pos.getY() - cameraPos.y,
+                    pos.pos.getZ() - cameraPos.z);
+
+                // Translucent boxes, behind terrain but always visible
+
+                RenderSystem.disableDepthTest();
+            }
+
+            float forcedAlpha = simpleRendering ? a : a * 0.5f;
+
+            if (pos.type == FoundType.FOUND) GlStateManager.color4f(r, g, b, forcedAlpha);
+            else GlStateManager.color4f(rAlt, gAlt, bAlt, forcedAlpha);
 
             drawShape(tessellator, buffer, pos.shape,
                 pos.pos.getX() - cameraPos.x,
                 pos.pos.getY() - cameraPos.y,
                 pos.pos.getZ() - cameraPos.z);
-
-            RenderSystem.disableDepthTest();
-
-            if (pos.type == FoundType.FOUND) GlStateManager.color4f(r, g, b, a * 0.5f);
-            else GlStateManager.color4f(rAlt, gAlt, bAlt, a * 0.5f);
-
-            drawShape(tessellator, buffer, pos.shape,
-                pos.pos.getX() - cameraPos.x,
-                pos.pos.getY() - cameraPos.y,
-                pos.pos.getZ() - cameraPos.z);
-
-            RenderSystem.enableDepthTest();
 
             if (timeDiff >= WhereIsIt.CONFIG.getFadeoutTime()) {
                 toRemove.add(pos);
             }
         }
 
+        RenderSystem.enableDepthTest();
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
         RenderSystem.popMatrix();
 

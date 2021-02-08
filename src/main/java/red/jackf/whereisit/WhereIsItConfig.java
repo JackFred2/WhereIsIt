@@ -3,11 +3,15 @@ package red.jackf.whereisit;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.math.MathHelper;
 
 @Config(name = WhereIsIt.MODID)
 @Config.Gui.Background("minecraft:textures/block/barrel_top.png")
 public class WhereIsItConfig implements ConfigData {
+
     @ConfigEntry.Category("clientOptions")
     @ConfigEntry.Gui.TransitiveObject
     public Client clientOptions = new Client();
@@ -30,6 +34,10 @@ public class WhereIsItConfig implements ConfigData {
 
     public int getLineWidth() {
         return clientOptions.lineWidth;
+    }
+
+    public boolean forceSimpleRender() {
+        return clientOptions.forceSimpleRender;
     }
 
     public int getSearchRadius() {
@@ -75,6 +83,9 @@ public class WhereIsItConfig implements ConfigData {
 
         @ConfigEntry.BoundedDiscrete(max = 10, min = 1)
         public int lineWidth = 8;
+
+        @ConfigEntry.Gui.Tooltip
+        public boolean forceSimpleRender = false;
     }
 
     static class Server {

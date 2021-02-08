@@ -9,14 +9,18 @@
     "JackFred"
   ],
   "contributors": [
-    "qsefthuopq - Chinese Translation"
+    "qsefthuopq - Chinese Translation",
+    "zml2008 - OptiFine Compatibility Code"
   ],
   "contact": {
     "issues": "https://github.com/JackFred2/WhereIsIt/issues",
     "homepage": "https://github.com/JackFred2/WhereIsIt"
   },
 
-  "license": "MIT",
+  "license": [
+    "MIT",
+    "EPL-1.0"
+  ],
   "icon": "assets/whereisit/icon.png",
 
   "environment": "*",
@@ -45,6 +49,7 @@
     "minecraft": "1.16.x"
   },
   "suggests": {
-    "roughlyenoughitems": "*"
+    "roughlyenoughitems": "*",
+    "modmenu": "*"
   }
 }

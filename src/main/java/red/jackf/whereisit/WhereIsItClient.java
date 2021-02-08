@@ -8,6 +8,8 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.launch.common.FabricLauncher;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
@@ -25,6 +27,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import red.jackf.whereisit.client.RenderUtils;
+import red.jackf.whereisit.compat.OptifineHooks;
 import red.jackf.whereisit.network.FoundS2C;
 import red.jackf.whereisit.network.SearchC2S;
 
@@ -69,7 +72,9 @@ public class WhereIsItClient implements ClientModInitializer {
             });
         }));
 
-        WorldRenderEvents.LAST.register(RenderUtils::renderOutlines);
+        WorldRenderEvents.LAST.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
+            RenderUtils.renderOutlines(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
+        }));
     }
 
     public static class FoundItemPos {

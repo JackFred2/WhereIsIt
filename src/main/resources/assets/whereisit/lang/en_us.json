@@ -16,6 +16,8 @@
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime": "Fade Out Time",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@Tooltip": "Time for the outline to fade out in ticks.",
     "text.autoconfig.whereisit.option.clientOptions.lineWidth": "Block Outline Width",
+    "text.autoconfig.whereisit.option.clientOptions.forceSimpleRender": "Force Simple Render",
+    "text.autoconfig.whereisit.option.clientOptions.forceSimpleRender.@Tooltip": "Whether to use a simpler rendering box for outlines. Forced on when using OptiFine shaders.",
     "text.autoconfig.whereisit.title": "Where Is It Config",
     "whereisit.slowDown": "[Where Is It] Slow down!"
 }
