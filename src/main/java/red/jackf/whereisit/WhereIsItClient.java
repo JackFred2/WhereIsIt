@@ -1,12 +1,18 @@
 package red.jackf.whereisit;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
@@ -17,6 +23,8 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.opengl.GL11;
+import red.jackf.whereisit.client.RenderUtils;
 import red.jackf.whereisit.network.FoundS2C;
 import red.jackf.whereisit.network.SearchC2S;
 
@@ -41,21 +49,6 @@ public class WhereIsItClient implements ClientModInitializer {
         ClientPlayNetworking.send(WhereIsIt.FIND_ITEM_PACKET_ID, packet);
     }
 
-    public static void optimizedDrawShapeOutline(MatrixStack matrixStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
-        Matrix4f matrix4f = matrixStack.peek().getModel();
-        if (!CACHED_SHAPES.containsKey(voxelShape)) {
-            //WhereIsIt.log("Adding new cached shape");
-            List<Box> boxes = new LinkedList<>();
-            voxelShape.forEachEdge((x1, y1, z1, x2, y2, z2) -> boxes.add(new Box(x1, y1, z1, x2, y2, z2)));
-            CACHED_SHAPES.put(voxelShape, boxes);
-        }
-
-        for (Box box : CACHED_SHAPES.get(voxelShape)) {
-            vertexConsumer.vertex(matrix4f, (float) (box.minX + d), (float) (box.minY + e), (float) (box.minZ + f)).color(g, h, i, j).next();
-            vertexConsumer.vertex(matrix4f, (float) (box.maxX + d), (float) (box.maxY + e), (float) (box.maxZ + f)).color(g, h, i, j).next();
-        }
-    }
-
     @Override
     public void onInitializeClient() {
         KeyBindingHelper.registerKeyBinding(FIND_ITEMS);
@@ -75,6 +68,8 @@ public class WhereIsItClient implements ClientModInitializer {
                     ));
             });
         }));
+
+        WorldRenderEvents.LAST.register(RenderUtils::renderOutlines);
     }
 
     public static class FoundItemPos {
