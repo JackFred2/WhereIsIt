@@ -1,6 +1,6 @@
 /**
  * This file is originally written by zml2008 for WorldEditCUI, located at https://github.com/mikroskeem/WorldEditCUI/blob/master/src/main/java/eu/mikroskeem/worldeditcui/OptifineHooks.java
- *
+ * <p>
  * This file is licensed under the Eclipse Public License 1.0.
  */
 
@@ -66,19 +66,6 @@ public final class OptifineHooks {
         SHADERS_IS_SHADOW_PASS = shadersIsShadowPass;
     }
 
-    static String activeProgram() {
-        if (SHADERS_ACTIVE_PROGRAM == null || PROGRAM_GET_NAME == null) {
-            return "<optifine not detected>";
-        }
-
-        try {
-            return (String) PROGRAM_GET_NAME.invoke(SHADERS_ACTIVE_PROGRAM.invoke());
-        } catch (final Throwable ex) {
-            LOGGER.debug("[WhereIsIt] Failed to query OptiFine shader program", ex);
-            return "<program query failed>";
-        }
-    }
-
     /**
      * If optifine is available, modify shader state to do our rendering. Otherwise, just use our renderer.
      * @param renderer the actual callback to do some rendering
@@ -103,5 +90,4 @@ public final class OptifineHooks {
             LOGGER.error("[WhereIsIt] Failed to render WhereIsIt using OptiFine hooks", err);
         }
     }
-
 }
