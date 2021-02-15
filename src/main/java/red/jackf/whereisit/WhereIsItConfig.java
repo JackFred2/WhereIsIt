@@ -41,7 +41,6 @@ public class WhereIsItConfig implements ConfigData {
         return serverOptions.searchRadius;
     }
 
-
     public boolean doDeepSearch() {
         return serverOptions.doDeepSearch;
     }
@@ -61,7 +60,7 @@ public class WhereIsItConfig implements ConfigData {
         clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 10, 300);
         clientOptions.lineWidth = MathHelper.clamp(clientOptions.lineWidth, 1, 10);
 
-        serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 4, 24);
+        serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 8, 32);
         serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
     }
 
@@ -79,14 +78,14 @@ public class WhereIsItConfig implements ConfigData {
         public int alternateColour = 0xff4fff;
 
         @ConfigEntry.BoundedDiscrete(max = 10, min = 1)
-        public int lineWidth = 8;
+        public int lineWidth = 3;
 
         @ConfigEntry.Gui.Tooltip
         public boolean forceSimpleRender = false;
     }
 
     static class Server {
-        @ConfigEntry.BoundedDiscrete(max = 24, min = 4)
+        @ConfigEntry.BoundedDiscrete(max = 32, min = 8)
         public int searchRadius = 16;
 
         @ConfigEntry.Gui.Tooltip
