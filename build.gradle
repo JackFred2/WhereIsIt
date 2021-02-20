@@ -75,6 +75,7 @@ jar {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
+
 			// add all the jars that should be included when publishing to maven
 			artifact(remapJar) {
 				builtBy remapJar
@@ -87,7 +88,14 @@ publishing {
 
 	// select the repositories you want to publish to
 	repositories {
-		// uncomment to publish to the local maven
+		maven {
+			name = "GitHubPackages"
+			url = uri("https://maven.pkg.github.com/jackfred2/WhereIsIt")
+			credentials {
+				username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+				password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+			}
+		}
 		mavenLocal()
 	}
 }
