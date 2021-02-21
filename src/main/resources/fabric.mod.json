@@ -6,17 +6,23 @@
   "name": "Where Is It",
   "description": "Find an item in nearby inventories.",
   "authors": [
-    "JackFred"
+    {
+      "name": "JackFred",
+      "contact": {
+        "homepage": "https://github.com/JackFred2",
+        "email": "jack@jackf.red"
+      }
+    }
   ],
   "contributors": [
     "qsefthuopq - Chinese Translation",
     "zml2008 - OptiFine Compatibility Code"
   ],
   "contact": {
-    "issues": "https://github.com/JackFred2/WhereIsIt/issues",
-    "homepage": "https://github.com/JackFred2/WhereIsIt"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/where-is-it",
+    "sources": "https://github.com/JackFred2/WhereIsIt",
+    "issues": "https://github.com/JackFred2/WhereIsIt/issues"
   },
-
   "license": [
     "MIT",
     "EPL-1.0"
