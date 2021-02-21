@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import red.jackf.whereisit.WhereIsItClient;
+import red.jackf.whereisit.client.RenderUtils;
 
 import java.util.List;
 
@@ -16,6 +16,6 @@ import java.util.List;
 public class MixinDebugHud {
     @Inject(at = @At("RETURN"), method = "getLeftText")
     protected void whereisit$getLeftText(CallbackInfoReturnable<List<String>> info) {
-        info.getReturnValue().add("[Where Is It] Cached: " + WhereIsItClient.CACHED_SHAPES.size() + ", rendering " + WhereIsItClient.FOUND_ITEM_POSITIONS.size());
+        info.getReturnValue().add("[Where Is It] Cached: " + RenderUtils.CACHED_SHAPES.size() + ", rendering " + RenderUtils.FOUND_ITEM_POSITIONS.size());
     }
 }

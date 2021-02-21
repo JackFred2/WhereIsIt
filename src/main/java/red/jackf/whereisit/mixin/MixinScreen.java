@@ -29,7 +29,7 @@ public abstract class MixinScreen {
                 ItemStack itemToFind = REIHandler.findREIItems(mouseX, mouseY);
 
                 if (itemToFind != null) {
-                    WhereIsItClient.sendItemFindPacket(itemToFind.getItem(), Screen.hasShiftDown(), itemToFind.getTag());
+                    WhereIsItClient.searchForItem(itemToFind.getItem(), Screen.hasShiftDown(), itemToFind.getTag());
                     //cir.setReturnValue(true);
                 }
             }

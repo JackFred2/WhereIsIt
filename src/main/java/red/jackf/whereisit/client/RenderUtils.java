@@ -10,16 +10,14 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import org.lwjgl.opengl.GL11;
-import red.jackf.whereisit.FoundType;
 import red.jackf.whereisit.WhereIsIt;
-import red.jackf.whereisit.WhereIsItClient;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public abstract class RenderUtils {
-    private static final List<WhereIsItClient.FoundItemPos> toRemove = new ArrayList<>();
+    public static final Map<VoxelShape, List<Box>> CACHED_SHAPES = new HashMap<>();
+    public static final List<FoundItemPos> FOUND_ITEM_POSITIONS = new ArrayList<>();
+    private static final List<FoundItemPos> toRemove = new ArrayList<>();
 
     public static void renderOutlines(WorldRenderContext context, Boolean simpleRendering) {
         context.world().getProfiler().swap("whereisit");
@@ -39,15 +37,7 @@ public abstract class RenderUtils {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
-        float r = ((WhereIsIt.CONFIG.getColour() >> 16) & 0xff) / 255f;
-        float g = ((WhereIsIt.CONFIG.getColour() >> 8) & 0xff) / 255f;
-        float b = ((WhereIsIt.CONFIG.getColour()) & 0xff) / 255f;
-
-        float rAlt = ((WhereIsIt.CONFIG.getAlternateColour() >> 16) & 0xff) / 255f;
-        float gAlt = ((WhereIsIt.CONFIG.getAlternateColour() >> 8) & 0xff) / 255f;
-        float bAlt = ((WhereIsIt.CONFIG.getAlternateColour()) & 0xff) / 255f;
-
-        for (WhereIsItClient.FoundItemPos pos : WhereIsItClient.FOUND_ITEM_POSITIONS) {
+        for (FoundItemPos pos : FOUND_ITEM_POSITIONS) {
             long timeDiff = context.world().getTime() - pos.time;
             float a = (WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime();
 
@@ -55,8 +45,7 @@ public abstract class RenderUtils {
             if (!simpleRendering) {
                 RenderSystem.enableDepthTest();
 
-                if (pos.type == FoundType.FOUND) GlStateManager.color4f(r, g, b, a);
-                else GlStateManager.color4f(rAlt, gAlt, bAlt, a);
+                GlStateManager.color4f(pos.r, pos.g, pos.b, a);
 
                 drawShape(tessellator, buffer, pos.shape,
                     pos.pos.getX() - cameraPos.x,
@@ -70,8 +59,7 @@ public abstract class RenderUtils {
 
             float forcedAlpha = simpleRendering ? a : a * 0.5f;
 
-            if (pos.type == FoundType.FOUND) GlStateManager.color4f(r, g, b, forcedAlpha);
-            else GlStateManager.color4f(rAlt, gAlt, bAlt, forcedAlpha);
+            GlStateManager.color4f(pos.r, pos.g, pos.b, forcedAlpha);
 
             drawShape(tessellator, buffer, pos.shape,
                 pos.pos.getX() - cameraPos.x,
@@ -92,19 +80,19 @@ public abstract class RenderUtils {
         RenderSystem.disableBlend();
         RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F);
 
-        for (WhereIsItClient.FoundItemPos pos : toRemove)
-            WhereIsItClient.FOUND_ITEM_POSITIONS.remove(pos);
+        for (FoundItemPos pos : toRemove)
+            FOUND_ITEM_POSITIONS.remove(pos);
     }
 
     private static void drawShape(Tessellator tessellator, BufferBuilder buffer, VoxelShape shape, double x, double y, double z) {
         buffer.begin(GL11.GL_LINES, VertexFormats.POSITION);
-        List<Box> edges = WhereIsItClient.CACHED_SHAPES.get(shape);
+        List<Box> edges = CACHED_SHAPES.get(shape);
         if (edges == null) {
             //WhereIsIt.log("Adding new cached shape");
             List<Box> edgesList = new LinkedList<>();
             shape.forEachEdge((x1, y1, z1, x2, y2, z2) -> edgesList.add(new Box(x1, y1, z1, x2, y2, z2)));
             edges = edgesList;
-            WhereIsItClient.CACHED_SHAPES.put(shape, edgesList);
+            CACHED_SHAPES.put(shape, edgesList);
         }
 
         for (Box box : edges) {
