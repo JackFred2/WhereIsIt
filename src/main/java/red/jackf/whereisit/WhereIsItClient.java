@@ -52,7 +52,9 @@ public class WhereIsItClient implements ClientModInitializer {
     }
 
     public static void handleFoundItems(Collection<FoundItemPos> results) {
-        RenderUtils.FOUND_ITEM_POSITIONS.addAll(results);
+        for (FoundItemPos result : results) {
+            RenderUtils.FOUND_ITEM_POSITIONS.put(result.pos, result);
+        }
     }
 
     @Override

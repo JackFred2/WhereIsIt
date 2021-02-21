@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -16,8 +17,8 @@ import java.util.*;
 
 public abstract class RenderUtils {
     public static final Map<VoxelShape, List<Box>> CACHED_SHAPES = new HashMap<>();
-    public static final List<FoundItemPos> FOUND_ITEM_POSITIONS = new ArrayList<>();
-    private static final List<FoundItemPos> toRemove = new ArrayList<>();
+    public static final Map<BlockPos, FoundItemPos> FOUND_ITEM_POSITIONS = new HashMap<>();
+    private static final List<BlockPos> toRemove = new ArrayList<>();
 
     public static void renderOutlines(WorldRenderContext context, Boolean simpleRendering) {
         context.world().getProfiler().swap("whereisit");
@@ -37,7 +38,8 @@ public abstract class RenderUtils {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
-        for (FoundItemPos pos : FOUND_ITEM_POSITIONS) {
+        for (Map.Entry<BlockPos, FoundItemPos> entry : FOUND_ITEM_POSITIONS.entrySet()) {
+            FoundItemPos pos = entry.getValue();
             long timeDiff = context.world().getTime() - pos.time;
             float a = (WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime();
 
@@ -67,7 +69,7 @@ public abstract class RenderUtils {
                 pos.pos.getZ() - cameraPos.z);
 
             if (timeDiff >= WhereIsIt.CONFIG.getFadeoutTime()) {
-                toRemove.add(pos);
+                toRemove.add(entry.getKey());
             }
         }
 
@@ -80,8 +82,11 @@ public abstract class RenderUtils {
         RenderSystem.disableBlend();
         RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F);
 
-        for (FoundItemPos pos : toRemove)
-            FOUND_ITEM_POSITIONS.remove(pos);
+        Iterator<BlockPos> iter = toRemove.listIterator();
+        while (iter.hasNext()) {
+            FOUND_ITEM_POSITIONS.remove(iter.next());
+            iter.remove();
+        }
     }
 
     private static void drawShape(Tessellator tessellator, BufferBuilder buffer, VoxelShape shape, double x, double y, double z) {

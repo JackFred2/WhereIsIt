@@ -6,6 +6,8 @@ import red.jackf.whereisit.FoundType;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.WhereIsItClient;
 
+import java.util.Objects;
+
 public class FoundItemPos {
     public BlockPos pos;
     public long time;
@@ -35,5 +37,18 @@ public class FoundItemPos {
                 ((WhereIsIt.CONFIG.getColour() >> 8) & 0xff) / 255f,
                 ((WhereIsIt.CONFIG.getColour()) & 0xff) / 255f);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FoundItemPos that = (FoundItemPos) o;
+        return Objects.equals(pos, that.pos);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pos);
     }
 }
