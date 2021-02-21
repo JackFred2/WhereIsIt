@@ -62,8 +62,6 @@ public class WhereIsItClient implements ClientModInitializer {
         // send a request to the server
         SEARCH_FOR_ITEM.register((item, matchNbt, tag) -> ClientPlayNetworking.send(WhereIsIt.FIND_ITEM_PACKET_ID, new SearchC2S(item, matchNbt, tag)));
 
-        SEARCH_FOR_ITEM.register((item, matchNbt, tag) -> System.out.println("Invoked with " + item));
-
         ClientPlayNetworking.registerGlobalReceiver(WhereIsIt.FOUND_ITEMS_PACKET_ID, ((client, handler, buf, responseSender) -> {
             Map<BlockPos, FoundType> results = FoundS2C.read(buf);
 
