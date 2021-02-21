@@ -1,26 +1,25 @@
 package red.jackf.whereisit;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.InventoryProvider;
+import net.minecraft.block.LecternBlock;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.LecternBlockEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
-import red.jackf.whereisit.api.CustomItemBehavior;
-import red.jackf.whereisit.api.CustomWorldBehavior;
 
 import java.util.*;
-import java.util.function.Predicate;
 
-import static red.jackf.whereisit.WhereIsIt.log;
-
-public class Searcher {
-    private final List<ItemBehavior> itemBehaviors = new LinkedList<>();
-    private final List<WorldBehavior> worldBehaviors = new LinkedList<>();
-
-    public Map<BlockPos, FoundType> searchWorld(BlockPos basePos, ServerWorld world, Item toFind, CompoundTag toFindTag) {
+public abstract class Searcher {
+    public static Map<BlockPos, FoundType> searchWorld(BlockPos basePos, ServerWorld world, Item toFind, CompoundTag toFindTag) {
         Map<BlockPos, FoundType> positions = new HashMap<>();
         final int radius = WhereIsIt.CONFIG.getSearchRadius();
         int checkedBECount = 0;
@@ -40,21 +39,26 @@ public class Searcher {
 
                 for (Map.Entry<BlockPos, BlockEntity> entry : chunk.getBlockEntities().entrySet()) {
                     BlockPos pos = entry.getKey();
+                    BlockEntity be = entry.getValue();
                     if (pos.isWithinDistance(basePos, radius)) {
                         BlockState state = chunk.getBlockState(pos);
-                        try {
-                            for (WorldBehavior behavior : worldBehaviors) {
-                                if (behavior.getTest().test(state)) {
-                                    FoundType result = behavior.getAction().containsItem(toFind, toFindTag, state, pos, world);
-                                    if (result != FoundType.NOT_FOUND) {
-                                        positions.put(pos.toImmutable(), result);
-                                        break;
-                                    }
-                                }
-                            }
-                        } catch (Exception ex) {
-                            log("Error searching for item in " + state.getBlock() + ": " + ex.toString() + "|" + Arrays.toString(ex.getStackTrace()));
+                        FoundType result = FoundType.NOT_FOUND;
+
+                        // Lecterns
+                        if (state.getBlock() instanceof LecternBlock && state.get(LecternBlock.HAS_BOOK)) {
+                            result = searchItemStack(((LecternBlockEntity) be).getBook(), toFind, toFindTag, true);
+                        // Inventories (Chests etc)
+                        } else if (be instanceof Inventory) {
+                            result = invContains((Inventory) be, toFind, toFindTag, true);
+                        // Alternative inventories (Composters)
+                        } else if (state.getBlock() instanceof InventoryProvider) {
+                            Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
+                            if (inv != null)
+                                result = invContains(inv, toFind, toFindTag, true);
                         }
+
+                        if (result != FoundType.NOT_FOUND)
+                            positions.put(pos.toImmutable(), result);
                     }
                 }
             }
@@ -67,60 +71,39 @@ public class Searcher {
         return positions;
     }
 
-    public FoundType searchItemStack(ItemStack itemStack, Item toFind, CompoundTag nbtToFind, boolean deepSearch) {
-        if (itemStack.getItem() == toFind && (nbtToFind == null || nbtToFind.equals(itemStack.getTag()))) {
+    public static FoundType searchItemStack(ItemStack itemStack, Item toFind, CompoundTag toFindTag, boolean deepSearch) {
+        if (itemStack.getItem() == toFind && (toFindTag == null || toFindTag.equals(itemStack.getTag()))) {
             return FoundType.FOUND;
         } else if (!itemStack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch() && deepSearch) {
-            for (ItemBehavior behavior : itemBehaviors) {
-                if (behavior.getTest().test(itemStack) && behavior.getAction().containsItem(itemStack, toFind, nbtToFind)) {
-                    return FoundType.FOUND_DEEP;
+            // Shulker Boxes
+            if (itemStack.getItem() instanceof BlockItem && ((BlockItem) itemStack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
+                CompoundTag tag = itemStack.getSubTag("BlockEntityTag");
+                if (tag != null && tag.contains("Items", 9)) {
+                    ListTag items = tag.getList("Items", 10);
+                    for (int i = 0; i < items.size(); i++) {
+                        ItemStack containedStack = ItemStack.fromTag(items.getCompound(i));
+                        if (containedStack.getItem() == toFind && (toFindTag == null || toFindTag.equals(containedStack.getTag()))) {
+                            return FoundType.FOUND_DEEP;
+                        }
+                    }
                 }
             }
         }
         return FoundType.NOT_FOUND;
     }
 
-    public void addItemBehavior(Predicate<ItemStack> test, CustomItemBehavior action) {
-        itemBehaviors.add(new ItemBehavior(test, action));
-    }
-
-    public void addWorldBehavior(Predicate<BlockState> test, CustomWorldBehavior action) {
-        worldBehaviors.add(new WorldBehavior(test, action));
-    }
-
-    public static class ItemBehavior {
-        private final Predicate<ItemStack> test;
-        private final CustomItemBehavior action;
-
-        public ItemBehavior(Predicate<ItemStack> test, CustomItemBehavior action) {
-            this.test = test;
-            this.action = action;
+    /**
+     * Search an inventory for any instances of an item, non-recursively checking any sub-items.
+     *
+     * @param inv          The {@link Inventory} to search.
+     * @param searchingFor The item being searched for.
+     * @return Whether the inventory contains any instances of {@code searchingFor}.
+     */
+    public static FoundType invContains(Inventory inv, Item searchingFor, CompoundTag searchingForNbt, boolean deepSearch) {
+        for (int i = 0; i < inv.size(); i++) {
+            FoundType result = searchItemStack(inv.getStack(i), searchingFor, searchingForNbt, deepSearch);
+            if (result != FoundType.NOT_FOUND) return result;
         }
-
-        public CustomItemBehavior getAction() {
-            return action;
-        }
-
-        public Predicate<ItemStack> getTest() {
-            return test;
-        }
-    }
-
-    public static class WorldBehavior {
-        private final Predicate<BlockState> test;
-        private final CustomWorldBehavior action;
-
-        public WorldBehavior(Predicate<BlockState> test, CustomWorldBehavior action) {
-            this.test = test;
-            this.action = action;
-        }
-
-        public CustomWorldBehavior getAction() {
-            return action;
-        }
-
-        public Predicate<BlockState> getTest() {
-            return test;
-        }
+        return FoundType.NOT_FOUND;
     }
 }

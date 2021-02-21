@@ -75,7 +75,7 @@ public class WhereIsItClient implements ClientModInitializer {
         public VoxelShape shape;
         public FoundType type;
 
-        protected FoundItemPos(BlockPos pos, long time, VoxelShape shape, FoundType type) {
+        public FoundItemPos(BlockPos pos, long time, VoxelShape shape, FoundType type) {
             this.pos = pos;
             this.time = time;
             this.shape = shape;
