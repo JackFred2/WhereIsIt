@@ -37,6 +37,10 @@ public class WhereIsItConfig implements ConfigData {
         return clientOptions.forceSimpleRender;
     }
 
+    public boolean disableSlotHighlight() {
+        return clientOptions.disableSlotHighlight;
+    }
+
     public int getSearchRadius() {
         return serverOptions.searchRadius;
     }
@@ -79,6 +83,9 @@ public class WhereIsItConfig implements ConfigData {
 
         @ConfigEntry.BoundedDiscrete(max = 10, min = 1)
         public int lineWidth = 3;
+
+        @ConfigEntry.Gui.Tooltip
+        public boolean disableSlotHighlight = false;
 
         @ConfigEntry.Gui.Tooltip
         public boolean forceSimpleRender = false;

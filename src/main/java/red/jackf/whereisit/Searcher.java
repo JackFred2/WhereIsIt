@@ -106,4 +106,8 @@ public abstract class Searcher {
         }
         return FoundType.NOT_FOUND;
     }
+
+    public static boolean areStacksEqual(Item item1, CompoundTag tag1, Item item2, CompoundTag tag2, boolean ignoreNbt) {
+        return item1.equals(item2) && (ignoreNbt || Objects.equals(tag1,tag2));
+    }
 }

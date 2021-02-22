@@ -1,5 +1,7 @@
 package red.jackf.whereisit;
 
+import me.shedaniel.cloth.api.client.events.v0.ClothClientHooks;
+import me.shedaniel.cloth.api.client.events.v0.ScreenRenderCallback;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -36,6 +38,22 @@ public class WhereIsItClient implements ClientModInitializer {
         "key.categories.whereisit"
     );
 
+    private static Item lastSearchedItem = null;
+    private static CompoundTag lastSearchedTag = null;
+    private static boolean lastSearchedIgnoreNbt = false;
+
+    public static Item getLastSearchedItem() {
+        return lastSearchedItem;
+    }
+
+    public static CompoundTag getLastSearchedTag() {
+        return lastSearchedTag;
+    }
+
+    public static boolean lastSearchIgnoreNbt() {
+        return lastSearchedIgnoreNbt;
+    }
+
     /**
      * Triggered when a search is requested (i.e. the search key is pressed)
      */
@@ -49,12 +67,21 @@ public class WhereIsItClient implements ClientModInitializer {
      */
     public static void searchForItem(@NotNull Item item, boolean matchNbt, CompoundTag tag) {
         SEARCH_FOR_ITEM.invoker().searchForItem(item, matchNbt, tag);
+        WhereIsItClient.lastSearchedItem = item;
+        WhereIsItClient.lastSearchedIgnoreNbt = matchNbt;
+        WhereIsItClient.lastSearchedTag = tag;
     }
 
     public static void handleFoundItems(Collection<FoundItemPos> results) {
         for (FoundItemPos result : results) {
             RenderUtils.FOUND_ITEM_POSITIONS.put(result.pos, result);
         }
+    }
+
+    public static void clearLastItem() {
+        WhereIsItClient.lastSearchedItem = null;
+        WhereIsItClient.lastSearchedTag = null;
+        WhereIsItClient.lastSearchedIgnoreNbt = false;
     }
 
     @Override
@@ -79,6 +106,8 @@ public class WhereIsItClient implements ClientModInitializer {
         WorldRenderEvents.LAST.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
             RenderUtils.renderOutlines(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
         }));
+
+        ClothClientHooks.SCREEN_LATE_RENDER.register(RenderUtils::renderLastSlot);
     }
 
 }

@@ -6,6 +6,8 @@
   "mixins": [
   ],
   "client": [
+    "AccessorDrawableHelper",
+    "AccessorHandledScreen",
     "MixinDebugHud",
     "MixinHandledScreen",
     "MixinScreen"
