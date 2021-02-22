@@ -39,20 +39,25 @@ public abstract class RenderUtils {
         BufferBuilder buffer = tessellator.getBuffer();
 
         for (Map.Entry<BlockPos, FoundItemPos> entry : FOUND_ITEM_POSITIONS.entrySet()) {
-            FoundItemPos pos = entry.getValue();
-            long timeDiff = context.world().getTime() - pos.time;
+            FoundItemPos positionData = entry.getValue();
+            long timeDiff = context.world().getTime() - positionData.time;
             float a = (WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime();
+
+            Vec3d finalPos = cameraPos.subtract(positionData.pos.getX(), positionData.pos.getY(), positionData.pos.getZ()).negate();
+            if (finalPos.lengthSquared() > 4096) { // if it's more than 64 blocks away, scale it so distant ones are still visible
+                finalPos = finalPos.normalize().multiply(64);
+            }
 
             // Bright boxes, in front of terrain but blocked by it
             if (!simpleRendering) {
                 RenderSystem.enableDepthTest();
 
-                GlStateManager.color4f(pos.r, pos.g, pos.b, a);
+                GlStateManager.color4f(positionData.r, positionData.g, positionData.b, a);
 
-                drawShape(tessellator, buffer, pos.shape,
-                    pos.pos.getX() - cameraPos.x,
-                    pos.pos.getY() - cameraPos.y,
-                    pos.pos.getZ() - cameraPos.z);
+                drawShape(tessellator, buffer, positionData.shape,
+                    finalPos.x,
+                    finalPos.y,
+                    finalPos.z);
 
                 // Translucent boxes, behind terrain but always visible
 
@@ -61,12 +66,12 @@ public abstract class RenderUtils {
 
             float forcedAlpha = simpleRendering ? a : a * 0.5f;
 
-            GlStateManager.color4f(pos.r, pos.g, pos.b, forcedAlpha);
+            GlStateManager.color4f(positionData.r, positionData.g, positionData.b, forcedAlpha);
 
-            drawShape(tessellator, buffer, pos.shape,
-                pos.pos.getX() - cameraPos.x,
-                pos.pos.getY() - cameraPos.y,
-                pos.pos.getZ() - cameraPos.z);
+            drawShape(tessellator, buffer, positionData.shape,
+                finalPos.x,
+                finalPos.y,
+                finalPos.z);
 
             if (timeDiff >= WhereIsIt.CONFIG.getFadeoutTime()) {
                 toRemove.add(entry.getKey());
