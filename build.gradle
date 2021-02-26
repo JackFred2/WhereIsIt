@@ -94,7 +94,7 @@ curseforge {
 				optionalDependency("roughly-enough-items")
 				embeddedLibrary("cloth-config")
 			}
-			displayName = "${project.prefix}${archivesBaseName}-${version}.jar"
+			displayName = "${project.prefix} ${archivesBaseName}-${version}.jar"
 		}
 
 	}
