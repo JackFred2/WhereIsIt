@@ -96,6 +96,7 @@ curseforge {
 				optionalDependency("modmenu")
 				optionalDependency("roughly-enough-items")
 				embeddedLibrary("cloth-config")
+				embeddedLibrary("cloth-api")
 			}
 			displayName = "${project.prefix} ${archivesBaseName}-${version}.jar"
 		}
@@ -104,7 +105,6 @@ curseforge {
 
 	options {
 		forgeGradleIntegration = false
-		debug = true
 	}
 }
 
