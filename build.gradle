@@ -9,7 +9,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = "whereisit-${project.minecraft_version}"
-version = "1.11.5"
+version = "1.11.6"
 group = "red.jackf"
 
 minecraft {
@@ -36,8 +36,11 @@ dependencies {
 	modCompile "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
 	modCompile "com.terraformersmc:modmenu:${project.modmenu_version}"
 
-	modCompile "me.shedaniel.cloth:cloth-config-fabric:${project.clothconfig_version}"
-	include "me.shedaniel.cloth:cloth-config-fabric:${project.clothconfig_version}"
+	modApi "me.shedaniel.cloth.api:cloth-client-events-v0:${project.cloth_client_version}"
+	include "me.shedaniel.cloth.api:cloth-client-events-v0:${project.cloth_client_version}"
+
+	modCompile "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+	include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 }
 
 processResources {
