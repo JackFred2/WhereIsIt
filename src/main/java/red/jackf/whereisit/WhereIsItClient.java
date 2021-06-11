@@ -10,10 +10,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -39,14 +39,14 @@ public class WhereIsItClient implements ClientModInitializer {
     );
 
     private static Item lastSearchedItem = null;
-    private static CompoundTag lastSearchedTag = null;
+    private static NbtCompound lastSearchedTag = null;
     private static boolean lastSearchedIgnoreNbt = false;
 
     public static Item getLastSearchedItem() {
         return lastSearchedItem;
     }
 
-    public static CompoundTag getLastSearchedTag() {
+    public static NbtCompound getLastSearchedTag() {
         return lastSearchedTag;
     }
 
@@ -65,7 +65,7 @@ public class WhereIsItClient implements ClientModInitializer {
     /**
      * Trigger a search request
      */
-    public static void searchForItem(@NotNull Item item, boolean matchNbt, CompoundTag tag) {
+    public static void searchForItem(@NotNull Item item, boolean matchNbt, NbtCompound tag) {
         SEARCH_FOR_ITEM.invoker().searchForItem(item, matchNbt, tag);
         WhereIsItClient.lastSearchedItem = item;
         WhereIsItClient.lastSearchedIgnoreNbt = matchNbt;
@@ -103,9 +103,10 @@ public class WhereIsItClient implements ClientModInitializer {
             });
         }));
 
-        WorldRenderEvents.LAST.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
+        /*WorldRenderEvents.LAST.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
             RenderUtils.renderOutlines(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
-        }));
+        }));*/
+        WorldRenderEvents.LAST.register((ctx -> RenderUtils.renderOutlines(ctx, false)));
 
         ClothClientHooks.SCREEN_LATE_RENDER.register(RenderUtils::renderLastSlot);
     }

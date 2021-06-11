@@ -1,14 +1,11 @@
 package red.jackf.whereisit.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +18,6 @@ import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.WhereIsItClient;
 import red.jackf.whereisit.mixin.AccessorDrawableHelper;
 import red.jackf.whereisit.mixin.AccessorHandledScreen;
-import red.jackf.whereisit.mixin.MixinHandledScreen;
 
 import java.util.*;
 
@@ -31,72 +27,82 @@ public abstract class RenderUtils {
     private static final List<BlockPos> toRemove = new ArrayList<>();
 
     public static void renderOutlines(WorldRenderContext context, Boolean simpleRendering) {
+
         if (FOUND_ITEM_POSITIONS.size() == 0) return;
         context.world().getProfiler().swap("whereisit");
         Vec3d cameraPos = context.camera().getPos();
 
-        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        RenderSystem.enableBlend();
-        RenderSystem.enableAlphaTest();
-        RenderSystem.alphaFunc(GL11.GL_GREATER, 0.0f);
-        RenderSystem.disableTexture();
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-
-        RenderSystem.pushMatrix();
         RenderSystem.lineWidth(WhereIsIt.CONFIG.getLineWidth());
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.depthMask(true);
+        RenderSystem.disableCull();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableTexture();
+        //RenderSystem.depthFunc(GL11.GL_ALWAYS);
+
+        MatrixStack stack = RenderSystem.getModelViewStack();
+        stack.push();
+        RenderSystem.applyModelViewMatrix();
 
         for (Map.Entry<BlockPos, FoundItemPos> entry : FOUND_ITEM_POSITIONS.entrySet()) {
             FoundItemPos positionData = entry.getValue();
             long timeDiff = context.world().getTime() - positionData.time;
-            float a = (WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime();
+            float a =((WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime());
 
             Vec3d finalPos = cameraPos.subtract(positionData.pos.getX(), positionData.pos.getY(), positionData.pos.getZ()).negate();
             if (finalPos.lengthSquared() > 4096) { // if it's more than 64 blocks away, scale it so distant ones are still visible
                 finalPos = finalPos.normalize().multiply(64);
             }
 
+            RenderSystem.disableDepthTest();
+
+            buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+
             // Bright boxes, in front of terrain but blocked by it
             if (!simpleRendering) {
                 RenderSystem.enableDepthTest();
 
-                GlStateManager.color4f(positionData.r, positionData.g, positionData.b, a);
-
-                drawShape(tessellator, buffer, positionData.shape,
+                drawShape(buffer, positionData.shape,
                     finalPos.x,
                     finalPos.y,
-                    finalPos.z);
-
-                // Translucent boxes, behind terrain but always visible
+                    finalPos.z,
+                    positionData.r,
+                    positionData.g,
+                    positionData.b,
+                    a);
+                tessellator.draw();
 
                 RenderSystem.disableDepthTest();
             }
 
-            float forcedAlpha = simpleRendering ? a : a * 0.5f;
+            // Translucent boxes, behind terrain but always visible
+            buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-            GlStateManager.color4f(positionData.r, positionData.g, positionData.b, forcedAlpha);
-
-            drawShape(tessellator, buffer, positionData.shape,
+            drawShape(buffer, positionData.shape,
                 finalPos.x,
                 finalPos.y,
-                finalPos.z);
+                finalPos.z,
+                positionData.r,
+                positionData.g,
+                positionData.b,
+                a / 2);
+
+            tessellator.draw();
+
 
             if (timeDiff >= WhereIsIt.CONFIG.getFadeoutTime()) {
                 toRemove.add(entry.getKey());
             }
         }
 
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthFunc(GL11.GL_LEQUAL);
-        RenderSystem.popMatrix();
-
-        RenderSystem.depthMask(true);
-        RenderSystem.enableTexture();
-        RenderSystem.disableBlend();
-        RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F);
+        stack.pop();
+        //RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        RenderSystem.applyModelViewMatrix();
 
         Iterator<BlockPos> iter = toRemove.listIterator();
         while (iter.hasNext()) {
@@ -109,8 +115,7 @@ public abstract class RenderUtils {
         }
     }
 
-    private static void drawShape(Tessellator tessellator, BufferBuilder buffer, VoxelShape shape, double x, double y, double z) {
-        buffer.begin(GL11.GL_LINES, VertexFormats.POSITION);
+    private static void drawShape(BufferBuilder buffer, VoxelShape shape, double x, double y, double z, float r, float g, float b, float a) {
         List<Box> edges = CACHED_SHAPES.get(shape);
         if (edges == null) {
             //WhereIsIt.log("Adding new cached shape");
@@ -121,17 +126,14 @@ public abstract class RenderUtils {
         }
 
         for (Box box : edges) {
-            buffer.vertex(box.minX + x, box.minY + y, box.minZ + z).next();
-            buffer.vertex(box.maxX + x, box.maxY + y, box.maxZ + z).next();
+            buffer.vertex(box.minX + x, box.minY + y, box.minZ + z).color(r, g, b, a).next();
+            buffer.vertex(box.maxX + x, box.maxY + y, box.maxZ + z).color(r, g, b, a).next();
         }
-
-        tessellator.draw();
     }
 
     public static void renderLastSlot(MatrixStack matrixStack, MinecraftClient minecraftClient, Screen screen, int mouseX, int mouseY, float tickDelta) {
         if (WhereIsIt.CONFIG.disableSlotHighlight()) return;
-        if (screen instanceof HandledScreen) {
-            HandledScreen<?> handledScreen = (HandledScreen<?>) screen;
+        if (screen instanceof HandledScreen<?> handledScreen) {
             handledScreen.getScreenHandler().slots.forEach(slot -> {
                 ItemStack stack = slot.getStack();
                 if (Searcher.areStacksEqual(stack.getItem(), stack.getTag(), WhereIsItClient.getLastSearchedItem(), WhereIsItClient.getLastSearchedTag(), WhereIsItClient.lastSearchIgnoreNbt())) {

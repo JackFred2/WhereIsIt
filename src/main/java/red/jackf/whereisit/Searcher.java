@@ -10,8 +10,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
@@ -19,7 +19,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import java.util.*;
 
 public abstract class Searcher {
-    public static Map<BlockPos, FoundType> searchWorld(BlockPos basePos, ServerWorld world, Item toFind, CompoundTag toFindTag) {
+    public static Map<BlockPos, FoundType> searchWorld(BlockPos basePos, ServerWorld world, Item toFind, NbtCompound toFindTag) {
         Map<BlockPos, FoundType> positions = new HashMap<>();
         final int radius = WhereIsIt.CONFIG.getSearchRadius();
         int checkedBECount = 0;
@@ -71,17 +71,17 @@ public abstract class Searcher {
         return positions;
     }
 
-    public static FoundType searchItemStack(ItemStack itemStack, Item toFind, CompoundTag toFindTag, boolean deepSearch) {
+    public static FoundType searchItemStack(ItemStack itemStack, Item toFind, NbtCompound toFindTag, boolean deepSearch) {
         if (itemStack.getItem() == toFind && (toFindTag == null || toFindTag.equals(itemStack.getTag()))) {
             return FoundType.FOUND;
         } else if (!itemStack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch() && deepSearch) {
             // Shulker Boxes
             if (itemStack.getItem() instanceof BlockItem && ((BlockItem) itemStack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
-                CompoundTag tag = itemStack.getSubTag("BlockEntityTag");
+                NbtCompound tag = itemStack.getSubTag("BlockEntityTag");
                 if (tag != null && tag.contains("Items", 9)) {
-                    ListTag items = tag.getList("Items", 10);
+                    NbtList items = tag.getList("Items", 10);
                     for (int i = 0; i < items.size(); i++) {
-                        ItemStack containedStack = ItemStack.fromTag(items.getCompound(i));
+                        ItemStack containedStack = ItemStack.fromNbt(items.getCompound(i));
                         if (containedStack.getItem() == toFind && (toFindTag == null || toFindTag.equals(containedStack.getTag()))) {
                             return FoundType.FOUND_DEEP;
                         }
@@ -99,7 +99,7 @@ public abstract class Searcher {
      * @param searchingFor The item being searched for.
      * @return Whether the inventory contains any instances of {@code searchingFor}.
      */
-    public static FoundType invContains(Inventory inv, Item searchingFor, CompoundTag searchingForNbt, boolean deepSearch) {
+    public static FoundType invContains(Inventory inv, Item searchingFor, NbtCompound searchingForNbt, boolean deepSearch) {
         for (int i = 0; i < inv.size(); i++) {
             FoundType result = searchItemStack(inv.getStack(i), searchingFor, searchingForNbt, deepSearch);
             if (result != FoundType.NOT_FOUND) return result;
@@ -107,7 +107,7 @@ public abstract class Searcher {
         return FoundType.NOT_FOUND;
     }
 
-    public static boolean areStacksEqual(Item item1, CompoundTag tag1, Item item2, CompoundTag tag2, boolean ignoreNbt) {
+    public static boolean areStacksEqual(Item item1, NbtCompound tag1, Item item2, NbtCompound tag2, boolean ignoreNbt) {
         return item1.equals(item2) && (ignoreNbt || Objects.equals(tag1,tag2));
     }
 }

@@ -1,5 +1,5 @@
 /**
- * This file is originally written by zml2008 for WorldEditCUI, located at https://github.com/mikroskeem/WorldEditCUI/blob/master/src/main/java/eu/mikroskeem/worldeditcui/OptifineHooks.java
+ * This file is originally written by zml2008 for WorldEditCUI, located at https://github.com/mikroskeem/WorldEditCUI/blob/72dd3dd048237b16878fcd8e1f0bdafd5844d7ef/src/main/java/eu/mikroskeem/worldeditcui/OptifineHooks.java
  * <p>
  * This file is licensed under the Eclipse Public License 1.0.
  */

@@ -1,20 +1,13 @@
 package red.jackf.whereisit.compat;
 
-import me.shedaniel.rei.api.EntryStack;
-import me.shedaniel.rei.gui.ContainerScreenOverlay;
-import me.shedaniel.rei.gui.RecipeViewingScreen;
-import me.shedaniel.rei.gui.VillagerRecipeViewingScreen;
-import me.shedaniel.rei.gui.widget.EntryWidget;
-import me.shedaniel.rei.gui.widget.Widget;
-import me.shedaniel.rei.impl.ItemEntryStack;
+import me.shedaniel.rei.api.client.REIRuntime;
+import me.shedaniel.rei.api.client.overlay.ScreenOverlay;
+import me.shedaniel.rei.api.common.entry.EntryStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
 import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
 @Environment(EnvType.CLIENT)
@@ -23,26 +16,32 @@ public class REIHandler {
     }
 
     public static ItemStack findREIItems(double mouseX, double mouseY) {
-        // Big List
-        ItemStack item = tryFindItem(ContainerScreenOverlay.getEntryListWidget().children(), mouseX, mouseY);
-        if (item != null) return item;
+        Optional<ScreenOverlay> overlayOptional = REIRuntime.getInstance().getOverlay();
 
-        // Favourites
-        if (ContainerScreenOverlay.getFavoritesListWidget() != null) {
-            item = tryFindItem(ContainerScreenOverlay.getFavoritesListWidget().children(), mouseX, mouseY);
-            if (item != null) return item;
+        if (overlayOptional.isPresent()) {
+            ScreenOverlay overlay = overlayOptional.get();
+
+            // Big List
+            EntryStack<?> mainListFocused = overlay.getEntryList().getFocusedStack();
+            if (!mainListFocused.isEmpty() && mainListFocused.getValueType() == ItemStack.class) return (ItemStack) mainListFocused.getValue();
+
+            // Favourites
+            if (overlay.getFavoritesList().isPresent()) {
+                EntryStack<?> favouritesFocused = overlay.getFavoritesList().get().getFocusedStack();
+                if (!favouritesFocused.isEmpty() && favouritesFocused.getValueType() == ItemStack.class) return (ItemStack) favouritesFocused.getValue();
+            }
+
+            /*if (MinecraftClient.getInstance().currentScreen instanceof RecipeViewingScreen
+                || MinecraftClient.getInstance().currentScreen instanceof VillagerRecipeViewingScreen) {
+                item = tryFindItem((MinecraftClient.getInstance().currentScreen).children(), mouseX, mouseY);
+                return item;
+            }*/
+
         }
-
-        if (MinecraftClient.getInstance().currentScreen instanceof RecipeViewingScreen
-            || MinecraftClient.getInstance().currentScreen instanceof VillagerRecipeViewingScreen) {
-            item = tryFindItem((MinecraftClient.getInstance().currentScreen).children(), mouseX, mouseY);
-            return item;
-        }
-
         return null;
     }
 
-    @Nullable
+    /*@Nullable
     private static ItemStack tryFindItem(@Nullable List<? extends Element> elements, double mouseX, double mouseY) {
         if (elements == null) return null;
         for (Element element : elements) {
@@ -59,5 +58,5 @@ public class REIHandler {
             }
         }
         return null;
-    }
+    }*/
 }
