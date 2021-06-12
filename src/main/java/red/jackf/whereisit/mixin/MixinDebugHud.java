@@ -16,6 +16,6 @@ import java.util.List;
 public class MixinDebugHud {
     @Inject(at = @At("RETURN"), method = "getLeftText")
     protected void whereisit$getLeftText(CallbackInfoReturnable<List<String>> info) {
-        info.getReturnValue().add("[Where Is It] Cached: " + RenderUtils.CACHED_SHAPES.size() + ", rendering " + RenderUtils.FOUND_ITEM_POSITIONS.size());
+        info.getReturnValue().add("[Where Is It] Rendering " + RenderUtils.FOUND_ITEM_POSITIONS.size());
     }
 }

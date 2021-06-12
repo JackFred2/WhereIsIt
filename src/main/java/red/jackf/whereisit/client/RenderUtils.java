@@ -2,15 +2,14 @@ package red.jackf.whereisit.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import org.lwjgl.opengl.GL11;
 import red.jackf.whereisit.Searcher;
@@ -30,7 +29,8 @@ public abstract class RenderUtils {
 
         if (FOUND_ITEM_POSITIONS.size() == 0) return;
         context.world().getProfiler().swap("whereisit");
-        Vec3d cameraPos = context.camera().getPos();
+        Camera camera = context.camera();
+        Vec3d cameraPos = camera.getPos();
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -44,6 +44,12 @@ public abstract class RenderUtils {
         MatrixStack stack = RenderSystem.getModelViewStack();
         stack.push();
         stack.scale(0.998f, 0.998f, 0.998f); // fixes z fighting by pulling all faces slightly closer to the camera
+
+        if (FabricLoader.getInstance().isModLoaded("canvas")) { // canvas compat
+            stack.multiply(new Quaternion(Vec3f.POSITIVE_X, camera.getPitch(), true));
+            stack.multiply(new Quaternion(Vec3f.POSITIVE_Y, camera.getYaw() + 180f, true));
+        }
+
         RenderSystem.applyModelViewMatrix();
 
         for (Map.Entry<BlockPos, FoundItemPos> entry : FOUND_ITEM_POSITIONS.entrySet()) {
