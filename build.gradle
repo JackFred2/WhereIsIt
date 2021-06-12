@@ -9,7 +9,7 @@ sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = "whereisit-${project.minecraft_version}"
-version = "1.12.1"
+version = "1.12.2"
 group = "red.jackf"
 
 minecraft {
@@ -18,7 +18,7 @@ minecraft {
 // Custom Repos
 repositories {
 	maven { url = "https://maven.fabricmc.net" } // Fabric
-	maven { url "https://maven.shedaniel.me/" } // REI & Cloth Config
+	maven { url = "https://maven.shedaniel.me/" } // REI & Cloth Config
 	maven { url = 'https://maven.terraformersmc.com/' } // ModMenu
 }
 
@@ -37,7 +37,6 @@ dependencies {
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
 	modImplementation "me.shedaniel.cloth.api:cloth-client-events-v0:${project.cloth_client_version}"
-	include "me.shedaniel.cloth.api:cloth-client-events-v0:${project.cloth_client_version}"
 
 	modImplementation "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 }
@@ -77,20 +76,17 @@ curseforge {
 		releaseType = "release"
 
 		addGameVersion "Fabric"
-		addGameVersion "Java 8"
+		addGameVersion "Java 16"
 
-		addGameVersion "1.16.2"
-		addGameVersion "1.16.3"
-		addGameVersion "1.16.4"
-		addGameVersion "1.16.5"
+		addGameVersion "1.17"
 
 		mainArtifact(remapJar) {
 			relations {
 				requiredDependency("fabric-api")
 				optionalDependency("modmenu")
 				optionalDependency("roughly-enough-items")
-				embeddedLibrary("cloth-config")
-				embeddedLibrary("cloth-api")
+				requiredDependency("cloth-config")
+				requiredDependency("cloth-api")
 			}
 			displayName = "${project.prefix} ${archivesBaseName}-${version}.jar"
 		}
