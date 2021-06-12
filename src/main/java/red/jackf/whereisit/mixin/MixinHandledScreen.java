@@ -19,13 +19,13 @@ import red.jackf.whereisit.WhereIsItClient;
 public abstract class MixinHandledScreen {
 
     @Accessor(value = "focusedSlot")
-    protected abstract Slot wii_getFocusedSlot();
+    protected abstract Slot whereisit$getFocusedSlot();
 
     @Inject(method = "keyPressed", at = @At("TAIL"))
     private void whereisit$handleModdedKeys(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (WhereIsItClient.FIND_ITEMS.matchesKey(keyCode, scanCode)) {
-            if (wii_getFocusedSlot() != null && wii_getFocusedSlot().hasStack()) {
-                WhereIsItClient.searchForItem(wii_getFocusedSlot().getStack().getItem(), Screen.hasShiftDown(), wii_getFocusedSlot().getStack().getTag());
+            if (whereisit$getFocusedSlot() != null && whereisit$getFocusedSlot().hasStack()) {
+                WhereIsItClient.searchForItem(whereisit$getFocusedSlot().getStack().getItem(), Screen.hasShiftDown(), whereisit$getFocusedSlot().getStack().getTag());
                 //cir.setReturnValue(true);
             }
         }

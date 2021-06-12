@@ -32,27 +32,24 @@ public abstract class RenderUtils {
         context.world().getProfiler().swap("whereisit");
         Vec3d cameraPos = context.camera().getPos();
 
-        RenderSystem.lineWidth(WhereIsIt.CONFIG.getLineWidth());
-
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.depthMask(true);
-        RenderSystem.disableCull();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableTexture();
-        //RenderSystem.depthFunc(GL11.GL_ALWAYS);
 
         MatrixStack stack = RenderSystem.getModelViewStack();
         stack.push();
+        stack.scale(0.998f, 0.998f, 0.998f); // fixes z fighting by pulling all faces slightly closer to the camera
         RenderSystem.applyModelViewMatrix();
 
         for (Map.Entry<BlockPos, FoundItemPos> entry : FOUND_ITEM_POSITIONS.entrySet()) {
             FoundItemPos positionData = entry.getValue();
             long timeDiff = context.world().getTime() - positionData.time;
-            float a =((WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime());
+            float a = ((WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime());
 
             Vec3d finalPos = cameraPos.subtract(positionData.pos.getX(), positionData.pos.getY(), positionData.pos.getZ()).negate();
             if (finalPos.lengthSquared() > 4096) { // if it's more than 64 blocks away, scale it so distant ones are still visible
@@ -61,11 +58,12 @@ public abstract class RenderUtils {
 
             RenderSystem.disableDepthTest();
 
-            buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
             // Bright boxes, in front of terrain but blocked by it
             if (!simpleRendering) {
                 RenderSystem.enableDepthTest();
+
+                buffer.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
 
                 drawShape(buffer, positionData.shape,
                     finalPos.x,
@@ -75,13 +73,16 @@ public abstract class RenderUtils {
                     positionData.g,
                     positionData.b,
                     a);
+
                 tessellator.draw();
 
                 RenderSystem.disableDepthTest();
             }
 
+            RenderSystem.depthFunc(GL11.GL_ALWAYS);
+
             // Translucent boxes, behind terrain but always visible
-            buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+            buffer.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
 
             drawShape(buffer, positionData.shape,
                 finalPos.x,
@@ -90,10 +91,11 @@ public abstract class RenderUtils {
                 positionData.r,
                 positionData.g,
                 positionData.b,
-                a / 2);
+                simpleRendering ? a : a / 2);
 
             tessellator.draw();
 
+            RenderSystem.depthFunc(GL11.GL_LEQUAL);
 
             if (timeDiff >= WhereIsIt.CONFIG.getFadeoutTime()) {
                 toRemove.add(entry.getKey());
@@ -101,7 +103,6 @@ public abstract class RenderUtils {
         }
 
         stack.pop();
-        //RenderSystem.depthFunc(GL11.GL_LEQUAL);
         RenderSystem.applyModelViewMatrix();
 
         Iterator<BlockPos> iter = toRemove.listIterator();
@@ -116,11 +117,11 @@ public abstract class RenderUtils {
     }
 
     private static void drawShape(BufferBuilder buffer, VoxelShape shape, double x, double y, double z, float r, float g, float b, float a) {
-        List<Box> edges = CACHED_SHAPES.get(shape);
+       /* List<Box> edges = CACHED_SHAPES.get(shape);
         if (edges == null) {
             //WhereIsIt.log("Adding new cached shape");
             List<Box> edgesList = new LinkedList<>();
-            shape.forEachEdge((x1, y1, z1, x2, y2, z2) -> edgesList.add(new Box(x1, y1, z1, x2, y2, z2)));
+            shape.forEachBox((x1, y1, z1, x2, y2, z2) -> edgesList.add(new Box(x1, y1, z1, x2, y2, z2)));
             edges = edgesList;
             CACHED_SHAPES.put(shape, edgesList);
         }
@@ -128,7 +129,64 @@ public abstract class RenderUtils {
         for (Box box : edges) {
             buffer.vertex(box.minX + x, box.minY + y, box.minZ + z).color(r, g, b, a).next();
             buffer.vertex(box.maxX + x, box.maxY + y, box.maxZ + z).color(r, g, b, a).next();
-        }
+        }*/
+
+        shape.forEachBox((x1, y1, z1, x2, y2, z2) -> {
+
+            //bottom / -y
+            buffer.vertex(x1 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y1 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x1 + x, y1 + y, z2 + z).color(r, g, b, a).next();
+
+            buffer.vertex(x1 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y1 + y, z2 + z).color(r, g, b, a).next();
+
+            //top / +y
+            buffer.vertex(x1 + x, y2 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x1 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+
+            buffer.vertex(x1 + x, y2 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z1 + z).color(r, g, b, a).next();
+
+            //west / -x
+            buffer.vertex(x1 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x1 + x, y1 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x1 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+
+            buffer.vertex(x1 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x1 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x1 + x, y2 + y, z1 + z).color(r, g, b, a).next();
+
+            //east / +x
+            buffer.vertex(x2 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y1 + y, z2 + z).color(r, g, b, a).next();
+
+            buffer.vertex(x2 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+
+            //west / -x
+            buffer.vertex(x1 + x, y1 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y1 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+
+            buffer.vertex(x1 + x, y1 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+            buffer.vertex(x1 + x, y2 + y, z2 + z).color(r, g, b, a).next();
+
+            //west / -x
+            buffer.vertex(x1 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+
+            buffer.vertex(x1 + x, y1 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x1 + x, y2 + y, z1 + z).color(r, g, b, a).next();
+            buffer.vertex(x2 + x, y2 + y, z1 + z).color(r, g, b, a).next();
+        });
     }
 
     public static void renderLastSlot(MatrixStack matrixStack, MinecraftClient minecraftClient, Screen screen, int mouseX, int mouseY, float tickDelta) {

@@ -29,9 +29,9 @@ public class WhereIsItConfig implements ConfigData {
         return clientOptions.alternateColour;
     }
 
-    public int getLineWidth() {
+    /*public int getLineWidth() {
         return clientOptions.lineWidth;
-    }
+    }*/
 
     public boolean forceSimpleRender() {
         return clientOptions.forceSimpleRender;
@@ -62,7 +62,7 @@ public class WhereIsItConfig implements ConfigData {
         clientOptions.colour = MathHelper.clamp(clientOptions.colour, 0x000000, 0xffffff);
         clientOptions.alternateColour = MathHelper.clamp(clientOptions.alternateColour, 0x000000, 0xffffff);
         clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 10, 300);
-        clientOptions.lineWidth = MathHelper.clamp(clientOptions.lineWidth, 1, 10);
+        /*clientOptions.lineWidth = MathHelper.clamp(clientOptions.lineWidth, 1, 10);*/
 
         serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 8, 32);
         serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
@@ -81,8 +81,8 @@ public class WhereIsItConfig implements ConfigData {
         @ConfigEntry.Gui.Tooltip
         public int alternateColour = 0xff4fff;
 
-        @ConfigEntry.BoundedDiscrete(max = 10, min = 1)
-        public int lineWidth = 3;
+        /*@ConfigEntry.BoundedDiscrete(max = 10, min = 1)
+        public int lineWidth = 3;*/
 
         @ConfigEntry.Gui.Tooltip
         public boolean disableSlotHighlight = false;
