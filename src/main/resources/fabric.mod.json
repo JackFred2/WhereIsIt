@@ -48,10 +48,12 @@
   "depends": {
     "fabricloader": ">=0.8.3",
     "fabric": "*",
-    "minecraft": "1.17.x"
+    "minecraft": "1.17.x",
+    "cloth-config2": ">=5.0.0",
+    "cloth-client-events-v0": ">=2.0.0"
   },
   "suggests": {
-    "roughlyenoughitems": "*",
+    "roughlyenoughitems": ">=6.0.0",
     "modmenu": "*"
   }
 }
