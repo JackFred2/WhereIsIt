@@ -12,12 +12,12 @@ import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
 public class FoundItemPos {
-    public BlockPos pos;
-    public long time;
-    public VoxelShape shape;
-    public final float r;
-    public final float g;
-    public final float b;
+    public final BlockPos pos;
+    public final long time;
+    public final VoxelShape shape;
+    public float r;
+    public float g;
+    public float b;
 
     public FoundItemPos(BlockPos pos, long time, VoxelShape shape, float r, float g, float b) {
         this.pos = pos;
@@ -27,6 +27,8 @@ public class FoundItemPos {
         this.g = g;
         this.b = b;
     }
+
+
 
     public static FoundItemPos from(BlockPos pos, long time, VoxelShape shape, FoundType type) {
         if (type == FoundType.FOUND_DEEP) {

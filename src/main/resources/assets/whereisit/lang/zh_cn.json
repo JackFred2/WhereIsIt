@@ -13,6 +13,8 @@
     "text.autoconfig.whereisit.option.clientOptions.colour.@Tooltip": "找到物品时显示的颜色.",
     "text.autoconfig.whereisit.option.clientOptions.alternateColour": "更改方块轮廓颜色",
     "text.autoconfig.whereisit.option.clientOptions.alternateColour.@Tooltip": "深度搜索时找打物品时显示的颜色",
+    "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Rainbow Mode",
+    "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Overrides colours above when enabled.",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime": "淡出时间",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@Tooltip": "轮廓淡出时间(单位为刻)",
     "text.autoconfig.whereisit.option.clientOptions.lineWidth": "方块轮廓宽度",
@@ -21,5 +23,5 @@
     "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight": "禁用背包栏位高亮",
     "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight.@Tooltip": "是否禁用高亮背包物品。",
     "text.autoconfig.whereisit.title": "Where Is It 配置",
-    "whereisit.slowDown": "[Where Is It] 慢点！"
+    "whereisit.slowDown": "[Where Is It] 慢点！",
 }

@@ -15,6 +15,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 import org.jetbrains.annotations.NotNull;
@@ -110,6 +111,14 @@ public class WhereIsItClient implements ClientModInitializer {
        // WorldRenderEvents.LAST.register((ctx -> RenderUtils.renderOutlines(ctx, false)));
 
         ClothClientHooks.SCREEN_LATE_RENDER.register(RenderUtils::renderLastSlot);
+
+        RenderUtils.RENDER_LOCATION_EVENT.register(((context, simpleRendering, foundItemPos) -> {
+            if (!WhereIsIt.CONFIG.isRainbowMode()) return;
+            Vec3f colour = RenderUtils.hueToColour(3 * context.world().getTime() + (foundItemPos.pos.getX() + foundItemPos.pos.getY() + foundItemPos.pos.getZ()) * 8L);
+            foundItemPos.r = colour.getX();
+            foundItemPos.g = colour.getY();
+            foundItemPos.b = colour.getZ();
+        }));
     }
 
 }

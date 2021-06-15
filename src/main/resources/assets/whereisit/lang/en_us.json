@@ -13,6 +13,8 @@
     "text.autoconfig.whereisit.option.clientOptions.colour.@Tooltip": "Shown when an item is found.",
     "text.autoconfig.whereisit.option.clientOptions.alternateColour": "Alternate Block Outline Colour",
     "text.autoconfig.whereisit.option.clientOptions.alternateColour.@Tooltip": "Shown when an item is found in a deep search.",
+    "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Rainbow Mode",
+    "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Overrides colours above when enabled.",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime": "Fade Out Time",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@Tooltip": "Time for the outline to fade out in ticks.",
     "text.autoconfig.whereisit.option.clientOptions.lineWidth": "Block Outline Width",
