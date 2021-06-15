@@ -8,9 +8,9 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
 
-archivesBaseName = "whereisit-${project.minecraft_version}"
-version = "1.12.5"
-group = "red.jackf"
+archivesBaseName = "${project.archives_base_name}-${project.minecraft_version}"
+version = project.mod_version
+group = project.maven_group
 
 minecraft {
 }

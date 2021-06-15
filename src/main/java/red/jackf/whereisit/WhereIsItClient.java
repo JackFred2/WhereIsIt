@@ -1,7 +1,6 @@
 package red.jackf.whereisit;
 
 import me.shedaniel.cloth.api.client.events.v0.ClothClientHooks;
-import me.shedaniel.cloth.api.client.events.v0.ScreenRenderCallback;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -17,9 +16,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
 import org.jetbrains.annotations.NotNull;
-import red.jackf.whereisit.client.FoundItemPos;
+import red.jackf.whereisit.client.PositionData;
 import red.jackf.whereisit.client.ItemSearchCallback;
 import red.jackf.whereisit.client.RenderUtils;
 import red.jackf.whereisit.compat.OptifineHooks;
@@ -74,8 +72,8 @@ public class WhereIsItClient implements ClientModInitializer {
         WhereIsItClient.lastSearchedTag = tag;
     }
 
-    public static void handleFoundItems(Collection<FoundItemPos> results) {
-        for (FoundItemPos result : results) {
+    public static void handleFoundItems(Collection<PositionData> results) {
+        for (PositionData result : results) {
             RenderUtils.FOUND_ITEM_POSITIONS.put(result.pos, result);
         }
     }
@@ -98,8 +96,8 @@ public class WhereIsItClient implements ClientModInitializer {
 
             client.execute(() -> {
                 World world = handler.getWorld();
-                List<FoundItemPos> found = results.entrySet().stream().map(
-                    entry -> FoundItemPos.from(entry.getKey(), world.getTime(), world.getBlockState(entry.getKey()).getOutlineShape(world, entry.getKey()), entry.getValue())
+                List<PositionData> found = results.entrySet().stream().map(
+                    entry -> PositionData.from(entry.getKey(), world.getTime(), world.getBlockState(entry.getKey()).getOutlineShape(world, entry.getKey()), entry.getValue())
                 ).collect(Collectors.toList());
                 handleFoundItems(found);
             });
@@ -112,12 +110,12 @@ public class WhereIsItClient implements ClientModInitializer {
 
         ClothClientHooks.SCREEN_LATE_RENDER.register(RenderUtils::renderLastSlot);
 
-        RenderUtils.RENDER_LOCATION_EVENT.register(((context, simpleRendering, foundItemPos) -> {
+        RenderUtils.RENDER_LOCATION_EVENT.register(((context, simpleRendering, positionData) -> {
             if (!WhereIsIt.CONFIG.isRainbowMode()) return;
-            Vec3f colour = RenderUtils.hueToColour(3 * context.world().getTime() + (foundItemPos.pos.getX() + foundItemPos.pos.getY() + foundItemPos.pos.getZ()) * 8L);
-            foundItemPos.r = colour.getX();
-            foundItemPos.g = colour.getY();
-            foundItemPos.b = colour.getZ();
+            Vec3f colour = RenderUtils.hueToColour(3 * context.world().getTime() + (positionData.pos.getX() + positionData.pos.getY() + positionData.pos.getZ()) * 8L);
+            positionData.r = colour.getX();
+            positionData.g = colour.getY();
+            positionData.b = colour.getZ();
         }));
     }
 

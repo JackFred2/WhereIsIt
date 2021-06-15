@@ -26,12 +26,12 @@ import java.util.*;
 
 @Environment(EnvType.CLIENT)
 public abstract class RenderUtils {
-    public static final Map<BlockPos, FoundItemPos> FOUND_ITEM_POSITIONS = new HashMap<>();
+    public static final Map<BlockPos, PositionData> FOUND_ITEM_POSITIONS = new HashMap<>();
     private static final List<BlockPos> toRemove = new ArrayList<>();
 
-    public static final Event<RenderLocation> RENDER_LOCATION_EVENT = EventFactory.createArrayBacked(RenderLocation.class, (context, simpleRendering, foundItemPos) -> {}, callbacks -> (context, simpleRendering, foundItemPos) -> {
+    public static final Event<RenderLocation> RENDER_LOCATION_EVENT = EventFactory.createArrayBacked(RenderLocation.class, (context, simpleRendering, positionData) -> {}, callbacks -> (context, simpleRendering, positionData) -> {
         for (final RenderLocation callback : callbacks) {
-            callback.renderLocation(context, simpleRendering, foundItemPos);
+            callback.renderLocation(context, simpleRendering, positionData);
         }
     });
 
@@ -62,8 +62,8 @@ public abstract class RenderUtils {
 
         RenderSystem.applyModelViewMatrix();
 
-        for (Map.Entry<BlockPos, FoundItemPos> entry : FOUND_ITEM_POSITIONS.entrySet()) {
-            FoundItemPos positionData = entry.getValue();
+        for (Map.Entry<BlockPos, PositionData> entry : FOUND_ITEM_POSITIONS.entrySet()) {
+            PositionData positionData = entry.getValue();
 
             RENDER_LOCATION_EVENT.invoker().renderLocation(context, simpleRendering, positionData);
             
@@ -226,7 +226,7 @@ public abstract class RenderUtils {
 
     @FunctionalInterface
     public interface RenderLocation {
-        void renderLocation(WorldRenderContext context, Boolean simpleRendering, FoundItemPos foundItemPos);
+        void renderLocation(WorldRenderContext context, Boolean simpleRendering, PositionData positionData);
     }
 
     // hue between 0 and 360

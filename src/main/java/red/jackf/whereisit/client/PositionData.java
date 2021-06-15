@@ -2,24 +2,26 @@ package red.jackf.whereisit.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import red.jackf.whereisit.FoundType;
 import red.jackf.whereisit.WhereIsIt;
-import red.jackf.whereisit.WhereIsItClient;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
-public class FoundItemPos {
+public class PositionData {
     public final BlockPos pos;
     public final long time;
     public final VoxelShape shape;
+    private final HashMap<Identifier, String> additional = new HashMap<>();
     public float r;
     public float g;
     public float b;
 
-    public FoundItemPos(BlockPos pos, long time, VoxelShape shape, float r, float g, float b) {
+    public PositionData(BlockPos pos, long time, VoxelShape shape, float r, float g, float b) {
         this.pos = pos;
         this.time = time;
         this.shape = shape;
@@ -28,16 +30,26 @@ public class FoundItemPos {
         this.b = b;
     }
 
+    public void addAdditional(Identifier id, String value) {
+        additional.put(id, value);
+    }
 
+    public boolean hasAdditional(Identifier id) {
+        return additional.containsKey(id);
+    }
 
-    public static FoundItemPos from(BlockPos pos, long time, VoxelShape shape, FoundType type) {
+    public String getAdditional(Identifier id) {
+        return additional.get(id);
+    }
+
+    public static PositionData from(BlockPos pos, long time, VoxelShape shape, FoundType type) {
         if (type == FoundType.FOUND_DEEP) {
-            return new FoundItemPos(pos, time, shape,
+            return new PositionData(pos, time, shape,
                 ((WhereIsIt.CONFIG.getAlternateColour() >> 16) & 0xff) / 255f,
                 ((WhereIsIt.CONFIG.getAlternateColour() >> 8) & 0xff) / 255f,
                 ((WhereIsIt.CONFIG.getAlternateColour()) & 0xff) / 255f);
         } else {
-            return new FoundItemPos(pos, time, shape,
+            return new PositionData(pos, time, shape,
                 ((WhereIsIt.CONFIG.getColour() >> 16) & 0xff) / 255f,
                 ((WhereIsIt.CONFIG.getColour() >> 8) & 0xff) / 255f,
                 ((WhereIsIt.CONFIG.getColour()) & 0xff) / 255f);
@@ -48,7 +60,7 @@ public class FoundItemPos {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FoundItemPos that = (FoundItemPos) o;
+        PositionData that = (PositionData) o;
         return Objects.equals(pos, that.pos);
     }
 
