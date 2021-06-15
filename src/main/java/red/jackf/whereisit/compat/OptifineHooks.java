@@ -6,6 +6,8 @@
 
 package red.jackf.whereisit.compat;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,6 +22,7 @@ import java.util.function.BiConsumer;
  *
  * @see <a href="https://github.com/sp614x/optifine/blob/master/OptiFineDoc/doc/shaders.txt">the shaders documentation</a>
  */
+@Environment(EnvType.CLIENT)
 public final class OptifineHooks {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();

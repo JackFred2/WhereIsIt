@@ -1,5 +1,7 @@
 package red.jackf.whereisit.client;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import red.jackf.whereisit.FoundType;
@@ -8,6 +10,7 @@ import red.jackf.whereisit.WhereIsItClient;
 
 import java.util.Objects;
 
+@Environment(EnvType.CLIENT)
 public class FoundItemPos {
     public BlockPos pos;
     public long time;

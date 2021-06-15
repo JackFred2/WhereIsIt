@@ -1,7 +1,10 @@
 package red.jackf.whereisit.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -20,8 +23,8 @@ import red.jackf.whereisit.mixin.AccessorHandledScreen;
 
 import java.util.*;
 
+@Environment(EnvType.CLIENT)
 public abstract class RenderUtils {
-    public static final Map<VoxelShape, List<Box>> CACHED_SHAPES = new HashMap<>();
     public static final Map<BlockPos, FoundItemPos> FOUND_ITEM_POSITIONS = new HashMap<>();
     private static final List<BlockPos> toRemove = new ArrayList<>();
 
@@ -123,21 +126,7 @@ public abstract class RenderUtils {
     }
 
     private static void drawShape(BufferBuilder buffer, VoxelShape shape, double x, double y, double z, float r, float g, float b, float a) {
-       /* List<Box> edges = CACHED_SHAPES.get(shape);
-        if (edges == null) {
-            //WhereIsIt.log("Adding new cached shape");
-            List<Box> edgesList = new LinkedList<>();
-            shape.forEachBox((x1, y1, z1, x2, y2, z2) -> edgesList.add(new Box(x1, y1, z1, x2, y2, z2)));
-            edges = edgesList;
-            CACHED_SHAPES.put(shape, edgesList);
-        }
-
-        for (Box box : edges) {
-            buffer.vertex(box.minX + x, box.minY + y, box.minZ + z).color(r, g, b, a).next();
-            buffer.vertex(box.maxX + x, box.maxY + y, box.maxZ + z).color(r, g, b, a).next();
-        }*/
-
-        shape.forEachBox((x1, y1, z1, x2, y2, z2) -> {
+       shape.forEachBox((x1, y1, z1, x2, y2, z2) -> {
 
             //bottom / -y
             buffer.vertex(x1 + x, y1 + y, z1 + z).color(r, g, b, a).next();
