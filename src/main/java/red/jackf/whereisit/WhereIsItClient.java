@@ -16,6 +16,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldEvents;
 import org.jetbrains.annotations.NotNull;
 import red.jackf.whereisit.client.PositionData;
 import red.jackf.whereisit.client.ItemSearchCallback;
@@ -106,7 +107,6 @@ public class WhereIsItClient implements ClientModInitializer {
         WorldRenderEvents.LAST.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
             RenderUtils.renderOutlines(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
         }));
-       // WorldRenderEvents.LAST.register((ctx -> RenderUtils.renderOutlines(ctx, false)));
 
         ClothClientHooks.SCREEN_LATE_RENDER.register(RenderUtils::renderLastSlot);
 

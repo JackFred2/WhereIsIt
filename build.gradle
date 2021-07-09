@@ -79,6 +79,7 @@ curseforge {
 		addGameVersion "Java 16"
 
 		addGameVersion "1.17"
+		addGameVersion "1.17.1"
 
 		mainArtifact(remapJar) {
 			relations {

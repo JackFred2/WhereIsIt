@@ -8,6 +8,7 @@
   "client": [
     "AccessorDrawableHelper",
     "AccessorHandledScreen",
+    "MixinMinecraftClient",
     "MixinDebugHud",
     "MixinHandledScreen",
     "MixinScreen"
