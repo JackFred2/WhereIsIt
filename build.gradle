@@ -99,6 +99,22 @@ curseforge {
 	}
 }
 
+task publishModrinth (type: TaskModrinthUpload){ // Make sure it runs after build!
+	onlyIf {
+		project.hasProperty("modrinth.key")
+	}
+
+	token = project.findProperty("modrinth.key")
+	projectId = 'FCTyEqkn'
+	versionNumber = project.mod_version
+	versionName = "Where Is It $project.mod_version"
+	uploadFile = remapJar
+	changelog = "Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt"
+	addGameVersion('1.17')
+	addGameVersion('1.17.1')
+	addLoader('fabric')
+}
+
 // configure the maven publication
 publishing {
 	publications {
