@@ -229,9 +229,8 @@ public abstract class RenderUtils {
         void renderLocation(WorldRenderContext context, Boolean simpleRendering, PositionData positionData);
     }
 
-    // hue between 0 and 360
     public static Vec3f hueToColour(float hue) {
-        hue = hue % 360;
+        hue = ((hue % 360) + 360) % 360;
         float factor = 1 - Math.abs(MathHelper.floorMod(hue / 60f, 2) - 1);
 
         switch ((int) (hue / 60)) {
