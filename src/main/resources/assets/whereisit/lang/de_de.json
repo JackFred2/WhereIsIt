@@ -22,6 +22,7 @@
     "text.autoconfig.whereisit.option.clientOptions.forceSimpleRender.@Tooltip": "Whether to use a simpler rendering box for outlines. Forced on when using OptiFine shaders.",
     "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight": "Disable Inventory Slot Highlight",
     "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight.@Tooltip": "Whether to disable the slot highlight indicating where the item is located.",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Text Size Modifier",
     "text.autoconfig.whereisit.title": "Where Is It Config",
     "whereisit.slowDown": "[Where Is It] Slow down!"
 }

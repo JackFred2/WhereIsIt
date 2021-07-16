@@ -29,6 +29,8 @@ public class WhereIsItConfig implements ConfigData {
         return clientOptions.alternateColour;
     }
 
+    public int getTextSizeModifier() { return clientOptions.textSizeModifier; }
+
     public boolean isRainbowMode() { return clientOptions.rainbowMode; }
 
     public boolean forceSimpleRender() {
@@ -60,6 +62,7 @@ public class WhereIsItConfig implements ConfigData {
         clientOptions.colour = MathHelper.clamp(clientOptions.colour, 0x000000, 0xffffff);
         clientOptions.alternateColour = MathHelper.clamp(clientOptions.alternateColour, 0x000000, 0xffffff);
         clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 10, 300);
+        clientOptions.textSizeModifier = MathHelper.clamp(clientOptions.textSizeModifier, 50, 400);
 
         serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 8, 32);
         serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
@@ -86,6 +89,10 @@ public class WhereIsItConfig implements ConfigData {
 
         @ConfigEntry.Gui.Tooltip
         public boolean forceSimpleRender = false;
+
+
+        @ConfigEntry.BoundedDiscrete(max = 400, min = 50)
+        public int textSizeModifier = 100;
     }
 
     static class Server {

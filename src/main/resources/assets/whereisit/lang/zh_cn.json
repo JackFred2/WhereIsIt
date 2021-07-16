@@ -22,6 +22,7 @@
     "text.autoconfig.whereisit.option.clientOptions.forceSimpleRender.@Tooltip": "是否使用简单渲染盒渲染轮廓。使用OptFine光影时强制开启。",
     "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight": "禁用背包栏位高亮",
     "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight.@Tooltip": "是否禁用高亮背包物品。",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Text Size Modifier",
     "text.autoconfig.whereisit.title": "Where Is It 配置",
     "whereisit.slowDown": "[Where Is It] 慢点！"
 }

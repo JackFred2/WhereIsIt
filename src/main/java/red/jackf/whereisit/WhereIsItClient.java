@@ -14,7 +14,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
@@ -25,12 +25,9 @@ import red.jackf.whereisit.client.RenderUtils;
 import red.jackf.whereisit.compat.OptifineHooks;
 import red.jackf.whereisit.network.FoundS2C;
 import red.jackf.whereisit.network.SearchC2S;
-import red.jackf.whereisit.utilities.FoundType;
-import red.jackf.whereisit.utilities.SearchResult;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
@@ -112,13 +109,9 @@ public class WhereIsItClient implements ClientModInitializer {
             });
         }));
 
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
-            RenderUtils.drawTextWithBackground(context1, new Vec3d(0, 20, 0), new LiteralText("bruh"), 64);
-        }));
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> RenderUtils.renderTexts(context1, simple || WhereIsIt.CONFIG.forceSimpleRender())));
 
-        WorldRenderEvents.LAST.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
-            RenderUtils.renderOutlines(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
-        }));
+        WorldRenderEvents.LAST.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> RenderUtils.renderHighlights(context1, simple || WhereIsIt.CONFIG.forceSimpleRender())));
 
         ClothClientHooks.SCREEN_LATE_RENDER.register(((stack, client, screen, x, y, tickDelta) -> RenderUtils.drawLastSlot(stack, screen)));
 

@@ -20,8 +20,9 @@
     "text.autoconfig.whereisit.option.clientOptions.lineWidth": "Толщина контура вокруг блока",
     "text.autoconfig.whereisit.option.clientOptions.forceSimpleRender": "Принудительная упрощённая отрисовка",
     "text.autoconfig.whereisit.option.clientOptions.forceSimpleRender.@Tooltip": "Стоит ли упрощённую отрисовку контуров. Принудительно включается при использовании шейдеров OptiFine.",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Text Size Modifier",
     "text.autoconfig.whereisit.title": "Настройки Where Is It",
     "whereisit.slowDown": "[Where Is It] Помедленнее!",
     "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight": "Отключить подсветку слота инвентаря",
-    "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight.@Tooltip": "Стоит ли отключать подсветку слота искомого предмета.",
+    "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight.@Tooltip": "Стоит ли отключать подсветку слота искомого предмета."
 }

@@ -41,9 +41,24 @@ public abstract class RenderUtils {
         }
     });
 
-    public static void renderOutlines(WorldRenderContext context, Boolean simpleRendering) {
+    public static void renderTexts(WorldRenderContext context, Boolean simpleRendering) {
         if (FOUND_ITEM_POSITIONS.size() == 0) return;
-        context.world().getProfiler().swap("whereisit");
+        context.world().getProfiler().swap("whereisit_text");
+
+        for (var entry : FOUND_ITEM_POSITIONS.entrySet()) {
+            var data = entry.getValue();
+            var i = data.getAllText().size() - 1;
+            for (Text text : data.getAllText()) {
+                var pos = Vec3d.of(data.pos).add(0, i * 0.3d * (WhereIsIt.CONFIG.getTextSizeModifier() / 100f), 0);
+                drawTextWithBackground(context, pos, text, 64);
+                i--;
+            }
+        }
+    }
+
+    public static void renderHighlights(WorldRenderContext context, Boolean simpleRendering) {
+        if (FOUND_ITEM_POSITIONS.size() == 0) return;
+        context.world().getProfiler().swap("whereisit_highlights");
         
         Camera camera = context.camera();
         Vec3d cameraPos = camera.getPos();
@@ -253,17 +268,18 @@ public abstract class RenderUtils {
      * @param maxDistance The maximum distance, after which the text will not be rendered.
      */
     public static void drawTextWithBackground(WorldRenderContext context, Vec3d pos, Text text, int maxDistance) {
-        EntityRenderDispatcher dispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
-        Vec3d finalPos = pos.subtract(context.camera().getPos()).add(0, 1, 0);
+        var dispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
+        var finalPos = pos.subtract(context.camera().getPos()).add(0.5, 1.5, 0.5);
+        float textScale = WhereIsIt.CONFIG.getTextSizeModifier() / 100f;
         if (finalPos.lengthSquared() <= maxDistance * maxDistance) {
-            MatrixStack matrices = context.matrixStack();
+            var matrices = context.matrixStack();
             matrices.push();
             matrices.translate(finalPos.x, finalPos.y, finalPos.z);
             matrices.multiply(dispatcher.getRotation());
-            matrices.scale(-0.025F, -0.025F, 0.025F);
-            Matrix4f matrix4f = matrices.peek().getModel();
+            matrices.scale(-0.025F * textScale, -0.025F * textScale, 0.025F * textScale);
+            var matrix4f = matrices.peek().getModel();
             int backgroundColour = (int) (MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25F) * 255.0F) << 24;
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            var textRenderer = MinecraftClient.getInstance().textRenderer;
             float xOffset = (float) (-textRenderer.getWidth(text) / 2);
             textRenderer.draw(text, xOffset, 0, 553648127, false, matrix4f, context.consumers(), true, backgroundColour, 15728880);
             textRenderer.draw(text, xOffset, 0, -1, false, matrix4f, context.consumers(), false, 0, 15728880);
