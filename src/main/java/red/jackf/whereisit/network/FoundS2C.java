@@ -10,11 +10,6 @@ import red.jackf.whereisit.WhereIsIt;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Old results class for backwards compatibility. Will be removed sometime in the future when I'm confident everyone's
- * updated.
- */
-@Deprecated
 public class FoundS2C extends PacketByteBuf {
     public static final Identifier ID = WhereIsIt.id("found_item_s2c");
 
