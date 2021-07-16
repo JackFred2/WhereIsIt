@@ -2,57 +2,80 @@ package red.jackf.whereisit.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
-import red.jackf.whereisit.FoundType;
+import org.jetbrains.annotations.Nullable;
+import red.jackf.whereisit.utilities.FoundType;
 import red.jackf.whereisit.WhereIsIt;
 
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 @Environment(EnvType.CLIENT)
 public class PositionData {
     public final BlockPos pos;
     public final long time;
     public final VoxelShape shape;
-    private final HashMap<Identifier, String> additional = new HashMap<>();
+    private List<Text> texts = null;
     public float r;
     public float g;
     public float b;
 
-    public PositionData(BlockPos pos, long time, VoxelShape shape, float r, float g, float b) {
+    public PositionData(BlockPos pos, long time, VoxelShape shape, float r, float g, float b, @Nullable Text initialName) {
         this.pos = pos;
         this.time = time;
         this.shape = shape;
         this.r = r;
         this.g = g;
         this.b = b;
+
+        if (initialName != null) {
+            assertTextList();
+            addText(initialName);
+        }
     }
 
-    public void addAdditional(Identifier id, String value) {
-        additional.put(id, value);
+    private void assertTextList() {
+        if (texts == null) texts = new ArrayList<>();
     }
 
-    public boolean hasAdditional(Identifier id) {
-        return additional.containsKey(id);
+    public List<Text> getAllText() {
+        return texts == null ? Collections.emptyList() : texts;
     }
 
-    public String getAdditional(Identifier id) {
-        return additional.get(id);
+    public void removeText(int index) {
+        if (texts != null) texts.remove(index);
     }
 
-    public static PositionData from(BlockPos pos, long time, VoxelShape shape, FoundType type) {
+    public void setText(int index, Text text) {
+        assertTextList();
+        texts.set(index, text);
+    }
+
+    public void addText(int index, Text text) {
+        assertTextList();
+        texts.add(index, text);
+    }
+
+    public void addText(Text text) {
+        assertTextList();
+        texts.add(text);
+    }
+
+    public static PositionData from(BlockPos pos, long time, VoxelShape shape, FoundType type, @Nullable Text name) {
         if (type == FoundType.FOUND_DEEP) {
             return new PositionData(pos, time, shape,
                 ((WhereIsIt.CONFIG.getAlternateColour() >> 16) & 0xff) / 255f,
                 ((WhereIsIt.CONFIG.getAlternateColour() >> 8) & 0xff) / 255f,
-                ((WhereIsIt.CONFIG.getAlternateColour()) & 0xff) / 255f);
+                ((WhereIsIt.CONFIG.getAlternateColour()) & 0xff) / 255f,
+                name);
         } else {
             return new PositionData(pos, time, shape,
                 ((WhereIsIt.CONFIG.getColour() >> 16) & 0xff) / 255f,
                 ((WhereIsIt.CONFIG.getColour() >> 8) & 0xff) / 255f,
-                ((WhereIsIt.CONFIG.getColour()) & 0xff) / 255f);
+                ((WhereIsIt.CONFIG.getColour()) & 0xff) / 255f,
+                name);
         }
     }
 

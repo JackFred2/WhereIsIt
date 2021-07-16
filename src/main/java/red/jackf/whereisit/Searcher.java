@@ -1,6 +1,5 @@
 package red.jackf.whereisit;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.LecternBlock;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -13,14 +12,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.util.Nameable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
+import red.jackf.whereisit.utilities.FoundType;
+import red.jackf.whereisit.utilities.SearchResult;
 
 import java.util.*;
 
 public abstract class Searcher {
-    public static Map<BlockPos, FoundType> searchWorld(BlockPos basePos, ServerWorld world, Item toFind, NbtCompound toFindTag) {
-        Map<BlockPos, FoundType> positions = new HashMap<>();
+    public static Map<BlockPos, SearchResult> searchWorld(BlockPos basePos, ServerWorld world, Item toFind, NbtCompound toFindTag) {
+        Map<BlockPos, SearchResult> positions = new HashMap<>();
         final int radius = WhereIsIt.CONFIG.getSearchRadius();
         int checkedBECount = 0;
 
@@ -38,27 +41,30 @@ public abstract class Searcher {
                 checkedBECount += chunk.getBlockEntities().size();
 
                 for (Map.Entry<BlockPos, BlockEntity> entry : chunk.getBlockEntities().entrySet()) {
-                    BlockPos pos = entry.getKey();
-                    BlockEntity be = entry.getValue();
+                    var pos = entry.getKey();
+                    var be = entry.getValue();
                     if (pos.isWithinDistance(basePos, radius)) {
-                        BlockState state = chunk.getBlockState(pos);
-                        FoundType result = FoundType.NOT_FOUND;
+                        var state = chunk.getBlockState(pos);
+                        var foundType = FoundType.NOT_FOUND;
+                        Text invName = null;
+
+                        if (be instanceof Nameable name && name.hasCustomName()) invName = name.getCustomName();
 
                         // Lecterns
                         if (state.getBlock() instanceof LecternBlock && state.get(LecternBlock.HAS_BOOK)) {
-                            result = searchItemStack(((LecternBlockEntity) be).getBook(), toFind, toFindTag, true);
+                            foundType = searchItemStack(((LecternBlockEntity) be).getBook(), toFind, toFindTag, true);
                         // Inventories (Chests etc)
                         } else if (be instanceof Inventory) {
-                            result = invContains((Inventory) be, toFind, toFindTag, true);
+                            foundType = invContains((Inventory) be, toFind, toFindTag, true);
                         // Alternative inventories (Composters)
                         } else if (state.getBlock() instanceof InventoryProvider) {
                             Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
                             if (inv != null)
-                                result = invContains(inv, toFind, toFindTag, true);
+                                foundType = invContains(inv, toFind, toFindTag, true);
                         }
 
-                        if (result != FoundType.NOT_FOUND)
-                            positions.put(pos.toImmutable(), result);
+                        if (foundType != FoundType.NOT_FOUND)
+                            positions.put(pos.toImmutable(), new SearchResult(foundType, invName));
                     }
                 }
             }

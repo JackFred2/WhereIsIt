@@ -25,6 +25,8 @@ import red.jackf.whereisit.client.RenderUtils;
 import red.jackf.whereisit.compat.OptifineHooks;
 import red.jackf.whereisit.network.FoundS2C;
 import red.jackf.whereisit.network.SearchC2S;
+import red.jackf.whereisit.utilities.FoundType;
+import red.jackf.whereisit.utilities.SearchResult;
 
 import java.util.Collection;
 import java.util.List;
@@ -94,12 +96,17 @@ public class WhereIsItClient implements ClientModInitializer {
         SEARCH_FOR_ITEM.register((item, matchNbt, tag) -> ClientPlayNetworking.send(SearchC2S.ID, new SearchC2S(item, matchNbt, tag)));
 
         ClientPlayNetworking.registerGlobalReceiver(FoundS2C.ID, ((client, handler, buf, responseSender) -> {
-            Map<BlockPos, FoundType> results = FoundS2C.read(buf);
+            var results = FoundS2C.read(buf);
 
             client.execute(() -> {
                 World world = handler.getWorld();
                 List<PositionData> found = results.entrySet().stream().map(
-                    entry -> PositionData.from(entry.getKey(), world.getTime(), world.getBlockState(entry.getKey()).getOutlineShape(world, entry.getKey()), entry.getValue())
+                    entry -> {
+                        var pos = entry.getKey();
+                        var type = entry.getValue().foundType();
+                        var name = entry.getValue().name();
+                        return PositionData.from(pos, world.getTime(), world.getBlockState(pos).getOutlineShape(world, pos), type, name);
+                    }
                 ).collect(Collectors.toList());
                 handleFoundItems(found);
             });

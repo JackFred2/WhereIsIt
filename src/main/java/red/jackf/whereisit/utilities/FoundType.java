@@ -1,4 +1,4 @@
-package red.jackf.whereisit;
+package red.jackf.whereisit.utilities;
 
 /**
  * States how an item was found, used for different colours.
