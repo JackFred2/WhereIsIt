@@ -13,10 +13,11 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
 import org.jetbrains.annotations.NotNull;
 import red.jackf.whereisit.client.PositionData;
 import red.jackf.whereisit.client.ItemSearchCallback;
@@ -90,9 +91,9 @@ public class WhereIsItClient implements ClientModInitializer {
         KeyBindingHelper.registerKeyBinding(FIND_ITEMS);
 
         // send a request to the server
-        SEARCH_FOR_ITEM.register((item, matchNbt, tag) -> ClientPlayNetworking.send(WhereIsIt.FIND_ITEM_PACKET_ID, new SearchC2S(item, matchNbt, tag)));
+        SEARCH_FOR_ITEM.register((item, matchNbt, tag) -> ClientPlayNetworking.send(SearchC2S.ID, new SearchC2S(item, matchNbt, tag)));
 
-        ClientPlayNetworking.registerGlobalReceiver(WhereIsIt.FOUND_ITEMS_PACKET_ID, ((client, handler, buf, responseSender) -> {
+        ClientPlayNetworking.registerGlobalReceiver(FoundS2C.ID, ((client, handler, buf, responseSender) -> {
             Map<BlockPos, FoundType> results = FoundS2C.read(buf);
 
             client.execute(() -> {
@@ -104,11 +105,15 @@ public class WhereIsItClient implements ClientModInitializer {
             });
         }));
 
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
+            RenderUtils.drawTextWithBackground(context1, new Vec3d(0, 20, 0), new LiteralText("bruh"), 64);
+        }));
+
         WorldRenderEvents.LAST.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
             RenderUtils.renderOutlines(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
         }));
 
-        ClothClientHooks.SCREEN_LATE_RENDER.register(RenderUtils::renderLastSlot);
+        ClothClientHooks.SCREEN_LATE_RENDER.register(((stack, client, screen, x, y, tickDelta) -> RenderUtils.drawLastSlot(stack, screen)));
 
         RenderUtils.RENDER_LOCATION_EVENT.register(((context, simpleRendering, positionData) -> {
             if (!WhereIsIt.CONFIG.isRainbowMode()) return;

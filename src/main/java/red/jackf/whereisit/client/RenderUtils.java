@@ -8,11 +8,14 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import org.lwjgl.opengl.GL11;
@@ -29,6 +32,9 @@ public abstract class RenderUtils {
     public static final Map<BlockPos, PositionData> FOUND_ITEM_POSITIONS = new HashMap<>();
     private static final List<BlockPos> toRemove = new ArrayList<>();
 
+    /**
+     * Hook for changing a {@link PositionData} before rendering, e.g. for changing colour/text.
+     */
     public static final Event<RenderLocation> RENDER_LOCATION_EVENT = EventFactory.createArrayBacked(RenderLocation.class, (context, simpleRendering, positionData) -> {}, callbacks -> (context, simpleRendering, positionData) -> {
         for (final RenderLocation callback : callbacks) {
             callback.renderLocation(context, simpleRendering, positionData);
@@ -76,7 +82,6 @@ public abstract class RenderUtils {
             }
 
             RenderSystem.disableDepthTest();
-
 
             // Bright boxes, in front of terrain but blocked by it
             if (!simpleRendering) {
@@ -135,6 +140,18 @@ public abstract class RenderUtils {
         }
     }
 
+    /**
+     * Draws a hologram of a VoxelShape with a specified colour and position.
+     * @param buffer {@link BufferBuilder} to create vertices for.
+     * @param shape {@link VoxelShape} to draw.
+     * @param x X coordinate offset.
+     * @param y Y coordinate offset.
+     * @param z Z coordinate offset.
+     * @param r Red colour component.
+     * @param g Green colour component.
+     * @param b Blue colour component.
+     * @param a Alpha colour component.
+     */
     private static void drawShape(BufferBuilder buffer, VoxelShape shape, double x, double y, double z, float r, float g, float b, float a) {
        shape.forEachBox((x1, y1, z1, x2, y2, z2) -> {
 
@@ -201,7 +218,10 @@ public abstract class RenderUtils {
         });
     }
 
-    public static void renderLastSlot(MatrixStack matrixStack, MinecraftClient minecraftClient, Screen screen, int mouseX, int mouseY, float tickDelta) {
+    /**
+     * Draws a highlight over slots that contain the last searched item.
+     */
+    public static void drawLastSlot(MatrixStack matrixStack, Screen screen) {
         if (WhereIsIt.CONFIG.disableSlotHighlight()) return;
         if (screen instanceof HandledScreen<?> handledScreen) {
             handledScreen.getScreenHandler().slots.forEach(slot -> {
@@ -221,6 +241,34 @@ public abstract class RenderUtils {
                     RenderSystem.enableDepthTest();
                 }
             });
+        }
+    }
+
+    /**
+     * Draws text at a specified location in the world, at the same scale as a nameplate.
+     * Call in {@link net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents#AFTER_ENTITIES} for correct occlusion with terrain.
+     * @param context The {@link WorldRenderContext} given by the render event hook.
+     * @param pos The position in-world to render text at.
+     * @param text The {@link Text} object to draw.
+     * @param maxDistance The maximum distance, after which the text will not be rendered.
+     */
+    public static void drawTextWithBackground(WorldRenderContext context, Vec3d pos, Text text, int maxDistance) {
+        EntityRenderDispatcher dispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
+        Vec3d finalPos = pos.subtract(context.camera().getPos()).add(0, 1, 0);
+        if (finalPos.lengthSquared() <= maxDistance * maxDistance) {
+            MatrixStack matrices = context.matrixStack();
+            matrices.push();
+            matrices.translate(finalPos.x, finalPos.y, finalPos.z);
+            matrices.multiply(dispatcher.getRotation());
+            matrices.scale(-0.025F, -0.025F, 0.025F);
+            Matrix4f matrix4f = matrices.peek().getModel();
+            int backgroundColour = (int) (MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25F) * 255.0F) << 24;
+            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            float xOffset = (float) (-textRenderer.getWidth(text) / 2);
+            textRenderer.draw(text, xOffset, 0, 553648127, false, matrix4f, context.consumers(), true, backgroundColour, 15728880);
+            textRenderer.draw(text, xOffset, 0, -1, false, matrix4f, context.consumers(), false, 0, 15728880);
+            matrices.pop();
+            RenderSystem.applyModelViewMatrix();
         }
     }
 
