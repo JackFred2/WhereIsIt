@@ -17,3 +17,4 @@ All other code and resources are licensed under the MIT license.
 - law4x - Chinese Translation
 - zml2008 - Optifine Compatibility Code
 - Alexey2gor - Russian Translation
+- kyrtion - Russian Translation
