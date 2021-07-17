@@ -13,16 +13,16 @@
     "text.autoconfig.whereisit.option.clientOptions.colour.@Tooltip": "Показывается, когда предмет найден.",
     "text.autoconfig.whereisit.option.clientOptions.alternateColour": "Альтернативный цвет контура",
     "text.autoconfig.whereisit.option.clientOptions.alternateColour.@Tooltip": "Показывается, когда предмет найден с помощью глубокого поиска.",
-    "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Rainbow Mode",
-    "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Overrides colours above when enabled.",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime": "Время затухания",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@Tooltip": "Время в тиках, за которое выделение затухает.",
     "text.autoconfig.whereisit.option.clientOptions.lineWidth": "Толщина контура вокруг блока",
     "text.autoconfig.whereisit.option.clientOptions.forceSimpleRender": "Принудительная упрощённая отрисовка",
     "text.autoconfig.whereisit.option.clientOptions.forceSimpleRender.@Tooltip": "Стоит ли упрощённую отрисовку контуров. Принудительно включается при использовании шейдеров OptiFine.",
-    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Text Size Modifier",
     "text.autoconfig.whereisit.title": "Настройки Where Is It",
     "whereisit.slowDown": "[Where Is It] Помедленнее!",
     "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight": "Отключить подсветку слота инвентаря",
-    "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight.@Tooltip": "Стоит ли отключать подсветку слота искомого предмета."
+    "text.autoconfig.whereisit.option.clientOptions.disableSlotHighlight.@Tooltip": "Стоит ли отключать подсветку слота искомого предмета.",
+    "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Радужный режим",
+    "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Переопределяет цвета, указанные выше, если они включены.",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Модификационный размер текста"
 }
