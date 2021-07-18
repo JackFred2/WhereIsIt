@@ -109,9 +109,13 @@ public class WhereIsItClient implements ClientModInitializer {
             });
         }));
 
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> RenderUtils.renderTexts(context1, simple || WhereIsIt.CONFIG.forceSimpleRender())));
-
-        WorldRenderEvents.LAST.register(context -> OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> RenderUtils.renderHighlights(context1, simple || WhereIsIt.CONFIG.forceSimpleRender())));
+        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((context, hitResult) -> {
+            OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
+                RenderUtils.renderHighlights(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
+                RenderUtils.renderTexts(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
+            });
+            return true;
+        });
 
         ClothClientHooks.SCREEN_LATE_RENDER.register(((stack, client, screen, x, y, tickDelta) -> RenderUtils.drawLastSlot(stack, screen)));
 

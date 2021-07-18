@@ -76,10 +76,8 @@ public abstract class RenderUtils {
         stack.push();
         stack.scale(0.998f, 0.998f, 0.998f); // fixes z fighting by pulling all faces slightly closer to the camera
 
-        if (FabricLoader.getInstance().isModLoaded("canvas")) { // canvas compat
-            stack.multiply(new Quaternion(Vec3f.POSITIVE_X, camera.getPitch(), true));
-            stack.multiply(new Quaternion(Vec3f.POSITIVE_Y, camera.getYaw() + 180f, true));
-        }
+        stack.multiply(new Quaternion(Vec3f.POSITIVE_X, camera.getPitch(), true));
+        stack.multiply(new Quaternion(Vec3f.POSITIVE_Y, camera.getYaw() + 180f, true));
 
         RenderSystem.applyModelViewMatrix();
 
