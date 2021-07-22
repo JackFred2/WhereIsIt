@@ -72,33 +72,35 @@ jar {
 }
 
 curseforge {
-	apiKey = project.findProperty("cf.key")
-	project {
-		id = "378036"
-		changelog = "Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt"
-		releaseType = "release"
+	if (project.hasProperty("cf.key")) {
+		apiKey = project.findProperty("cf.key")
+		project {
+			id = "378036"
+			changelog = "Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt"
+			releaseType = "release"
 
-		addGameVersion "Fabric"
-		addGameVersion "Java 16"
+			addGameVersion "Fabric"
+			addGameVersion "Java 16"
 
-		addGameVersion "1.17"
-		addGameVersion "1.17.1"
+			addGameVersion "1.17"
+			addGameVersion "1.17.1"
 
-		mainArtifact(remapJar) {
-			relations {
-				requiredDependency("fabric-api")
-				optionalDependency("modmenu")
-				optionalDependency("roughly-enough-items")
-				requiredDependency("cloth-config")
-				requiredDependency("cloth-api")
+			mainArtifact(remapJar) {
+				relations {
+					requiredDependency("fabric-api")
+					optionalDependency("modmenu")
+					optionalDependency("roughly-enough-items")
+					requiredDependency("cloth-config")
+					requiredDependency("cloth-api")
+				}
+				displayName = "${project.prefix} ${archivesBaseName}-${version}.jar"
 			}
-			displayName = "${project.prefix} ${archivesBaseName}-${version}.jar"
+
 		}
 
-	}
-
-	options {
-		forgeGradleIntegration = false
+		options {
+			forgeGradleIntegration = false
+		}
 	}
 }
 
