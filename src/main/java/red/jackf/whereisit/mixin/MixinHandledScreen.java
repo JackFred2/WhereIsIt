@@ -25,7 +25,7 @@ public abstract class MixinHandledScreen {
     private void whereisit$handleModdedKeys(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (WhereIsItClient.FIND_ITEMS.matchesKey(keyCode, scanCode)) {
             if (whereisit$getFocusedSlot() != null && whereisit$getFocusedSlot().hasStack()) {
-                WhereIsItClient.searchForItem(whereisit$getFocusedSlot().getStack().getItem(), Screen.hasShiftDown(), whereisit$getFocusedSlot().getStack().getTag());
+                WhereIsItClient.searchForItem(whereisit$getFocusedSlot().getStack().getItem(), Screen.hasShiftDown(), whereisit$getFocusedSlot().getStack().getNbt());
                 //cir.setReturnValue(true);
             }
         }

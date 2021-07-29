@@ -6,13 +6,10 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -239,7 +236,7 @@ public abstract class RenderUtils {
         if (screen instanceof HandledScreen<?> handledScreen) {
             handledScreen.getScreenHandler().slots.forEach(slot -> {
                 ItemStack stack = slot.getStack();
-                if (Searcher.areStacksEqual(stack.getItem(), stack.getTag(), WhereIsItClient.getLastSearchedItem(), WhereIsItClient.getLastSearchedTag(), WhereIsItClient.lastSearchIgnoreNbt())) {
+                if (Searcher.areStacksEqual(stack.getItem(), stack.getNbt(), WhereIsItClient.getLastSearchedItem(), WhereIsItClient.getLastSearchedTag(), WhereIsItClient.lastSearchIgnoreNbt())) {
                     int x = slot.x + ((AccessorHandledScreen) screen).getX();
                     int y = slot.y + ((AccessorHandledScreen) screen).getY();
                     final int colour = 0x80FFFF00;

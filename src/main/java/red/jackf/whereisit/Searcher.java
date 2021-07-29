@@ -78,17 +78,17 @@ public abstract class Searcher {
     }
 
     public static FoundType searchItemStack(ItemStack itemStack, Item toFind, NbtCompound toFindTag, boolean deepSearch) {
-        if (itemStack.getItem() == toFind && (toFindTag == null || toFindTag.equals(itemStack.getTag()))) {
+        if (itemStack.getItem() == toFind && (toFindTag == null || toFindTag.equals(itemStack.getNbt()))) {
             return FoundType.FOUND;
         } else if (!itemStack.isEmpty() && WhereIsIt.CONFIG.doDeepSearch() && deepSearch) {
             // Shulker Boxes
             if (itemStack.getItem() instanceof BlockItem && ((BlockItem) itemStack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
-                NbtCompound tag = itemStack.getSubTag("BlockEntityTag");
+                NbtCompound tag = itemStack.getSubNbt("BlockEntityTag");
                 if (tag != null && tag.contains("Items", 9)) {
                     NbtList items = tag.getList("Items", 10);
                     for (int i = 0; i < items.size(); i++) {
                         ItemStack containedStack = ItemStack.fromNbt(items.getCompound(i));
-                        if (containedStack.getItem() == toFind && (toFindTag == null || toFindTag.equals(containedStack.getTag()))) {
+                        if (containedStack.getItem() == toFind && (toFindTag == null || toFindTag.equals(containedStack.getNbt()))) {
                             return FoundType.FOUND_DEEP;
                         }
                     }
