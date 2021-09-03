@@ -27,4 +27,4 @@ All other code and resources are licensed under the MIT license.
 
 ### Credits
 
-See the [fabric.mod.json](src/resources/fabric.mod.json)
+See the [fabric.mod.json](src/main/resources/fabric.mod.json)
