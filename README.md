@@ -11,10 +11,10 @@ Current translation targets (as of 2021/09/03):
 - French (100%) ✅
 - German (0%)
 - Italian (0%)
-- Polish (76%)
+- Polish (96%)
 - Portuguese (0%)
 - Russian (100%) ✅
-- Spanish (3%)
+- Spanish (100%) ✅
 - Turkish (3%)
 - Welsh (0%)
 
