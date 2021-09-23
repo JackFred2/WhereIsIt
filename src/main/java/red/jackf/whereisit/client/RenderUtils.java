@@ -236,7 +236,7 @@ public abstract class RenderUtils {
         if (screen instanceof HandledScreen<?> handledScreen) {
             handledScreen.getScreenHandler().slots.forEach(slot -> {
                 ItemStack stack = slot.getStack();
-                if (Searcher.areStacksEqual(stack.getItem(), stack.getNbt(), WhereIsItClient.getLastSearchedItem(), WhereIsItClient.getLastSearchedTag(), WhereIsItClient.lastSearchIgnoreNbt())) {
+                if (slot.hasStack() && Searcher.areStacksEqual(stack.getItem(), stack.getNbt(), WhereIsItClient.getLastSearchedItem(), WhereIsItClient.getLastSearchedTag(), WhereIsItClient.lastSearchIgnoreNbt())) {
                     int x = slot.x + ((AccessorHandledScreen) screen).getX();
                     int y = slot.y + ((AccessorHandledScreen) screen).getY();
                     final int colour = 0x80FFFF00;

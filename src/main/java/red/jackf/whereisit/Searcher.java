@@ -114,6 +114,6 @@ public abstract class Searcher {
     }
 
     public static boolean areStacksEqual(Item item1, NbtCompound tag1, Item item2, NbtCompound tag2, boolean ignoreNbt) {
-        return item1.equals(item2) && (ignoreNbt || Objects.equals(tag1,tag2));
+        return Objects.equals(item1, item2) && (ignoreNbt || Objects.equals(tag1,tag2));
     }
 }
