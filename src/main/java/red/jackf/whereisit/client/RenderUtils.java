@@ -84,7 +84,7 @@ public abstract class RenderUtils {
             RENDER_LOCATION_EVENT.invoker().renderLocation(context, simpleRendering, positionData);
             
             long timeDiff = context.world().getTime() - positionData.time;
-            float a = ((WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime());
+            float a = ((WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime()) * 0.6f;
 
             Vec3d finalPos = cameraPos.subtract(positionData.pos.getX(), positionData.pos.getY(), positionData.pos.getZ()).negate();
             if (finalPos.lengthSquared() > 4096) { // if it's more than 64 blocks away, scale it so distant ones are still visible

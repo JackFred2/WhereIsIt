@@ -9,6 +9,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +36,11 @@ public class WhereIsIt implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        AutoConfig.getConfigHolder(WhereIsItConfig.class).registerSaveListener((configHolder, whereIsItConfig) -> {
+            whereIsItConfig.validatePostLoad();
+            return ActionResult.PASS;
+        });
+
         if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
             REILoaded = true;
             log("REI Found");

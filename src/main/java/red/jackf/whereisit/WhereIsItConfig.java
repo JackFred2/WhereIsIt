@@ -5,6 +5,8 @@ import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Objects;
+
 @Config(name = WhereIsIt.MODID)
 @Config.Gui.Background("minecraft:textures/block/barrel_top.png")
 public class WhereIsItConfig implements ConfigData {
@@ -61,17 +63,17 @@ public class WhereIsItConfig implements ConfigData {
     public void validatePostLoad() {
         clientOptions.colour = MathHelper.clamp(clientOptions.colour, 0x000000, 0xffffff);
         clientOptions.alternateColour = MathHelper.clamp(clientOptions.alternateColour, 0x000000, 0xffffff);
-        clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 10, 300);
+        clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 10, 3600 * 20);
         clientOptions.textSizeModifier = MathHelper.clamp(clientOptions.textSizeModifier, 50, 400);
 
-        serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 8, 32);
+        serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 8, 48);
         serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
     }
 
     static class Client {
-        @ConfigEntry.BoundedDiscrete(max = 300, min = 10)
+        //@ConfigEntry.BoundedDiscrete(max = 300, min = 10)
         @ConfigEntry.Gui.Tooltip
-        public int fadeOutTime = 140;
+        public int fadeOutTime = 200;
 
         @ConfigEntry.ColorPicker
         @ConfigEntry.Gui.Tooltip
@@ -96,7 +98,7 @@ public class WhereIsItConfig implements ConfigData {
     }
 
     static class Server {
-        @ConfigEntry.BoundedDiscrete(max = 32, min = 8)
+        @ConfigEntry.BoundedDiscrete(max = 48, min = 8)
         public int searchRadius = 16;
 
         @ConfigEntry.Gui.Tooltip
