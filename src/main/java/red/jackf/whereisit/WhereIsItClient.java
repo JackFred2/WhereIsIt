@@ -13,14 +13,11 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
-import red.jackf.whereisit.client.PositionData;
 import red.jackf.whereisit.client.ItemSearchCallback;
+import red.jackf.whereisit.client.PositionData;
 import red.jackf.whereisit.client.RenderUtils;
 import red.jackf.whereisit.compat.OptifineHooks;
 import red.jackf.whereisit.network.FoundS2C;
@@ -38,7 +35,13 @@ public class WhereIsItClient implements ClientModInitializer {
         89,
         "key.categories.whereisit"
     );
-
+    /**
+     * Triggered when a search is requested (i.e. the search key is pressed)
+     */
+    public static final Event<ItemSearchCallback> SEARCH_FOR_ITEM = EventFactory.createArrayBacked(ItemSearchCallback.class, listeners -> (item, matchNbt, tag) -> {
+        for (ItemSearchCallback callback : listeners)
+            callback.searchForItem(item, matchNbt, tag);
+    });
     private static Item lastSearchedItem = null;
     private static NbtCompound lastSearchedTag = null;
     private static boolean lastSearchedIgnoreNbt = false;
@@ -54,14 +57,6 @@ public class WhereIsItClient implements ClientModInitializer {
     public static boolean lastSearchIgnoreNbt() {
         return lastSearchedIgnoreNbt;
     }
-
-    /**
-     * Triggered when a search is requested (i.e. the search key is pressed)
-     */
-    public static final Event<ItemSearchCallback> SEARCH_FOR_ITEM = EventFactory.createArrayBacked(ItemSearchCallback.class, listeners -> (item, matchNbt, tag) -> {
-        for (ItemSearchCallback callback : listeners)
-            callback.searchForItem(item, matchNbt, tag);
-    });
 
     /**
      * Trigger a search request

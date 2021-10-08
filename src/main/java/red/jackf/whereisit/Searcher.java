@@ -19,7 +19,9 @@ import net.minecraft.world.chunk.WorldChunk;
 import red.jackf.whereisit.utilities.FoundType;
 import red.jackf.whereisit.utilities.SearchResult;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public abstract class Searcher {
     public static Map<BlockPos, SearchResult> searchWorld(BlockPos basePos, ServerWorld world, Item toFind, NbtCompound toFindTag) {
@@ -53,10 +55,10 @@ public abstract class Searcher {
                         // Lecterns
                         if (state.getBlock() instanceof LecternBlock && state.get(LecternBlock.HAS_BOOK)) {
                             foundType = searchItemStack(((LecternBlockEntity) be).getBook(), toFind, toFindTag, true);
-                        // Inventories (Chests etc)
+                            // Inventories (Chests etc)
                         } else if (be instanceof Inventory) {
                             foundType = invContains((Inventory) be, toFind, toFindTag, true);
-                        // Alternative inventories (Composters)
+                            // Alternative inventories (Composters)
                         } else if (state.getBlock() instanceof InventoryProvider) {
                             Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
                             if (inv != null)
@@ -114,6 +116,6 @@ public abstract class Searcher {
     }
 
     public static boolean areStacksEqual(Item item1, NbtCompound tag1, Item item2, NbtCompound tag2, boolean ignoreNbt) {
-        return Objects.equals(item1, item2) && (ignoreNbt || Objects.equals(tag1,tag2));
+        return Objects.equals(item1, item2) && (ignoreNbt || Objects.equals(tag1, tag2));
     }
 }

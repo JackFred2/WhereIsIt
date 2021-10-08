@@ -23,12 +23,14 @@ public class REIHandler {
 
             // Big List
             EntryStack<?> mainListFocused = overlay.getEntryList().getFocusedStack();
-            if (!mainListFocused.isEmpty() && mainListFocused.getValueType() == ItemStack.class) return (ItemStack) mainListFocused.getValue();
+            if (!mainListFocused.isEmpty() && mainListFocused.getValueType() == ItemStack.class)
+                return (ItemStack) mainListFocused.getValue();
 
             // Favourites
             if (overlay.getFavoritesList().isPresent()) {
                 EntryStack<?> favouritesFocused = overlay.getFavoritesList().get().getFocusedStack();
-                if (!favouritesFocused.isEmpty() && favouritesFocused.getValueType() == ItemStack.class) return (ItemStack) favouritesFocused.getValue();
+                if (!favouritesFocused.isEmpty() && favouritesFocused.getValueType() == ItemStack.class)
+                    return (ItemStack) favouritesFocused.getValue();
             }
 
             /*if (MinecraftClient.getInstance().currentScreen instanceof RecipeViewingScreen

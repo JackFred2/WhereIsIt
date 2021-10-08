@@ -8,9 +8,9 @@
   "client": [
     "AccessorDrawableHelper",
     "AccessorHandledScreen",
-    "MixinMinecraftClient",
     "MixinDebugHud",
     "MixinHandledScreen",
+    "MixinMinecraftClient",
     "MixinScreen"
   ],
   "injectors": {

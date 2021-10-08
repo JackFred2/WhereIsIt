@@ -71,6 +71,7 @@ public final class OptifineHooks {
 
     /**
      * If optifine is available, modify shader state to do our rendering. Otherwise, just use our renderer.
+     *
      * @param renderer the actual callback to do some rendering
      */
     public static void doOptifineAwareRender(final WorldRenderContext ctx, final BiConsumer<WorldRenderContext, Boolean> renderer) {

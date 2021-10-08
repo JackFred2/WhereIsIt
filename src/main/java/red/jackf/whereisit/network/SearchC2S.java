@@ -29,5 +29,6 @@ public class SearchC2S extends PacketByteBuf {
         return new Context(item, matchNbt, tag);
     }
 
-    public record Context(Item item, boolean matchNbt, @Nullable NbtCompound tag) {}
+    public record Context(Item item, boolean matchNbt, @Nullable NbtCompound tag) {
+    }
 }

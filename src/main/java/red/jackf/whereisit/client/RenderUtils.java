@@ -27,16 +27,16 @@ import java.util.*;
 @Environment(EnvType.CLIENT)
 public abstract class RenderUtils {
     public static final Map<BlockPos, PositionData> FOUND_ITEM_POSITIONS = new HashMap<>();
-    private static final List<BlockPos> toRemove = new ArrayList<>();
-
     /**
      * Hook for changing a {@link PositionData} before rendering, e.g. for changing colour/text.
      */
-    public static final Event<RenderLocation> RENDER_LOCATION_EVENT = EventFactory.createArrayBacked(RenderLocation.class, (context, simpleRendering, positionData) -> {}, callbacks -> (context, simpleRendering, positionData) -> {
+    public static final Event<RenderLocation> RENDER_LOCATION_EVENT = EventFactory.createArrayBacked(RenderLocation.class, (context, simpleRendering, positionData) -> {
+    }, callbacks -> (context, simpleRendering, positionData) -> {
         for (final RenderLocation callback : callbacks) {
             callback.renderLocation(context, simpleRendering, positionData);
         }
     });
+    private static final List<BlockPos> toRemove = new ArrayList<>();
 
     public static void renderTexts(WorldRenderContext context, Boolean simpleRendering) {
         if (FOUND_ITEM_POSITIONS.size() == 0) return;
@@ -56,7 +56,7 @@ public abstract class RenderUtils {
     public static void renderHighlights(WorldRenderContext context, Boolean simpleRendering) {
         if (FOUND_ITEM_POSITIONS.size() == 0) return;
         context.world().getProfiler().swap("whereisit_highlights");
-        
+
         Camera camera = context.camera();
         Vec3d cameraPos = camera.getPos();
 
@@ -82,7 +82,7 @@ public abstract class RenderUtils {
             PositionData positionData = entry.getValue();
 
             RENDER_LOCATION_EVENT.invoker().renderLocation(context, simpleRendering, positionData);
-            
+
             long timeDiff = context.world().getTime() - positionData.time;
             float a = ((WhereIsIt.CONFIG.getFadeoutTime() - timeDiff) / (float) WhereIsIt.CONFIG.getFadeoutTime()) * 0.6f;
 
@@ -152,79 +152,80 @@ public abstract class RenderUtils {
 
     /**
      * Draws a hologram of a VoxelShape with a specified colour and position.
+     *
      * @param buffer {@link BufferBuilder} to create vertices for.
-     * @param shape {@link VoxelShape} to draw.
-     * @param x X coordinate offset.
-     * @param y Y coordinate offset.
-     * @param z Z coordinate offset.
-     * @param r Red colour component.
-     * @param g Green colour component.
-     * @param b Blue colour component.
-     * @param a Alpha colour component.
+     * @param shape  {@link VoxelShape} to draw.
+     * @param x      X coordinate offset.
+     * @param y      Y coordinate offset.
+     * @param z      Z coordinate offset.
+     * @param r      Red colour component.
+     * @param g      Green colour component.
+     * @param b      Blue colour component.
+     * @param a      Alpha colour component.
      */
     private static void drawShape(BufferBuilder buffer, VoxelShape shape, double x, double y, double z, float r, float g, float b, float a) {
-       shape.forEachBox((x1, y1, z1, x2, y2, z2) -> {
+        shape.forEachBox((x1, y1, z1, x2, y2, z2) -> {
 
-           double lowX = x1 + x;
-           double lowY = y1 + y;
-           double lowZ = z1 + z;
-           double highX = x2 + x;
-           double highY = y2 + y;
-           double highZ = z2 + z;
+            double lowX = x1 + x;
+            double lowY = y1 + y;
+            double lowZ = z1 + z;
+            double highX = x2 + x;
+            double highY = y2 + y;
+            double highZ = z2 + z;
 
             //bottom / -y
-            buffer.vertex(lowX , lowY , lowZ ).color(r, g, b, a).next();
-            buffer.vertex(highX, lowY , highZ).color(r, g, b, a).next();
-            buffer.vertex(lowX , lowY , highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(highX, lowY, highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, highZ).color(r, g, b, a).next();
 
-            buffer.vertex(lowX , lowY , lowZ ).color(r, g, b, a).next();
-            buffer.vertex(highX, lowY , lowZ ).color(r, g, b, a).next();
-            buffer.vertex(highX, lowY , highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(highX, lowY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(highX, lowY, highZ).color(r, g, b, a).next();
 
             //top / +y
-            buffer.vertex(lowX , highY, lowZ ).color(r, g, b, a).next();
-            buffer.vertex(lowX , highY, highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, highY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, highY, highZ).color(r, g, b, a).next();
             buffer.vertex(highX, highY, highZ).color(r, g, b, a).next();
 
-            buffer.vertex(lowX , highY, lowZ ).color(r, g, b, a).next();
+            buffer.vertex(lowX, highY, lowZ).color(r, g, b, a).next();
             buffer.vertex(highX, highY, highZ).color(r, g, b, a).next();
-            buffer.vertex(highX, highY, lowZ ).color(r, g, b, a).next();
+            buffer.vertex(highX, highY, lowZ).color(r, g, b, a).next();
 
             //west / -x
-            buffer.vertex(lowX , lowY , lowZ ).color(r, g, b, a).next();
-            buffer.vertex(lowX , lowY , highZ).color(r, g, b, a).next();
-            buffer.vertex(lowX , highY, highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, highY, highZ).color(r, g, b, a).next();
 
-            buffer.vertex(lowX , lowY , lowZ ).color(r, g, b, a).next();
-            buffer.vertex(lowX , highY, highZ).color(r, g, b, a).next();
-            buffer.vertex(lowX , highY, lowZ ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, highY, highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, highY, lowZ).color(r, g, b, a).next();
 
             //east / +x
-            buffer.vertex(highX, lowY , lowZ ).color(r, g, b, a).next();
+            buffer.vertex(highX, lowY, lowZ).color(r, g, b, a).next();
             buffer.vertex(highX, highY, highZ).color(r, g, b, a).next();
-            buffer.vertex(highX, lowY , highZ).color(r, g, b, a).next();
+            buffer.vertex(highX, lowY, highZ).color(r, g, b, a).next();
 
-            buffer.vertex(highX, lowY , lowZ ).color(r, g, b, a).next();
-            buffer.vertex(highX, highY, lowZ ).color(r, g, b, a).next();
+            buffer.vertex(highX, lowY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(highX, highY, lowZ).color(r, g, b, a).next();
             buffer.vertex(highX, highY, highZ).color(r, g, b, a).next();
 
             //west / -x
-            buffer.vertex(lowX , lowY , highZ).color(r, g, b, a).next();
-            buffer.vertex(highX, lowY , highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, highZ).color(r, g, b, a).next();
+            buffer.vertex(highX, lowY, highZ).color(r, g, b, a).next();
             buffer.vertex(highX, highY, highZ).color(r, g, b, a).next();
 
-            buffer.vertex(lowX , lowY , highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, highZ).color(r, g, b, a).next();
             buffer.vertex(highX, highY, highZ).color(r, g, b, a).next();
-            buffer.vertex(lowX , highY, highZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, highY, highZ).color(r, g, b, a).next();
 
             //west / -x
-            buffer.vertex(lowX , lowY , lowZ ).color(r, g, b, a).next();
-            buffer.vertex(highX, highY, lowZ ).color(r, g, b, a).next();
-            buffer.vertex(highX, lowY , lowZ ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(highX, highY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(highX, lowY, lowZ).color(r, g, b, a).next();
 
-            buffer.vertex(lowX , lowY , lowZ ).color(r, g, b, a).next();
-            buffer.vertex(lowX , highY, lowZ ).color(r, g, b, a).next();
-            buffer.vertex(highX, highY, lowZ ).color(r, g, b, a).next();
+            buffer.vertex(lowX, lowY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(lowX, highY, lowZ).color(r, g, b, a).next();
+            buffer.vertex(highX, highY, lowZ).color(r, g, b, a).next();
         });
     }
 
@@ -257,9 +258,10 @@ public abstract class RenderUtils {
     /**
      * Draws text at a specified location in the world, at the same scale as a nameplate.
      * Call in {@link net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents#AFTER_ENTITIES} for correct occlusion with terrain.
-     * @param context The {@link WorldRenderContext} given by the render event hook.
-     * @param pos The position in-world to render text at.
-     * @param text The {@link Text} object to draw.
+     *
+     * @param context     The {@link WorldRenderContext} given by the render event hook.
+     * @param pos         The position in-world to render text at.
+     * @param text        The {@link Text} object to draw.
      * @param maxDistance The maximum distance, after which the text will not be rendered.
      */
     public static void drawTextWithBackground(WorldRenderContext context, Vec3d pos, Text text, int maxDistance) {
@@ -283,24 +285,30 @@ public abstract class RenderUtils {
         }
     }
 
-    @FunctionalInterface
-    public interface RenderLocation {
-        void renderLocation(WorldRenderContext context, Boolean simpleRendering, PositionData positionData);
-    }
-
     public static Vec3f hueToColour(float hue) {
         hue = ((hue % 360) + 360) % 360;
         float factor = 1 - Math.abs(MathHelper.floorMod(hue / 60f, 2) - 1);
 
         switch ((int) (hue / 60)) {
-            case 0 : return new Vec3f(1, factor,0);
-            case 1 : return new Vec3f(factor, 1,0);
-            case 2 : return new Vec3f(0,1, factor);
-            case 3 : return new Vec3f(0,factor, 1);
-            case 4 : return new Vec3f(factor,0, 1);
-            case 5 : return new Vec3f(1,0, factor);
+            case 0:
+                return new Vec3f(1, factor, 0);
+            case 1:
+                return new Vec3f(factor, 1, 0);
+            case 2:
+                return new Vec3f(0, 1, factor);
+            case 3:
+                return new Vec3f(0, factor, 1);
+            case 4:
+                return new Vec3f(factor, 0, 1);
+            case 5:
+                return new Vec3f(1, 0, factor);
         }
 
         throw new RuntimeException("Exhausted switch statement?");
+    }
+
+    @FunctionalInterface
+    public interface RenderLocation {
+        void renderLocation(WorldRenderContext context, Boolean simpleRendering, PositionData positionData);
     }
 }

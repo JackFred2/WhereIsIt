@@ -17,7 +17,9 @@ import org.apache.logging.log4j.Logger;
 import red.jackf.whereisit.network.FoundS2C;
 import red.jackf.whereisit.network.SearchC2S;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class WhereIsIt implements ModInitializer {
     public static final String MODID = "whereisit";

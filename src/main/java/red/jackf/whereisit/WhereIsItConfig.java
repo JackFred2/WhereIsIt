@@ -5,8 +5,6 @@ import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.Objects;
-
 @Config(name = WhereIsIt.MODID)
 @Config.Gui.Background("minecraft:textures/block/barrel_top.png")
 public class WhereIsItConfig implements ConfigData {
@@ -31,9 +29,13 @@ public class WhereIsItConfig implements ConfigData {
         return clientOptions.alternateColour;
     }
 
-    public int getTextSizeModifier() { return clientOptions.textSizeModifier; }
+    public int getTextSizeModifier() {
+        return clientOptions.textSizeModifier;
+    }
 
-    public boolean isRainbowMode() { return clientOptions.rainbowMode; }
+    public boolean isRainbowMode() {
+        return clientOptions.rainbowMode;
+    }
 
     public boolean forceSimpleRender() {
         return clientOptions.forceSimpleRender;

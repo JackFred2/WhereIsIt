@@ -3,24 +3,26 @@ package red.jackf.whereisit.client;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import red.jackf.whereisit.utilities.FoundType;
 import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.utilities.FoundType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
 public class PositionData {
     public final BlockPos pos;
     public final long time;
     public final VoxelShape shape;
-    private List<Text> texts = null;
     public float r;
     public float g;
     public float b;
+    private List<Text> texts = null;
 
     public PositionData(BlockPos pos, long time, VoxelShape shape, float r, float g, float b, @Nullable Text initialName) {
         this.pos = pos;
@@ -33,6 +35,22 @@ public class PositionData {
         if (initialName != null) {
             assertTextList();
             addText(initialName);
+        }
+    }
+
+    public static PositionData from(BlockPos pos, long time, VoxelShape shape, FoundType type, @Nullable Text name) {
+        if (type == FoundType.FOUND_DEEP) {
+            return new PositionData(pos, time, shape,
+                ((WhereIsIt.CONFIG.getAlternateColour() >> 16) & 0xff) / 255f,
+                ((WhereIsIt.CONFIG.getAlternateColour() >> 8) & 0xff) / 255f,
+                ((WhereIsIt.CONFIG.getAlternateColour()) & 0xff) / 255f,
+                name);
+        } else {
+            return new PositionData(pos, time, shape,
+                ((WhereIsIt.CONFIG.getColour() >> 16) & 0xff) / 255f,
+                ((WhereIsIt.CONFIG.getColour() >> 8) & 0xff) / 255f,
+                ((WhereIsIt.CONFIG.getColour()) & 0xff) / 255f,
+                name);
         }
     }
 
@@ -61,22 +79,6 @@ public class PositionData {
     public void addText(Text text) {
         assertTextList();
         texts.add(text);
-    }
-
-    public static PositionData from(BlockPos pos, long time, VoxelShape shape, FoundType type, @Nullable Text name) {
-        if (type == FoundType.FOUND_DEEP) {
-            return new PositionData(pos, time, shape,
-                ((WhereIsIt.CONFIG.getAlternateColour() >> 16) & 0xff) / 255f,
-                ((WhereIsIt.CONFIG.getAlternateColour() >> 8) & 0xff) / 255f,
-                ((WhereIsIt.CONFIG.getAlternateColour()) & 0xff) / 255f,
-                name);
-        } else {
-            return new PositionData(pos, time, shape,
-                ((WhereIsIt.CONFIG.getColour() >> 16) & 0xff) / 255f,
-                ((WhereIsIt.CONFIG.getColour() >> 8) & 0xff) / 255f,
-                ((WhereIsIt.CONFIG.getColour()) & 0xff) / 255f,
-                name);
-        }
     }
 
     @Override

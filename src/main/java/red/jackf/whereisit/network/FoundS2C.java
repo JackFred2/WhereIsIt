@@ -4,8 +4,8 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import red.jackf.whereisit.utilities.FoundType;
 import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.utilities.FoundType;
 import red.jackf.whereisit.utilities.SearchResult;
 
 import java.util.HashMap;
@@ -13,13 +13,13 @@ import java.util.Map;
 
 /**
  * Structure:
- *
+ * <p>
  * int: size of results
  * for each result:
- *   BlockPos: position
- *   FoundType: type of finding (either normal or deep)
- *   boolean: if there's a custom name
- *   (if above bool is true): Text: custom name
+ * BlockPos: position
+ * FoundType: type of finding (either normal or deep)
+ * boolean: if there's a custom name
+ * (if above bool is true): Text: custom name
  */
 public class FoundS2C extends PacketByteBuf {
     public static final Identifier ID = WhereIsIt.id("found_item_s2c");

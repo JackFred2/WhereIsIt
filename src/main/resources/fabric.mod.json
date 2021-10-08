@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "id": "whereisit",
   "version": "${version}",
-
   "name": "Where Is It",
   "description": "Find an item in nearby inventories.",
   "authors": [
@@ -35,7 +34,6 @@
     "EPL-1.0"
   ],
   "icon": "assets/whereisit/icon.png",
-
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -51,7 +49,6 @@
   "mixins": [
     "whereisit.mixins.json"
   ],
-
   "depends": {
     "fabricloader": ">=0.8.3",
     "fabric": "*",
