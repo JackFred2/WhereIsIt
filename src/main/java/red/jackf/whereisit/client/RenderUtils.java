@@ -56,6 +56,7 @@ public abstract class RenderUtils {
 
     // clear the slot and in-world highlight
     public static void clearSearch() {
+        System.out.println("t");
         FOUND_ITEM_POSITIONS.clear();
         clearSlotSearch();
     }

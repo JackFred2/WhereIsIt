@@ -28,8 +28,6 @@ public abstract class MixinHandledScreen {
             if (whereisit$getFocusedSlot() != null && whereisit$getFocusedSlot().hasStack()) {
                 WhereIsItClient.searchForItem(whereisit$getFocusedSlot().getStack().getItem(), Screen.hasShiftDown(), whereisit$getFocusedSlot().getStack().getNbt());
                 //cir.setReturnValue(true);
-            } else {
-                RenderUtils.clearSearch();
             }
         }
     }
