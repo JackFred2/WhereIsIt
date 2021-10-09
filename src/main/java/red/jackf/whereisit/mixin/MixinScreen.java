@@ -22,7 +22,6 @@ public abstract class MixinScreen {
     @Inject(method = "keyPressed", at = @At("TAIL"))
     private void whereisit$handleModdedKeys(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (WhereIsItClient.FIND_ITEMS.matchesKey(keyCode, scanCode)) {
-            RenderUtils.clearSearch();
             if (WhereIsIt.REILoaded) {
                 double gameScale = (double) MinecraftClient.getInstance().getWindow().getScaledWidth() / (double) MinecraftClient.getInstance().getWindow().getWidth();
                 double mouseX = MinecraftClient.getInstance().mouse.getX() * gameScale;

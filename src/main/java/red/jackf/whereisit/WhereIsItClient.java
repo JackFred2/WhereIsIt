@@ -43,6 +43,11 @@ public class WhereIsItClient implements ClientModInitializer {
             callback.searchForItem(item, matchNbt, tag);
     });
 
+    static {
+        // needs to be called first otherwise results get removed
+        SEARCH_FOR_ITEM.register((item, matchNbt, tag) -> RenderUtils.clearSearch());
+    }
+
     /**
      * Trigger a search request
      */
