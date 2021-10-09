@@ -32,6 +32,8 @@ public abstract class MixinScreen {
                 if (itemToFind != null) {
                     WhereIsItClient.searchForItem(itemToFind.getItem(), Screen.hasShiftDown(), itemToFind.getNbt());
                     //cir.setReturnValue(true);
+                } else {
+                    RenderUtils.clearSearch();
                 }
             }
         }
