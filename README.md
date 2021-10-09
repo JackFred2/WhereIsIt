@@ -4,17 +4,17 @@ A [Fabric](https://fabricmc.net/) mod to find items in nearby inventories.
 
 You can contribute at https://poeditor.com/join/project?hash=FWkLQzLyw4. You will be credited under the name used in POEditor; if you want it to be under a different name please leave an issue or contact me.
 
-Current translation targets (as of 2021/09/03):
+Current translation targets (as of 2021/09/10):
 
-- Chinese (100%) ✅
+- Chinese (86%) 
 - English (100%) ✅
-- French (100%) ✅
+- French (86%) ✅
 - German (0%)
 - Italian (0%)
-- Polish (96%)
+- Polish (83%)
 - Portuguese (0%)
-- Russian (100%) ✅
-- Spanish (100%) ✅
+- Russian (86%) ✅
+- Spanish (86%) ✅
 - Turkish (3%)
 - Welsh (0%)
 
