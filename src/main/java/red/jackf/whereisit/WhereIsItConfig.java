@@ -45,6 +45,8 @@ public class WhereIsItConfig implements ConfigData {
         return clientOptions.disableSlotHighlight;
     }
 
+    public int getMaximumResults() { return clientOptions.maximumResults; }
+
     public int getSearchRadius() {
         return serverOptions.searchRadius;
     }
@@ -68,12 +70,14 @@ public class WhereIsItConfig implements ConfigData {
         clientOptions.fadeOutTime = MathHelper.clamp(clientOptions.fadeOutTime, 10, 3600 * 20);
         clientOptions.textSizeModifier = MathHelper.clamp(clientOptions.textSizeModifier, 50, 400);
 
+        clientOptions.maximumResults = MathHelper.clamp(clientOptions.maximumResults, 0, 128);
+
         serverOptions.searchRadius = MathHelper.clamp(serverOptions.searchRadius, 8, 48);
         serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
     }
 
     static class Client {
-        //@ConfigEntry.BoundedDiscrete(max = 300, min = 10)
+        @ConfigEntry.Gui.PrefixText
         @ConfigEntry.Gui.Tooltip
         public int fadeOutTime = 200;
 
@@ -86,7 +90,7 @@ public class WhereIsItConfig implements ConfigData {
         public int alternateColour = 0xff4fff;
 
         @ConfigEntry.Gui.Tooltip
-        public boolean rainbowMode = false;
+        public boolean rainbowMode = true;
 
         @ConfigEntry.Gui.Tooltip
         public boolean disableSlotHighlight = false;
@@ -94,9 +98,13 @@ public class WhereIsItConfig implements ConfigData {
         @ConfigEntry.Gui.Tooltip
         public boolean forceSimpleRender = false;
 
-
         @ConfigEntry.BoundedDiscrete(max = 400, min = 50)
         public int textSizeModifier = 100;
+
+        @ConfigEntry.Gui.PrefixText
+        @ConfigEntry.Gui.Tooltip
+        @ConfigEntry.BoundedDiscrete(max = 128, min = 0)
+        public int maximumResults = 0;
     }
 
     static class Server {

@@ -60,10 +60,9 @@ public class WhereIsIt implements ModInitializer {
                     long beforeTime = System.nanoTime();
 
                     if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT || world.getTime() >= rateLimitMap.getOrDefault(player.getUuid(), 0L) + WhereIsIt.CONFIG.getCooldown()) {
-                        var positions = Searcher.searchWorld(basePos, world, itemToFind, searchContext.tag());
+                        var positions = Searcher.searchWorld(basePos, world, itemToFind, searchContext.tag(), searchContext.maximum());
                         if (positions.size() > 0) {
                             var packet = new FoundS2C(positions);
-
                             ServerPlayNetworking.send(player, FoundS2C.ID, packet);
                             player.closeHandledScreen();
                         }

@@ -9,17 +9,21 @@ import red.jackf.whereisit.utilities.FoundType;
 import red.jackf.whereisit.utilities.SearchResult;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Structure:
- * <p>
- * int: size of results
+ * <ul>
+ * <li> int: size of results
+ * </ul>
  * for each result:
- * BlockPos: position
- * FoundType: type of finding (either normal or deep)
- * boolean: if there's a custom name
- * (if above bool is true): Text: custom name
+ * <ul>
+ * <li> BlockPos: position
+ * <li> FoundType: type of finding (either normal or deep)
+ * <li> boolean: if there's a custom name
+ * <li> (if has a custom name): Text: custom name
+ * </ul>
  */
 public class FoundS2C extends PacketByteBuf {
     public static final Identifier ID = WhereIsIt.id("found_item_s2c");
@@ -37,7 +41,7 @@ public class FoundS2C extends PacketByteBuf {
     }
 
     public static Map<BlockPos, SearchResult> read(PacketByteBuf buf) {
-        Map<BlockPos, SearchResult> results = new HashMap<>();
+        Map<BlockPos, SearchResult> results = new LinkedHashMap<>();
         int max = buf.readInt();
         for (int i = 0; i < max; i++) {
             results.put(buf.readBlockPos(), new SearchResult(buf.readEnumConstant(FoundType.class), buf.readBoolean() ? buf.readText() : null));

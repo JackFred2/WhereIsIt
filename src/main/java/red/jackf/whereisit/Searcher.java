@@ -20,19 +20,22 @@ import red.jackf.whereisit.utilities.FoundType;
 import red.jackf.whereisit.utilities.SearchResult;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class Searcher {
-    public static Map<BlockPos, SearchResult> searchWorld(BlockPos basePos, ServerWorld world, Item toFind, NbtCompound toFindTag) {
+    public static Map<BlockPos, SearchResult> searchWorld(BlockPos playerPos, ServerWorld world, Item toFind, NbtCompound toFindTag, int maximumCount) {
         Map<BlockPos, SearchResult> positions = new HashMap<>();
         final int radius = WhereIsIt.CONFIG.getSearchRadius();
+
         int checkedBECount = 0;
 
-        int minChunkX = (-radius + basePos.getX()) >> 4;
-        int maxChunkX = (radius + 1 + basePos.getX()) >> 4;
-        int minChunkZ = (-radius + basePos.getZ()) >> 4;
-        int maxChunkZ = (radius + 1 + basePos.getZ()) >> 4;
+        int minChunkX = (-radius + playerPos.getX()) >> 4;
+        int maxChunkX = (radius + 1 + playerPos.getX()) >> 4;
+        int minChunkZ = (-radius + playerPos.getZ()) >> 4;
+        int maxChunkZ = (radius + 1 + playerPos.getZ()) >> 4;
 
         for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
             for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
@@ -45,7 +48,7 @@ public abstract class Searcher {
                 for (Map.Entry<BlockPos, BlockEntity> entry : chunk.getBlockEntities().entrySet()) {
                     var pos = entry.getKey();
                     var be = entry.getValue();
-                    if (pos.isWithinDistance(basePos, radius)) {
+                    if (pos.isWithinDistance(playerPos, radius)) {
                         var state = chunk.getBlockState(pos);
                         var foundType = FoundType.NOT_FOUND;
                         Text invName = null;
@@ -76,7 +79,18 @@ public abstract class Searcher {
             WhereIsIt.log("Checked " + checkedBECount + " BlockEntities");
         }
 
-        return positions;
+        if (positions.size() > maximumCount) {
+            return positions.entrySet().stream()
+                .sorted((e1, e2) -> {
+                    var e1distance = e1.getKey().getSquaredDistance(playerPos, false);
+                    var e2distance = e2.getKey().getSquaredDistance(playerPos, false);
+                    return Double.compare(e1distance, e2distance);
+                })
+                .limit(maximumCount)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (result1, result2) -> result1, LinkedHashMap::new));
+        } else {
+            return positions;
+        }
     }
 
     public static FoundType searchItemStack(ItemStack itemStack, Item toFind, NbtCompound toFindTag, boolean deepSearch) {

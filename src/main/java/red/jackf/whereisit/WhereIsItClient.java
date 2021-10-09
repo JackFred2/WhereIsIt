@@ -62,7 +62,7 @@ public class WhereIsItClient implements ClientModInitializer {
         KeyBindingHelper.registerKeyBinding(FIND_ITEMS);
 
         // send a request to the server
-        SEARCH_FOR_ITEM.register((item, matchNbt, tag) -> ClientPlayNetworking.send(SearchC2S.ID, new SearchC2S(item, matchNbt, tag)));
+        SEARCH_FOR_ITEM.register((item, matchNbt, tag) -> ClientPlayNetworking.send(SearchC2S.ID, new SearchC2S(item, matchNbt, tag, WhereIsIt.CONFIG.getMaximumResults() == 0 ? Integer.MAX_VALUE : WhereIsIt.CONFIG.getMaximumResults())));
 
         ClientPlayNetworking.registerGlobalReceiver(FoundS2C.ID, ((client, handler, buf, responseSender) -> {
             var results = FoundS2C.read(buf);
