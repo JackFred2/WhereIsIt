@@ -42,42 +42,19 @@ public class WhereIsItClient implements ClientModInitializer {
         for (ItemSearchCallback callback : listeners)
             callback.searchForItem(item, matchNbt, tag);
     });
-    private static Item lastSearchedItem = null;
-    private static NbtCompound lastSearchedTag = null;
-    private static boolean lastSearchedIgnoreNbt = false;
-
-    public static Item getLastSearchedItem() {
-        return lastSearchedItem;
-    }
-
-    public static NbtCompound getLastSearchedTag() {
-        return lastSearchedTag;
-    }
-
-    public static boolean lastSearchIgnoreNbt() {
-        return lastSearchedIgnoreNbt;
-    }
 
     /**
      * Trigger a search request
      */
     public static void searchForItem(@NotNull Item item, boolean matchNbt, NbtCompound tag) {
         SEARCH_FOR_ITEM.invoker().searchForItem(item, matchNbt, tag);
-        WhereIsItClient.lastSearchedItem = item;
-        WhereIsItClient.lastSearchedIgnoreNbt = matchNbt;
-        WhereIsItClient.lastSearchedTag = tag;
+        RenderUtils.setLastSearch(item, matchNbt, tag);
     }
 
     public static void handleFoundItems(Collection<PositionData> results) {
         for (PositionData result : results) {
             RenderUtils.FOUND_ITEM_POSITIONS.put(result.pos, result);
         }
-    }
-
-    public static void clearLastItem() {
-        WhereIsItClient.lastSearchedItem = null;
-        WhereIsItClient.lastSearchedTag = null;
-        WhereIsItClient.lastSearchedIgnoreNbt = false;
     }
 
     @Override

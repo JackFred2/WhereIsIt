@@ -11,10 +11,13 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import red.jackf.whereisit.Searcher;
 import red.jackf.whereisit.WhereIsIt;
@@ -36,7 +39,34 @@ public abstract class RenderUtils {
             callback.renderLocation(context, simpleRendering, positionData);
         }
     });
+
     private static final List<BlockPos> toRemove = new ArrayList<>();
+    @Nullable
+    public static Item lastSearchedItem = null;
+    @Nullable
+    public static NbtCompound lastSearchedTag = null;
+    public static boolean lastSearchedIgnoreNbt = false;
+    private static long lastSearchTime = 0L;
+
+    public static void setLastSearch(Item item, boolean ignoreNbt, NbtCompound nbt) {
+        lastSearchedItem = item;
+        lastSearchedIgnoreNbt = ignoreNbt;
+        lastSearchedTag = nbt;
+    }
+
+    // clear the slot and in-world highlight
+    public static void clearSearch() {
+        FOUND_ITEM_POSITIONS.clear();
+        clearSlotSearch();
+    }
+
+    // clear the inventory slot highlight
+    public static void clearSlotSearch() {
+        lastSearchedItem = null;
+        lastSearchedIgnoreNbt = false;
+        lastSearchedTag = null;
+        lastSearchTime = -1L;
+    }
 
     public static void renderTexts(WorldRenderContext context, Boolean simpleRendering) {
         if (FOUND_ITEM_POSITIONS.size() == 0) return;
@@ -54,6 +84,12 @@ public abstract class RenderUtils {
     }
 
     public static void renderHighlights(WorldRenderContext context, Boolean simpleRendering) {
+        if (lastSearchTime == -1 && lastSearchedItem != null) { // first tick after search
+            lastSearchTime = context.world().getTime();
+        } else if (context.world().getTime() >= lastSearchTime + WhereIsIt.CONFIG.getFadeoutTime()) { // remove the search highlight after a given time
+            clearSlotSearch();
+        }
+
         if (FOUND_ITEM_POSITIONS.size() == 0) return;
         context.world().getProfiler().swap("whereisit_highlights");
 
@@ -144,10 +180,6 @@ public abstract class RenderUtils {
             FOUND_ITEM_POSITIONS.remove(iter.next());
             iter.remove();
         }
-
-        if (FOUND_ITEM_POSITIONS.size() == 0) {
-            WhereIsItClient.clearLastItem();
-        }
     }
 
     /**
@@ -233,11 +265,11 @@ public abstract class RenderUtils {
      * Draws a highlight over slots that contain the last searched item.
      */
     public static void drawLastSlot(MatrixStack matrixStack, Screen screen) {
-        if (WhereIsIt.CONFIG.disableSlotHighlight()) return;
+        if (WhereIsIt.CONFIG.disableSlotHighlight() || lastSearchedItem == null || lastSearchTime == -1L) return;
         if (screen instanceof HandledScreen<?> handledScreen) {
             handledScreen.getScreenHandler().slots.forEach(slot -> {
                 ItemStack stack = slot.getStack();
-                if (slot.hasStack() && Searcher.areStacksEqual(stack.getItem(), stack.getNbt(), WhereIsItClient.getLastSearchedItem(), WhereIsItClient.getLastSearchedTag(), WhereIsItClient.lastSearchIgnoreNbt())) {
+                if (slot.hasStack() && Searcher.areStacksEqual(stack.getItem(), stack.getNbt(), lastSearchedItem, lastSearchedTag, lastSearchedIgnoreNbt)) {
                     int x = slot.x + ((AccessorHandledScreen) screen).getX();
                     int y = slot.y + ((AccessorHandledScreen) screen).getY();
                     final int colour = 0x80FFFF00;

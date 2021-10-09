@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import red.jackf.whereisit.WhereIsItClient;
+import red.jackf.whereisit.client.RenderUtils;
 
 // Where HandledScreen features are present
 
@@ -24,6 +25,7 @@ public abstract class MixinHandledScreen {
     @Inject(method = "keyPressed", at = @At("TAIL"))
     private void whereisit$handleModdedKeys(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (WhereIsItClient.FIND_ITEMS.matchesKey(keyCode, scanCode)) {
+            RenderUtils.clearSearch();
             if (whereisit$getFocusedSlot() != null && whereisit$getFocusedSlot().hasStack()) {
                 WhereIsItClient.searchForItem(whereisit$getFocusedSlot().getStack().getItem(), Screen.hasShiftDown(), whereisit$getFocusedSlot().getStack().getNbt());
                 //cir.setReturnValue(true);
