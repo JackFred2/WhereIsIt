@@ -89,7 +89,7 @@ public class WhereIsItClient implements ClientModInitializer {
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((context, hitResult) -> {
             OptifineHooks.doOptifineAwareRender(context, (context1, simple) -> {
                 RenderUtils.renderHighlights(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
-                if (WhereIsIt.CONFIG.clientOptions.showLabelsForResults)
+                if (WhereIsIt.CONFIG.shouldShowResultLabels())
                     RenderUtils.renderTexts(context1, simple || WhereIsIt.CONFIG.forceSimpleRender());
             });
             return true;

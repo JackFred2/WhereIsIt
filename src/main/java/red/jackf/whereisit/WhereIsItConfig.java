@@ -33,6 +33,8 @@ public class WhereIsItConfig implements ConfigData {
         return clientOptions.textSizeModifier;
     }
 
+    public boolean shouldShowResultLabels() { return clientOptions.showLabelsForResults; }
+
     public boolean isRainbowMode() {
         return clientOptions.rainbowMode;
     }
@@ -76,7 +78,7 @@ public class WhereIsItConfig implements ConfigData {
         serverOptions.cooldownTicks = MathHelper.clamp(serverOptions.cooldownTicks, 0, 50);
     }
 
-    static class Client {
+    private static class Client {
         @ConfigEntry.Gui.PrefixText
         @ConfigEntry.Gui.Tooltip
         public int fadeOutTime = 200;
@@ -110,7 +112,7 @@ public class WhereIsItConfig implements ConfigData {
         public int maximumResults = 0;
     }
 
-    static class Server {
+    private static class Server {
         @ConfigEntry.BoundedDiscrete(max = 48, min = 8)
         public int searchRadius = 16;
 
