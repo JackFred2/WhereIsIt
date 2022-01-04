@@ -98,8 +98,11 @@ public class WhereIsItConfig implements ConfigData {
         @ConfigEntry.Gui.Tooltip
         public boolean forceSimpleRender = false;
 
+        @ConfigEntry.Gui.PrefixText
         @ConfigEntry.BoundedDiscrete(max = 400, min = 50)
         public int textSizeModifier = 100;
+
+        public boolean showLabelsForResults = true;
 
         @ConfigEntry.Gui.PrefixText
         @ConfigEntry.Gui.Tooltip

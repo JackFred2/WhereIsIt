@@ -7,7 +7,9 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Items;
+import net.minecraft.text.ClickEvent;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -55,7 +57,7 @@ public class WhereIsIt implements ModInitializer {
                 server.execute(() -> {
 
                     var basePos = player.getBlockPos();
-                    var world = player.getServerWorld();
+                    var world = player.getWorld();
 
                     long beforeTime = System.nanoTime();
 

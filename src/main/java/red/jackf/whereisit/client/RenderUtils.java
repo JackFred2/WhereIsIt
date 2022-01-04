@@ -56,7 +56,6 @@ public abstract class RenderUtils {
 
     // clear the slot and in-world highlight
     public static void clearSearch() {
-        System.out.println("t");
         FOUND_ITEM_POSITIONS.clear();
         clearSlotSearch();
     }
@@ -75,10 +74,16 @@ public abstract class RenderUtils {
 
         for (var entry : FOUND_ITEM_POSITIONS.entrySet()) {
             var data = entry.getValue();
+            var basePos = Vec3d.of(data.pos);
+
+            if (!context.world().getBlockState(data.pos.up()).isOpaque()) {
+                basePos = basePos.add(0, 1d, 0);
+            }
+
             var i = data.getAllText().size() - 1;
             for (Text text : data.getAllText()) {
-                var pos = Vec3d.of(data.pos).add(0, i * 0.3d * (WhereIsIt.CONFIG.getTextSizeModifier() / 100f), 0);
-                drawTextWithBackground(context, pos, text, 64);
+                var pos = basePos.add(0, i * 0.3d * (WhereIsIt.CONFIG.getTextSizeModifier() / 100f), 0);
+                drawTextWithBackground(context, pos, text, 64, true);
                 i--;
             }
         }
@@ -296,10 +301,11 @@ public abstract class RenderUtils {
      * @param pos         The position in-world to render text at.
      * @param text        The {@link Text} object to draw.
      * @param maxDistance The maximum distance, after which the text will not be rendered.
+     * @param seeThrough  If the text should be darkened when behind terrain.
      */
-    public static void drawTextWithBackground(WorldRenderContext context, Vec3d pos, Text text, int maxDistance) {
+    public static void drawTextWithBackground(WorldRenderContext context, Vec3d pos, Text text, int maxDistance, boolean seeThrough) {
         var dispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
-        var finalPos = pos.subtract(context.camera().getPos()).add(0.5, 1.5, 0.5);
+        var finalPos = pos.subtract(context.camera().getPos()).add(0.5, 0.5, 0.5);
         float textScale = WhereIsIt.CONFIG.getTextSizeModifier() / 100f;
         if (finalPos.lengthSquared() <= maxDistance * maxDistance) {
             var matrices = context.matrixStack();
@@ -307,12 +313,12 @@ public abstract class RenderUtils {
             matrices.translate(finalPos.x, finalPos.y, finalPos.z);
             matrices.multiply(dispatcher.getRotation());
             matrices.scale(-0.025F * textScale, -0.025F * textScale, 0.025F * textScale);
-            var matrix4f = matrices.peek().getModel();
+            var matrix4f = matrices.peek().getPositionMatrix();
             int backgroundColour = (int) (MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25F) * 255.0F) << 24;
             var textRenderer = MinecraftClient.getInstance().textRenderer;
             float xOffset = (float) (-textRenderer.getWidth(text) / 2);
-            textRenderer.draw(text, xOffset, 0, 553648127, false, matrix4f, context.consumers(), true, backgroundColour, 15728880);
-            textRenderer.draw(text, xOffset, 0, -1, false, matrix4f, context.consumers(), false, 0, 15728880);
+            textRenderer.draw(text, xOffset, 0, 0x20FFFFFF, false, matrix4f, context.consumers(), true, backgroundColour, 0x00F000F0); // background
+            textRenderer.draw(text, xOffset, 0, 0xFFFFFFFF, false, matrix4f, context.consumers(), seeThrough, 0, 0x00F000F0); // text
             matrices.pop();
             RenderSystem.applyModelViewMatrix();
         }
