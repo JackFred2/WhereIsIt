@@ -38,6 +38,14 @@ public class WhereIsIt implements ModInitializer {
         LOGGER.info(str);
     }
 
+    public static void error(String str) {
+        LOGGER.error(str);
+    }
+
+    public static void error(Exception ex) {
+        LOGGER.error(ex);
+    }
+
     @Override
     public void onInitialize() {
         AutoConfig.getConfigHolder(WhereIsItConfig.class).registerSaveListener((configHolder, whereIsItConfig) -> {
