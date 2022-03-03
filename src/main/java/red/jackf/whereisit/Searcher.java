@@ -82,8 +82,8 @@ public abstract class Searcher {
         if (positions.size() > maximumCount) {
             return positions.entrySet().stream()
                 .sorted((e1, e2) -> {
-                    var e1distance = e1.getKey().getSquaredDistance(playerPos, false);
-                    var e2distance = e2.getKey().getSquaredDistance(playerPos, false);
+                    var e1distance = e1.getKey().getSquaredDistance(playerPos);
+                    var e2distance = e2.getKey().getSquaredDistance(playerPos);
                     return Double.compare(e1distance, e2distance);
                 })
                 .limit(maximumCount)
