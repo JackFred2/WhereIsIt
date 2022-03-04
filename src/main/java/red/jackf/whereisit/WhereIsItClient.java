@@ -95,8 +95,6 @@ public class WhereIsItClient implements ClientModInitializer {
             return true;
         });
 
-        ClothClientHooks.SCREEN_LATE_RENDER.register(((stack, client, screen, x, y, tickDelta) -> RenderUtils.drawLastSlot(stack, screen)));
-
         RenderUtils.RENDER_LOCATION_EVENT.register(((context, simpleRendering, positionData) -> {
             if (!WhereIsIt.CONFIG.isRainbowMode()) return;
             Vec3f colour = RenderUtils.hueToColour(3 * context.world().getTime() + (positionData.pos.getX() + positionData.pos.getY() + positionData.pos.getZ()) * 8L);

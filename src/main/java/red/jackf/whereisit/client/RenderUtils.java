@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -44,12 +43,12 @@ public abstract class RenderUtils {
     public static Item lastSearchedItem = null;
     @Nullable
     public static NbtCompound lastSearchedTag = null;
-    public static boolean lastSearchedIgnoreNbt = false;
+    public static boolean lastSearchedMatchNbt = false;
     private static long lastSearchTime = 0L;
 
-    public static void setLastSearch(Item item, boolean ignoreNbt, NbtCompound nbt) {
+    public static void setLastSearch(Item item, boolean matchNbt, NbtCompound nbt) {
         lastSearchedItem = item;
-        lastSearchedIgnoreNbt = ignoreNbt;
+        lastSearchedMatchNbt = matchNbt;
         lastSearchedTag = nbt;
     }
 
@@ -62,7 +61,7 @@ public abstract class RenderUtils {
     // clear the inventory slot highlight
     public static void clearSlotSearch() {
         lastSearchedItem = null;
-        lastSearchedIgnoreNbt = false;
+        lastSearchedMatchNbt = false;
         lastSearchedTag = null;
         lastSearchTime = -1L;
     }
@@ -269,27 +268,34 @@ public abstract class RenderUtils {
     /**
      * Draws a highlight over slots that contain the last searched item.
      */
-    public static void drawLastSlot(MatrixStack matrixStack, Screen screen) {
+    public static void drawSlotWithLastSearchedItem(MatrixStack matrixStack, HandledScreen<?> screen) {
         if (WhereIsIt.CONFIG.disableSlotHighlight() || lastSearchedItem == null || lastSearchTime == -1L) return;
-        if (screen instanceof HandledScreen<?> handledScreen) {
-            handledScreen.getScreenHandler().slots.forEach(slot -> {
-                ItemStack stack = slot.getStack();
-                if (slot.hasStack() && Searcher.areStacksEqual(stack.getItem(), stack.getNbt(), lastSearchedItem, lastSearchedTag, lastSearchedIgnoreNbt)) {
-                    int x = slot.x + ((AccessorHandledScreen) screen).whereisit$getX();
-                    int y = slot.y + ((AccessorHandledScreen) screen).whereisit$getY();
-                    final int colour = 0x80FFFF00;
-                    RenderSystem.disableDepthTest();
-                    RenderSystem.colorMask(true, true, true, false);
-                    ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x - 2, y - 2, x, y + 18, colour, colour);
-                    ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x + 16, y - 2, x + 18, y + 18, colour, colour);
-
-                    ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x, y - 2, x + 16, y, colour, colour);
-                    ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x, y + 16, x + 16, y + 18, colour, colour);
-                    RenderSystem.colorMask(true, true, true, true);
-                    RenderSystem.enableDepthTest();
+        int time = (int) ((System.currentTimeMillis() / 15) % 360);
+        screen.getScreenHandler().slots.forEach(slot -> {
+            ItemStack stack = slot.getStack();
+            if (slot.hasStack() && Searcher.areStacksEqual(stack.getItem(), stack.getNbt(), lastSearchedItem, lastSearchedTag, lastSearchedMatchNbt)) {
+                int colour;
+                if (WhereIsIt.CONFIG.isRainbowMode()) {
+                    Vec3f colourRaw = RenderUtils.hueToColour(time + 5 * slot.id);
+                    Vec3i colourRGB = new Vec3i(colourRaw.getX() * 255, colourRaw.getY() * 255, colourRaw.getZ() * 255);
+                    colour = (((128 << 8) + colourRGB.getX() << 8) + colourRGB.getY() << 8) + colourRGB.getZ();
+                } else {
+                    colour = 0x80FFFF00;
                 }
-            });
-        }
+
+                int x = slot.x + ((AccessorHandledScreen) screen).whereisit$getX();
+                int y = slot.y + ((AccessorHandledScreen) screen).whereisit$getY();
+                RenderSystem.disableDepthTest();
+                RenderSystem.colorMask(true, true, true, false);
+                ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x - 2, y - 2, x, y + 18, colour, colour);
+                ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x + 16, y - 2, x + 18, y + 18, colour, colour);
+
+                ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x, y - 2, x + 16, y, colour, colour);
+                ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x, y + 16, x + 16, y + 18, colour, colour);
+                RenderSystem.colorMask(true, true, true, true);
+                RenderSystem.enableDepthTest();
+            }
+        });
     }
 
     /**

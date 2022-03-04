@@ -7,11 +7,13 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookGhostSlots;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.slot.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import red.jackf.whereisit.WhereIsItClient;
 import red.jackf.whereisit.client.RenderUtils;
@@ -51,5 +53,10 @@ public abstract class MixinHandledScreen {
                 }
             }
         }
+    }
+
+    @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"))
+    private void whereisit$drawSlotHighlights(MatrixStack stack, int x, int y, CallbackInfo ci) {
+        RenderUtils.drawSlotWithLastSearchedItem(stack, (HandledScreen<?>) (Object) this);
     }
 }
