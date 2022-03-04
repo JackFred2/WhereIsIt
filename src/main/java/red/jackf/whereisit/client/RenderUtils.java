@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import red.jackf.whereisit.Searcher;
 import red.jackf.whereisit.WhereIsIt;
-import red.jackf.whereisit.WhereIsItClient;
 import red.jackf.whereisit.mixin.AccessorDrawableHelper;
 import red.jackf.whereisit.mixin.AccessorHandledScreen;
 
@@ -276,8 +275,8 @@ public abstract class RenderUtils {
             handledScreen.getScreenHandler().slots.forEach(slot -> {
                 ItemStack stack = slot.getStack();
                 if (slot.hasStack() && Searcher.areStacksEqual(stack.getItem(), stack.getNbt(), lastSearchedItem, lastSearchedTag, lastSearchedIgnoreNbt)) {
-                    int x = slot.x + ((AccessorHandledScreen) screen).getX();
-                    int y = slot.y + ((AccessorHandledScreen) screen).getY();
+                    int x = slot.x + ((AccessorHandledScreen) screen).whereisit$getX();
+                    int y = slot.y + ((AccessorHandledScreen) screen).whereisit$getY();
                     final int colour = 0x80FFFF00;
                     RenderSystem.disableDepthTest();
                     RenderSystem.colorMask(true, true, true, false);

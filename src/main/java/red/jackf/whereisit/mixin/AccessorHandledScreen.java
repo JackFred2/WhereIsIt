@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AccessorHandledScreen {
 
     @Accessor(value = "x")
-    int getX();
+    int whereisit$getX();
 
     @Accessor(value = "y")
-    int getY();
+    int whereisit$getY();
 }
