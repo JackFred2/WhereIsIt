@@ -7,10 +7,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Items;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -78,12 +76,12 @@ public class WhereIsIt implements ModInitializer {
                         }
                         rateLimitMap.put(player.getUuid(), world.getTime());
                     } else {
-                        player.sendMessage(new TranslatableText("whereisit.slowDown").formatted(Formatting.YELLOW), false);
+                        player.sendMessage(Text.translatable("whereisit.slowDown").formatted(Formatting.YELLOW), false);
                     }
 
                     if (WhereIsIt.CONFIG.printSearchTime()) {
                         long time = (System.nanoTime() - beforeTime);
-                        player.sendMessage(new LiteralText("Lookup Time: " + time + "ns"), false);
+                        player.sendMessage(Text.literal("Lookup Time: " + time + "ns"), false);
                         WhereIsIt.LOGGER.info("Lookup Time: " + time + "ns");
                     }
                 });
