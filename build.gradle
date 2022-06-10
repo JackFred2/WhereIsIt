@@ -108,6 +108,10 @@ modrinth {
 	changelog = "Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt"
 	gameVersions = project.game_versions.tokenize(",")
 	loaders = ["fabric", "quilt"]
+	dependencies {
+		required.project("9s6osm5g") // cloth config
+		required.project("P7dR8mSH") // fabric api
+	}
 }
 
 // configure the maven publication
