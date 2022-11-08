@@ -25,8 +25,8 @@
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Радужный режим",
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Переопределяет цвета, указанные выше, если они включены.",
     "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Модификационный размер текста",
-    "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Rendering",
-    "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Maximum returned results",
-    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Search Preferences",
-    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@Tooltip": "Set to 0 for no limit."
+    "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Рендеринг",
+    "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Макимальное количество результатов",
+    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Настройки поиска",
+    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@Tooltip": "0 - без ограничений"
 }
