@@ -8,14 +8,15 @@ Current translation targets (as of 2021/09/10):
 
 - Chinese (86%) 
 - English (100%) ✅
-- French (86%) ✅
-- German (0%)
-- Italian (0%)
-- Polish (83%)
+- French (96%)
+- German (100%) ✅
+- Italian (100%) ✅
+- Korean (20%)
+- Polish (100%) ✅
 - Portuguese (0%)
-- Russian (86%) ✅
-- Spanish (86%) ✅
-- Turkish (3%)
+- Russian (100%) ✅
+- Spanish (86%)
+- Turkish (100%) ✅
 - Welsh (0%)
 
 If your language isn't listed, feel free to make an issue requesting it.
