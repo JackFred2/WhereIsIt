@@ -6,7 +6,7 @@
     "text.autoconfig.whereisit.option.serverOptions.doDeepSearch": "Wykonuj wyszukiwanie dokładne",
     "text.autoconfig.whereisit.option.serverOptions.doDeepSearch.@Tooltip": "Czy wyszukiwać w ekwipunkach (Shulkerowe skrzynie).",
     "text.autoconfig.whereisit.option.serverOptions.printSearchTime": "Pokaż czas wyszukiwania",
-    "text.autoconfig.whereisit.option.serverOptions.cooldownTicks": "Search Cooldown Period",
+    "text.autoconfig.whereisit.option.serverOptions.cooldownTicks": "Okres odnowienia szukania",
     "text.autoconfig.whereisit.option.serverOptions.cooldownTicks.@Tooltip": "MInimalnie ticków pomiędzy wysłaniem na osobę. Ustaw na 0, aby wyłączyć.",
     "text.autoconfig.whereisit.category.clientOptions": "Opcje Klienta",
     "text.autoconfig.whereisit.option.clientOptions.colour": "Kolor Obramowania Bloków",
@@ -26,7 +26,7 @@
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Nadpisuje kolory powyżej, gdy włączone.",
     "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Modyfikator rozmiaru tekstu",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Rendering",
-    "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Maximum returned results",
-    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Search Preferences",
-    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@Tooltip": "Set to 0 for no limit."
+    "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Maksimum zwróconych wyników",
+    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Preferencje szukania",
+    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@Tooltip": "Ustaw na 0 na nielimitowane."
 }
