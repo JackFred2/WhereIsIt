@@ -25,6 +25,8 @@
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Dugine Boje",
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Nadjačava gornje boje kada je uključeno.",
     "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Modifikator Veličine Teksta",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier.@PrefixText": "Labels",
+    "text.autoconfig.whereisit.option.clientOptions.showLabelsForResults": "Show labels for returned results",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Renderiranje",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Maksimalni povratni rezultat",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Postavke Pretraživanja",

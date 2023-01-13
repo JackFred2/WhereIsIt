@@ -25,6 +25,8 @@
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Regnbågsläge",
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Overrides colours above when enabled.",
     "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Textstorleksmodifierare",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier.@PrefixText": "Labels",
+    "text.autoconfig.whereisit.option.clientOptions.showLabelsForResults": "Show labels for returned results",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Rendering",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Maxantalet sökresultat",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Sökpreferenser",

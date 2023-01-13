@@ -25,6 +25,8 @@
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "彩虹模式",
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "启用时覆盖上面的颜色。",
     "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "文字大小调节器",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier.@PrefixText": "Labels",
+    "text.autoconfig.whereisit.option.clientOptions.showLabelsForResults": "Show labels for returned results",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Rendering",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Maximum returned results",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Search Preferences",

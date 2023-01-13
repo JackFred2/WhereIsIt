@@ -25,6 +25,8 @@
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Gökkuşağı Modu",
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Etkinleştirildiğinde üstteki renklerin üzerine ayarlanır.",
     "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Metin Boyut Niteleyicisi",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier.@PrefixText": "Labels",
+    "text.autoconfig.whereisit.option.clientOptions.showLabelsForResults": "Show labels for returned results",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Görüntüleme",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Çıkan maksimum sonuçlar",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Arama Tercihleri",

@@ -25,6 +25,8 @@
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Rainbow Mode",
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Overrides colours above when enabled.",
     "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Text Size Modifier",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier.@PrefixText": "Labels",
+    "text.autoconfig.whereisit.option.clientOptions.showLabelsForResults": "Show labels for returned results",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Rendering",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Maximum returned results",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Search Preferences",
