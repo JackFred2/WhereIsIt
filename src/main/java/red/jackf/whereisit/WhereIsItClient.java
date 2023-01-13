@@ -12,9 +12,9 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 import red.jackf.whereisit.client.ItemSearchCallback;
 import red.jackf.whereisit.client.PositionData;
 import red.jackf.whereisit.client.RenderUtils;
@@ -96,10 +96,10 @@ public class WhereIsItClient implements ClientModInitializer {
 
         RenderUtils.RENDER_LOCATION_EVENT.register(((context, simpleRendering, positionData) -> {
             if (!WhereIsIt.CONFIG.isRainbowMode()) return;
-            Vec3f colour = RenderUtils.hueToColour(3 * context.world().getTime() + (positionData.pos.getX() + positionData.pos.getY() + positionData.pos.getZ()) * 8L);
-            positionData.r = colour.getX();
-            positionData.g = colour.getY();
-            positionData.b = colour.getZ();
+            Vector3f colour = RenderUtils.hueToColour(3 * context.world().getTime() + (positionData.pos.getX() + positionData.pos.getY() + positionData.pos.getZ()) * 8L);
+            positionData.r = colour.x();
+            positionData.g = colour.y();
+            positionData.b = colour.z();
         }));
     }
 

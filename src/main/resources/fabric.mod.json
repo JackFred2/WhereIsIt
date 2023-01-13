@@ -17,6 +17,7 @@
     "zml2008 - OptiFine Compatibility Code",
     "Huajimur - Simplified Chinese Translation",
     "Jerry Li - Simplified Chinese Translation",
+    "Furije - Croatian Translation",
     "Jonathan - French Translation",
     "Lucas Sarazin - French Translation",
     "ibdib - German Translation",
@@ -31,6 +32,7 @@
     "Vanya - Russian Translation",
     "noroj - Spanish Translation",
     "SmallPepperZ - Spanish Translation",
+    "Eric1337 - Swedish Translation",
     "Ege_e - Turkish Translation"
   ],
   "contact": {
@@ -60,7 +62,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.8.3",
-    "fabric": "*",
+    "fabric-api": "*",
     "minecraft": "1.19.x",
     "cloth-config2": ">=5.0.0"
   },

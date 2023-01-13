@@ -4,8 +4,9 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.WhereIsIt;
@@ -26,7 +27,7 @@ public class SearchC2S extends PacketByteBuf {
 
     public SearchC2S(@NotNull Item toFind, boolean matchNbt, @Nullable NbtCompound nbtCompound, int maximum) {
         super(Unpooled.buffer());
-        this.writeIdentifier(Registry.ITEM.getId(toFind));
+        this.writeIdentifier(Registries.ITEM.getId(toFind));
         this.writeBoolean(matchNbt);
         if (matchNbt) {
             this.writeNbt(nbtCompound);
@@ -35,7 +36,7 @@ public class SearchC2S extends PacketByteBuf {
     }
 
     public static Context read(PacketByteBuf buf) {
-        Item item = Registry.ITEM.get(buf.readIdentifier());
+        Item item = Registries.ITEM.get(buf.readIdentifier());
         boolean matchNbt = buf.readBoolean();
         NbtCompound tag = matchNbt ? buf.readNbt() : null;
         int maximum = buf.readInt();

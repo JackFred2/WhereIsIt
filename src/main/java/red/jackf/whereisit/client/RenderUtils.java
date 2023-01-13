@@ -17,6 +17,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import red.jackf.whereisit.Searcher;
 import red.jackf.whereisit.WhereIsIt;
@@ -102,7 +104,7 @@ public abstract class RenderUtils {
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.depthMask(true);
         RenderSystem.enableBlend();
@@ -113,8 +115,8 @@ public abstract class RenderUtils {
         stack.push();
         stack.scale(0.998f, 0.998f, 0.998f); // fixes z fighting by pulling all faces slightly closer to the camera
 
-        stack.multiply(new Quaternion(Vec3f.POSITIVE_X, camera.getPitch(), true));
-        stack.multiply(new Quaternion(Vec3f.POSITIVE_Y, camera.getYaw() + 180f, true));
+        stack.multiply(new Quaternionf(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch())));
+        stack.multiply(new Quaternionf(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180f)));
 
         RenderSystem.applyModelViewMatrix();
 
@@ -276,8 +278,8 @@ public abstract class RenderUtils {
             if (slot.hasStack() && Searcher.areStacksEqual(stack.getItem(), stack.getNbt(), lastSearchedItem, lastSearchedTag, lastSearchedMatchNbt)) {
                 int colour;
                 if (WhereIsIt.CONFIG.isRainbowMode()) {
-                    Vec3f colourRaw = RenderUtils.hueToColour(time + 5 * slot.id);
-                    Vec3i colourRGB = new Vec3i(colourRaw.getX() * 255, colourRaw.getY() * 255, colourRaw.getZ() * 255);
+                    Vector3f colourRaw = RenderUtils.hueToColour(time + 5 * slot.id);
+                    Vec3i colourRGB = new Vec3i(colourRaw.x() * 255, colourRaw.y() * 255, colourRaw.z() * 255);
                     colour = (((128 << 8) + colourRGB.getX() << 8) + colourRGB.getY() << 8) + colourRGB.getZ();
                 } else {
                     colour = 0x80FFFF00;
@@ -329,23 +331,23 @@ public abstract class RenderUtils {
         }
     }
 
-    public static Vec3f hueToColour(float hue) {
+    public static Vector3f hueToColour(float hue) {
         hue = ((hue % 360) + 360) % 360;
         float factor = 1 - Math.abs(MathHelper.floorMod(hue / 60f, 2) - 1);
 
         switch ((int) (hue / 60)) {
             case 0:
-                return new Vec3f(1, factor, 0);
+                return new Vector3f(1, factor, 0);
             case 1:
-                return new Vec3f(factor, 1, 0);
+                return new Vector3f(factor, 1, 0);
             case 2:
-                return new Vec3f(0, 1, factor);
+                return new Vector3f(0, 1, factor);
             case 3:
-                return new Vec3f(0, factor, 1);
+                return new Vector3f(0, factor, 1);
             case 4:
-                return new Vec3f(factor, 0, 1);
+                return new Vector3f(factor, 0, 1);
             case 5:
-                return new Vec3f(1, 0, factor);
+                return new Vector3f(1, 0, factor);
         }
 
         throw new RuntimeException("Exhausted switch statement?");
