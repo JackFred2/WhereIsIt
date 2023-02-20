@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.WhereIsItClient;
 import red.jackf.whereisit.client.RenderUtils;
+import red.jackf.whereisit.compat.EMIHandler;
 import red.jackf.whereisit.compat.REIHandler;
 
 // Where REI/non-HandledScreen features are processed
@@ -22,19 +23,23 @@ public abstract class MixinScreen {
     @Inject(method = "keyPressed", at = @At("TAIL"))
     private void whereisit$handleModdedKeys(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (WhereIsItClient.FIND_ITEMS.matchesKey(keyCode, scanCode)) {
+            ItemStack itemToFind = null;
             if (WhereIsIt.REILoaded) {
                 double gameScale = (double) MinecraftClient.getInstance().getWindow().getScaledWidth() / (double) MinecraftClient.getInstance().getWindow().getWidth();
                 double mouseX = MinecraftClient.getInstance().mouse.getX() * gameScale;
                 double mouseY = MinecraftClient.getInstance().mouse.getY() * gameScale;
 
-                ItemStack itemToFind = REIHandler.findREIItems(mouseX, mouseY);
+                itemToFind = REIHandler.findREIItems(mouseX, mouseY);
+            }
 
-                if (itemToFind != null) {
-                    WhereIsItClient.searchForItem(itemToFind.getItem(), Screen.hasShiftDown(), itemToFind.getNbt());
-                    //cir.setReturnValue(true);
-                } else {
-                    RenderUtils.clearSearch();
-                }
+            if (WhereIsIt.EMILoaded && itemToFind == null) {
+                itemToFind = EMIHandler.findEMIItems();
+            }
+
+            if (itemToFind != null) {
+                WhereIsItClient.searchForItem(itemToFind.getItem(), Screen.hasShiftDown(), itemToFind.getNbt());
+            } else if (WhereIsIt.REILoaded || WhereIsIt.EMILoaded) {
+                RenderUtils.clearSearch();
             }
         }
     }
