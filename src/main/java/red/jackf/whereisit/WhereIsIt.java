@@ -27,6 +27,7 @@ public class WhereIsIt implements ModInitializer {
     private static final Map<UUID, Long> rateLimitMap = new HashMap<>();
     public static WhereIsItConfig CONFIG = AutoConfig.register(WhereIsItConfig.class, GsonConfigSerializer::new).getConfig();
     public static boolean REILoaded = false;
+    public static boolean EMILoaded = false;
 
     public static Identifier id(String path) {
         return new Identifier(MODID, path);
@@ -54,6 +55,11 @@ public class WhereIsIt implements ModInitializer {
         if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
             REILoaded = true;
             log("REI Found");
+        }
+
+        if (FabricLoader.getInstance().isModLoaded("emi")) {
+            EMILoaded = true;
+            log("EMI Found");
         }
 
         ServerPlayNetworking.registerGlobalReceiver(SearchC2S.ID, ((server, player, handler, buf, responseSender) -> {
