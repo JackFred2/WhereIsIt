@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -109,7 +110,6 @@ public abstract class RenderUtils {
         RenderSystem.depthMask(true);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.disableTexture();
 
         MatrixStack stack = RenderSystem.getModelViewStack();
         stack.push();
@@ -279,7 +279,7 @@ public abstract class RenderUtils {
                 int colour;
                 if (WhereIsIt.CONFIG.isRainbowMode()) {
                     Vector3f colourRaw = RenderUtils.hueToColour(time + 5 * slot.id);
-                    Vec3i colourRGB = new Vec3i(colourRaw.x() * 255, colourRaw.y() * 255, colourRaw.z() * 255);
+                    Vec3i colourRGB = new Vec3i((int) (colourRaw.x() * 255), (int) (colourRaw.y() * 255), (int) (colourRaw.z() * 255));
                     colour = (((128 << 8) + colourRGB.getX() << 8) + colourRGB.getY() << 8) + colourRGB.getZ();
                 } else {
                     colour = 0x80FFFF00;
@@ -324,8 +324,8 @@ public abstract class RenderUtils {
             int backgroundColour = (int) (MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25F) * 255.0F) << 24;
             var textRenderer = MinecraftClient.getInstance().textRenderer;
             float xOffset = (float) (-textRenderer.getWidth(text) / 2);
-            textRenderer.draw(text, xOffset, 0, 0x20FFFFFF, false, matrix4f, context.consumers(), true, backgroundColour, 0x00F000F0); // background
-            textRenderer.draw(text, xOffset, 0, 0xFFFFFFFF, false, matrix4f, context.consumers(), seeThrough, 0, 0x00F000F0); // text
+            textRenderer.draw(text, xOffset, 0, 0x20FFFFFF, false, matrix4f, context.consumers(), TextRenderer.TextLayerType.SEE_THROUGH, backgroundColour, 0x00F000F0); // background
+            textRenderer.draw(text, xOffset, 0, 0xFFFFFFFF, false, matrix4f, context.consumers(), seeThrough ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL, 0, 0x00F000F0); // text
             matrices.pop();
             RenderSystem.applyModelViewMatrix();
         }
