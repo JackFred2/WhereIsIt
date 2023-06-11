@@ -24,7 +24,18 @@ bin/
 .classpath
 .project
 
+# macos
+
+*.DS_Store
+
 # fabric
 
 run/
-runserver/
+runServer/
+
+# java
+
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
