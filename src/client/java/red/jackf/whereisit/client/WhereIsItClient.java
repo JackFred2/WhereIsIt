@@ -22,7 +22,9 @@ public class WhereIsItClient implements ClientModInitializer {
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) ->
 			ScreenKeyboardEvents.afterKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
 				if (SEARCH.matches(key, scancode)) {
-					var stack = StackGrabber.EVENT.invoker().grabStack(screen1);
+					int mouseX = (int) (client.mouseHandler.xpos() * (double)client.getWindow().getGuiScaledWidth() / (double)client.getWindow().getScreenWidth());
+					int mouseY = (int) (client.mouseHandler.ypos() * (double)client.getWindow().getGuiScaledHeight() / (double)client.getWindow().getScreenHeight());
+					var stack = StackGrabber.EVENT.invoker().grabStack(screen1, mouseX, mouseY);
 					if (stack != null) {
 						LOGGER.debug("Searching for " + stack);
 					} else {
@@ -31,5 +33,8 @@ public class WhereIsItClient implements ClientModInitializer {
 				}
 			})
 		);
+
+		// default
+		StackGrabber.EVENT.register(DefaultGrabber::grab);
 	}
 }

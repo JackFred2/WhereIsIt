@@ -36,11 +36,15 @@ repositories {
 		}
 		maven {
 			name = "Shedaniel"
-			url "https://maven.shedaniel.me"
+			url = "https://maven.shedaniel.me"
 			content {
 				includeGroupByRegex("me.shedaniel.*")
 				includeGroup("dev.architectury")
 			}
+		}
+		maven {
+			name = "Modrinth"
+			url = "https://api.modrinth.com/maven"
 		}
 	}
 }
@@ -55,6 +59,7 @@ loom {
 		}
 	}
 
+	accessWidenerPath = file("src/main/resources/whereisit.accesswidener")
 }
 
 dependencies {
@@ -70,8 +75,9 @@ dependencies {
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
 	// ItemStack Grabbers
-	modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-	modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
+	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
+	modCompileOnlyApi "maven.modrinth:jei:FVcrIQ3r"
 
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version"
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"

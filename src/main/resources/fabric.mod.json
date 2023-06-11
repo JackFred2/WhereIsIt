@@ -21,6 +21,9 @@
 		],
 		"client": [
 			"red.jackf.whereisit.client.WhereIsItClient"
+		],
+		"jei_mod_plugin": [
+			"red.jackf.whereisit.client.compat.JEIPlugin"
 		]
 	},
 	"mixins": [
@@ -30,6 +33,7 @@
 			"environment": "client"
 		}
 	],
+	"accessWidener": "whereisit.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.14.21",
 		"minecraft": "~1.20",
