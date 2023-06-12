@@ -1,4 +1,5 @@
 {
   "key.whereisit.search": "Search for item",
-  "key.categories.whereisit": "Where Is It"
+  "key.categories.whereisit": "Where Is It",
+  "gui.whereisit.not_installed_serverside": "Not installed on server."
 }

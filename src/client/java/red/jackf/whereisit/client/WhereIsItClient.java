@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
@@ -12,6 +13,8 @@ import org.slf4j.Logger;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.ItemCriterion;
 import red.jackf.whereisit.client.api.StackGrabber;
+import red.jackf.whereisit.client.util.NotificationToast;
+import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 
 public class WhereIsItClient implements ClientModInitializer {
 	public static final Logger LOGGER = LogUtils.getLogger();
@@ -23,6 +26,10 @@ public class WhereIsItClient implements ClientModInitializer {
 
 		ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) ->
 			ScreenKeyboardEvents.afterKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
+				if (!ClientPlayNetworking.canSend(ServerboundSearchForItemPacket.TYPE)) {
+					NotificationToast.sendNotInstalledOnServer();
+					return;
+				}
 				if (SEARCH.matches(key, scancode)) {
 					int mouseX = (int) (client.mouseHandler.xpos() * (double)client.getWindow().getGuiScaledWidth() / (double)client.getWindow().getScreenWidth());
 					int mouseY = (int) (client.mouseHandler.ypos() * (double)client.getWindow().getGuiScaledHeight() / (double)client.getWindow().getScreenHeight());
@@ -30,8 +37,7 @@ public class WhereIsItClient implements ClientModInitializer {
 					if (stack != null) {
 						var request = new SearchRequest();
 						request.add(new ItemCriterion(stack.getItem()));
-						var packed = request.pack();
-						LOGGER.debug("Search: " + packed.toString());
+						ClientPlayNetworking.send(new ServerboundSearchForItemPacket(request));
 					} else {
 						LOGGER.debug("Empty search");
 					}

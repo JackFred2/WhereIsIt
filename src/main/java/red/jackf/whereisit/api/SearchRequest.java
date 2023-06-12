@@ -22,7 +22,7 @@ public class SearchRequest {
         return this;
     }
 
-    public ListTag pack() {
+    public CompoundTag pack() {
         var list = new ListTag();
         for (Criterion criterion : this.criteria) {
             var tag = new CompoundTag();
@@ -32,31 +32,38 @@ public class SearchRequest {
             tag.put(DATA, data);
             list.add(tag);
         }
-        return list;
+        var tag = new CompoundTag();
+        tag.put(DATA, list);
+        return tag;
     }
 
-    public static SearchRequest load(ListTag list) {
+    public static SearchRequest load(CompoundTag root) {
         var request = new SearchRequest();
-        for (Tag tag : list) {
-            if (tag instanceof CompoundTag compound
-                    && compound.contains(ID, Tag.TAG_STRING)
-                    && compound.contains(DATA, Tag.TAG_COMPOUND)) {
-                var typeId = ResourceLocation.tryParse(compound.getString(ID));
-                var type = Criterion.Type.REGISTRY.get(typeId);
-                if (type != null) {
-                    var data = compound.getCompound(DATA);
-                    var criterion = type.get();
-                    criterion.readTag(data);
-                    if (criterion.valid())
-                        request.add(criterion);
-                    else
-                        WhereIsIt.LOGGER.info("Criterion data for " + typeId + "invalid: " + data);
+        if (root.contains(DATA, Tag.TAG_LIST)) {
+            var list = root.getList(DATA, Tag.TAG_COMPOUND);
+            for (Tag tag : list) {
+                if (tag instanceof CompoundTag compound
+                        && compound.contains(ID, Tag.TAG_STRING)
+                        && compound.contains(DATA, Tag.TAG_COMPOUND)) {
+                    var typeId = ResourceLocation.tryParse(compound.getString(ID));
+                    var type = Criterion.Type.REGISTRY.get(typeId);
+                    if (type != null) {
+                        var data = compound.getCompound(DATA);
+                        var criterion = type.get();
+                        criterion.readTag(data);
+                        if (criterion.valid())
+                            request.add(criterion);
+                        else
+                            WhereIsIt.LOGGER.warn("Criterion data for " + typeId + "invalid: " + data);
+                    } else {
+                        WhereIsIt.LOGGER.warn("Unknown criterion: " + typeId);
+                    }
                 } else {
-                    WhereIsIt.LOGGER.info("Unknown criterion: " + typeId);
+                    WhereIsIt.LOGGER.warn("Invalid criterion tag: " + tag);
                 }
-            } else {
-                WhereIsIt.LOGGER.info("Invalid criterion tag: " + tag);
             }
+        } else {
+            WhereIsIt.LOGGER.warn("No data for search request");
         }
         return request;
     }
