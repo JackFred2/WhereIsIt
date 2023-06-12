@@ -44,14 +44,13 @@ public abstract class Criterion {
      */
     public abstract boolean test(ItemStack stack);
 
-    static <T extends Criterion> Type<T> register(ResourceLocation id, Type<T> type) {
+    public static <T extends Criterion> Type<T> register(ResourceLocation id, Type<T> type) {
         return Registry.register(Type.REGISTRY, id, type);
     }
 
     public interface Type<T extends Criterion> {
         ResourceKey<Registry<Type<? extends Criterion>>> REGISTRY_KEY = ResourceKey.createRegistryKey(WhereIsIt.id("criteria_supplier"));
         Registry<Type<? extends Criterion>> REGISTRY = FabricRegistryBuilder.createSimple(REGISTRY_KEY).buildAndRegister();
-
 
         T get();
     }

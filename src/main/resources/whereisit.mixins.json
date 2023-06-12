@@ -3,7 +3,6 @@
 	"package": "red.jackf.whereisit.mixins",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

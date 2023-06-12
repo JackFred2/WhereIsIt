@@ -6,7 +6,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import red.jackf.whereisit.criteria.VanillaCriteria;
 
+/**
+ * Checks against an item ID
+ */
 public class ItemCriterion extends Criterion {
     private static final String KEY = "ItemId";
     private Item item = Items.AIR;

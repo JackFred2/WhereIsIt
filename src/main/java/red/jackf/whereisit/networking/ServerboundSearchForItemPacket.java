@@ -7,7 +7,6 @@ import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 
 public record ServerboundSearchForItemPacket(SearchRequest request) implements FabricPacket {
-
     public static final PacketType<ServerboundSearchForItemPacket> TYPE = PacketType.create(WhereIsIt.id("c2s_searchforitem"), ServerboundSearchForItemPacket::new);
 
     public ServerboundSearchForItemPacket(FriendlyByteBuf buf) {

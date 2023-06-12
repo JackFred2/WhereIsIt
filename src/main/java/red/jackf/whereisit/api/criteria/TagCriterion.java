@@ -6,7 +6,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import red.jackf.whereisit.criteria.VanillaCriteria;
 
+/**
+ * Checks against an item tag
+ */
 public class TagCriterion extends Criterion {
     private static final String KEY = "TagId";
     private TagKey<Item> tag = null;
