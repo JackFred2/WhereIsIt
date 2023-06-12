@@ -23,7 +23,10 @@
 			"red.jackf.whereisit.client.WhereIsItClient"
 		],
 		"jei_mod_plugin": [
-			"red.jackf.whereisit.client.compat.JEIPlugin"
+			"red.jackf.whereisit.client.compat.WhereIsItJEIPlugin"
+		],
+		"rei_client": [
+			"red.jackf.whereisit.client.compat.WhereIsItREIPlugin"
 		]
 	},
 	"mixins": [

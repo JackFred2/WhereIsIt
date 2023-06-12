@@ -12,9 +12,10 @@ import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.StackGrabber;
 
-public final class JEIPlugin implements IModPlugin {
+public final class WhereIsItJEIPlugin implements IModPlugin {
     private boolean setup = false;
     private IJeiRuntime runtime = null;
 
@@ -27,6 +28,7 @@ public final class JEIPlugin implements IModPlugin {
     @Override
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
         if (!setup) {
+            WhereIsItClient.LOGGER.debug("Enabling JEI Support");
             StackGrabber.EVENT.register((screen, mouseX, mouseY) -> {
                 if (runtime != null) {
                     var ingredientsStack = getOverlayStack(runtime.getIngredientListOverlay()::getIngredientUnderMouse);

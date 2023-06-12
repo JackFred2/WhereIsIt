@@ -9,6 +9,8 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
+import red.jackf.whereisit.api.SearchRequest;
+import red.jackf.whereisit.api.criteria.ItemCriterion;
 import red.jackf.whereisit.client.api.StackGrabber;
 
 public class WhereIsItClient implements ClientModInitializer {
@@ -26,7 +28,10 @@ public class WhereIsItClient implements ClientModInitializer {
 					int mouseY = (int) (client.mouseHandler.ypos() * (double)client.getWindow().getGuiScaledHeight() / (double)client.getWindow().getScreenHeight());
 					var stack = StackGrabber.EVENT.invoker().grabStack(screen1, mouseX, mouseY);
 					if (stack != null) {
-						LOGGER.debug("Searching for " + stack);
+						var request = new SearchRequest();
+						request.add(new ItemCriterion(stack.getItem()));
+						var packed = request.pack();
+						LOGGER.debug("Search: " + packed.toString());
 					} else {
 						LOGGER.debug("Empty search");
 					}

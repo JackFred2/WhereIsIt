@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
+import red.jackf.whereisit.api.criteria.VanillaCriteria;
 
 public class WhereIsIt implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -15,5 +16,6 @@ public class WhereIsIt implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.debug("Setup Common");
+		VanillaCriteria.setup();
 	}
 }
