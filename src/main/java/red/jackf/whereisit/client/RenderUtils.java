@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -23,7 +24,6 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import red.jackf.whereisit.Searcher;
 import red.jackf.whereisit.WhereIsIt;
-import red.jackf.whereisit.mixin.AccessorDrawableHelper;
 import red.jackf.whereisit.mixin.AccessorHandledScreen;
 
 import java.util.*;
@@ -270,7 +270,7 @@ public abstract class RenderUtils {
     /**
      * Draws a highlight over slots that contain the last searched item.
      */
-    public static void drawSlotWithLastSearchedItem(MatrixStack matrixStack, HandledScreen<?> screen) {
+    public static void drawSlotWithLastSearchedItem(DrawContext context, HandledScreen<?> screen) {
         if (WhereIsIt.CONFIG.disableSlotHighlight() || lastSearchedItem == null || lastSearchTime == -1L) return;
         int time = (int) ((System.currentTimeMillis() / 15) % 360);
         screen.getScreenHandler().slots.forEach(slot -> {
@@ -289,11 +289,11 @@ public abstract class RenderUtils {
                 int y = slot.y + ((AccessorHandledScreen) screen).whereisit$getY();
                 RenderSystem.disableDepthTest();
                 RenderSystem.colorMask(true, true, true, false);
-                ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x - 2, y - 2, x, y + 18, colour, colour);
-                ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x + 16, y - 2, x + 18, y + 18, colour, colour);
+                context.fillGradient(x - 2, y - 2, x, y + 18, colour, colour);
+                context.fillGradient(x + 16, y - 2, x + 18, y + 18, colour, colour);
 
-                ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x, y - 2, x + 16, y, colour, colour);
-                ((AccessorDrawableHelper) screen).whereisit$fillGradient(matrixStack, x, y + 16, x + 16, y + 18, colour, colour);
+                context.fillGradient( x, y - 2, x + 16, y, colour, colour);
+                context.fillGradient( x, y + 16, x + 16, y + 18, colour, colour);
                 RenderSystem.colorMask(true, true, true, true);
                 RenderSystem.enableDepthTest();
             }

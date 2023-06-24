@@ -3,6 +3,7 @@ package red.jackf.whereisit.mixin;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookGhostSlots;
@@ -56,7 +57,7 @@ public abstract class MixinHandledScreen {
     }
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"))
-    private void whereisit$drawSlotHighlights(MatrixStack stack, int x, int y, CallbackInfo ci) {
-        RenderUtils.drawSlotWithLastSearchedItem(stack, (HandledScreen<?>) (Object) this);
+    private void whereisit$drawSlotHighlights(DrawContext context, int x, int y, CallbackInfo ci) {
+        RenderUtils.drawSlotWithLastSearchedItem(context, (HandledScreen<?>) (Object) this);
     }
 }
