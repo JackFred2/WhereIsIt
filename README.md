@@ -6,17 +6,20 @@ You can contribute at https://poeditor.com/join/project?hash=FWkLQzLyw4. You wil
 
 Current translation targets (as of 2021/09/10):
 
-- Chinese (86%) 
-- English (100%) ✅
-- French (96%)
-- German (100%) ✅
-- Italian (100%) ✅
-- Korean (20%)
-- Polish (100%) ✅
+- Chinese (100%)  ✅
+- Croatian (100%) ✅
+- English (reference)
+- French (90%)
+- German (93%)
+- Italian (93%)
+- Korean (37%)
+- Polish (93%) ✅
 - Portuguese (0%)
 - Russian (100%) ✅
-- Spanish (86%)
-- Turkish (100%) ✅
+- Slovenian (37%)
+- Spanish (81%)
+- Swedish (50%)
+- Turkish (93%
 - Welsh (0%)
 
 If your language isn't listed, feel free to make an issue requesting it.
