@@ -25,10 +25,10 @@
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Regenbogenmodus",
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Überschreibt die bisherigen Farben.",
     "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Textgrößen Modifikator",
-    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier.@PrefixText": "Labels",
-    "text.autoconfig.whereisit.option.clientOptions.showLabelsForResults": "Show labels for returned results",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Rendering",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Maximale Suchergebnisse",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Suchpräferenzen",
-    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@Tooltip": "Für keine Beschränkung auf 0 setzen."
+    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@Tooltip": "Für keine Beschränkung auf 0 setzen.",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier.@PrefixText": "Labels",
+    "text.autoconfig.whereisit.option.clientOptions.showLabelsForResults": "Show labels for returned results"
 }
