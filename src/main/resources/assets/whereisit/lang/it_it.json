@@ -25,10 +25,10 @@
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode": "Modalità arcobaleno",
     "text.autoconfig.whereisit.option.clientOptions.rainbowMode.@Tooltip": "Sovrascrive i colori di sopra quando abilitato.",
     "text.autoconfig.whereisit.option.clientOptions.textSizeModifier": "Modificatore della grandezza del testo",
-    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier.@PrefixText": "Labels",
-    "text.autoconfig.whereisit.option.clientOptions.showLabelsForResults": "Show labels for returned results",
     "text.autoconfig.whereisit.option.clientOptions.fadeOutTime.@PrefixText": "Rendering",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults": "Massimo di risultati ottenbili",
     "text.autoconfig.whereisit.option.clientOptions.maximumResults.@PrefixText": "Preferenze di ricerca",
-    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@Tooltip": "Imposta a 0 per nessun limite"
+    "text.autoconfig.whereisit.option.clientOptions.maximumResults.@Tooltip": "Imposta a 0 per nessun limite",
+    "text.autoconfig.whereisit.option.clientOptions.textSizeModifier.@PrefixText": "Labels",
+    "text.autoconfig.whereisit.option.clientOptions.showLabelsForResults": "Show labels for returned results"
 }
