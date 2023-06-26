@@ -69,7 +69,7 @@ public class WhereIsIt implements ModInitializer {
                 server.execute(() -> {
 
                     var basePos = player.getBlockPos();
-                    var world = player.getWorld();
+                    var world = player.getServerWorld();
 
                     long beforeTime = System.nanoTime();
 
