@@ -6,14 +6,16 @@ You can contribute at https://poeditor.com/join/project?hash=FWkLQzLyw4. You wil
 
 Current translation targets (as of 2021/09/10):
 
+- English (reference)
+
+
 - Chinese (100%)  ✅
 - Croatian (100%) ✅
-- English (reference)
 - French (90%)
 - German (93%)
 - Italian (93%)
 - Korean (37%)
-- Polish (93%) ✅
+- Polish (93%)
 - Portuguese (0%)
 - Russian (100%) ✅
 - Slovenian (37%)
