@@ -7,13 +7,13 @@ import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.api.runtime.IRecipesGui;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.api.SearchRequest;
+import red.jackf.whereisit.api.criteria.FluidCriterion;
+import red.jackf.whereisit.api.criteria.ItemCriterion;
 import red.jackf.whereisit.client.WhereIsItClient;
-import red.jackf.whereisit.client.api.StackGrabber;
+import red.jackf.whereisit.client.api.SearchRequestPopulator;
 
 public final class WhereIsItJEIPlugin implements IModPlugin {
     private boolean setup = false;
@@ -28,50 +28,49 @@ public final class WhereIsItJEIPlugin implements IModPlugin {
     @Override
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
         if (!setup) {
-            WhereIsItClient.LOGGER.debug("Enabling JEI Support");
-            StackGrabber.EVENT.register((screen, mouseX, mouseY) -> {
+            WhereIsItClient.LOGGER.info("Enabling JEI Support");
+            SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
                 if (runtime != null) {
-                    var ingredientsStack = getOverlayStack(runtime.getIngredientListOverlay()::getIngredientUnderMouse);
-                    if (ingredientsStack != null) return ingredientsStack;
+                    var ingredientsStack = parseIngredient(request, runtime.getIngredientListOverlay()::getIngredientUnderMouse);
+                    if (ingredientsStack) return;
 
-                    var bookmarkStack = getOverlayStack(runtime.getBookmarkOverlay()::getIngredientUnderMouse);
-                    if (bookmarkStack != null) return bookmarkStack;
+                    var bookmarkStack = parseIngredient(request, runtime.getBookmarkOverlay()::getIngredientUnderMouse);
+                    if (bookmarkStack) return;
 
-                    return getRecipeStack(runtime.getRecipesGui());
+                    getRecipeStack(request, runtime.getRecipesGui());
                 }
-                return null;
             });
             setup = true;
         }
         this.runtime = jeiRuntime;
     }
 
-    @Nullable
-    private ItemStack getRecipeStack(IRecipesGui recipe) {
+    private void getRecipeStack(SearchRequest request, IRecipesGui recipe) {
         var stack = recipe.getIngredientUnderMouse(VanillaTypes.ITEM_STACK);
-        if (stack.isPresent()) return stack.get();
-        var fluid = recipe.getIngredientUnderMouse(FabricTypes.FLUID_STACK);
-        if (fluid.isPresent()) {
-            var bucket = fluid.get().getFluid().getBucket();
-            if (bucket != Items.AIR) return new ItemStack(bucket);
+        if (stack.isPresent()) {
+            request.add(new ItemCriterion(stack.get().getItem()));
+            return;
         }
-        return null;
+        var fluid = recipe.getIngredientUnderMouse(FabricTypes.FLUID_STACK);
+        fluid.ifPresent(fluidIngredient -> request.add(new FluidCriterion(fluidIngredient.getFluid())));
     }
 
     private interface OverlayGetter {
         <I> I get(IIngredientType<I> type);
     }
 
-    @Nullable
-    private ItemStack getOverlayStack(OverlayGetter getter) {
+    private boolean parseIngredient(SearchRequest request, OverlayGetter getter) {
         var stack = getter.get(VanillaTypes.ITEM_STACK);
-        if (stack != null) return stack;
+        if (stack != null) {
+            request.add(new ItemCriterion(stack.getItem()));
+            return true;
+        }
         var fluidIngredient = getter.get(FabricTypes.FLUID_STACK);
         if (fluidIngredient != null) {
-            var bucketItem = fluidIngredient.getFluid().getBucket();
-            if (bucketItem != Items.AIR) return new ItemStack(bucketItem);
+            request.add(new FluidCriterion(fluidIngredient.getFluid()));
+            return true;
         }
-        return null;
+        return false;
     }
 
     @Override

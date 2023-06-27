@@ -24,6 +24,7 @@ repositories {
 			url = "https://maven.terraformersmc.com/releases/"
 			content {
 				includeGroup("com.terraformersmc")
+				includeGroup("dev.emi")
 			}
 		}
 		maven {
@@ -75,17 +76,21 @@ dependencies {
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
 	// ItemStack Grabbers
+	// https://github.com/mezz/JustEnoughItems/issues/2891
 	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
 	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
-	modCompileOnlyApi "maven.modrinth:jei:FVcrIQ3r"
+	modCompileOnlyApi "maven.modrinth:jei:$jei_modrinth_id"
 
-	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version"
-	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"
+	// modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version"
+	// modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
 
-	modRuntimeOnly "mezz.jei:jei-${minecraft_version}-fabric:${jei_version}"
+	//modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
+	modCompileOnly "dev.emi:emi-fabric:${emi_version}"
+
+	//modRuntimeOnly "mezz.jei:jei-${minecraft_version}-fabric:${jei_version}"
 	modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
-
-
+	modLocalRuntime "dev.emi:emi-fabric:${emi_version}"
 }
 
 processResources {

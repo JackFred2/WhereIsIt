@@ -27,6 +27,9 @@
 		],
 		"rei_client": [
 			"red.jackf.whereisit.client.compat.WhereIsItREIPlugin"
+		],
+		"emi": [
+			"red.jackf.whereisit.client.compat.WhereIsItEMICompat"
 		]
 	},
 	"mixins": [

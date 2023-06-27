@@ -1,5 +1,6 @@
 package red.jackf.whereisit.api.criteria;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -31,17 +32,25 @@ public class TagCriterion extends Criterion {
     @Override
     public void readTag(CompoundTag tag) {
         var id = ResourceLocation.tryParse(tag.getString(KEY));
-        if (id != null)
+        if (id != null) {
             this.tag = TagKey.create(Registries.ITEM, id);
+        }
     }
 
     @Override
     public boolean valid() {
-        return tag != null;
+        return BuiltInRegistries.ITEM.getTag(tag).isPresent();
     }
 
     @Override
     public boolean test(ItemStack stack) {
         return stack.is(tag);
+    }
+
+    @Override
+    public String toString() {
+        return "TagCriterion{" +
+                "tag=" + tag +
+                '}';
     }
 }

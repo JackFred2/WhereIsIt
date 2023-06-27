@@ -44,4 +44,11 @@ public class ItemCriterion extends Criterion {
     public boolean test(ItemStack stack) {
         return stack.is(this.item);
     }
+
+    @Override
+    public String toString() {
+        return "ItemCriterion{" +
+                "item=" + item +
+                '}';
+    }
 }

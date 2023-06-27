@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.networking.ClientboundPositionPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 
 import java.util.HashSet;
@@ -14,7 +15,7 @@ public class SearchHandler {
     private static final int RANGE = 8;
 
     @SuppressWarnings("UnstableApiUsage")
-    public static void handle(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender packetSender) {
+    public static void handle(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender response) {
         var startPos = player.blockPosition();
         var level = player.level();
         var pos = new BlockPos.MutableBlockPos();
@@ -29,7 +30,8 @@ public class SearchHandler {
                     for (var direction : Direction.values()) {
                         var storage = ItemStorage.SIDED.find(level, pos, direction);
                         if (storage != null) for (var view : storage) {
-                            if (packet.request().test(view.getResource().toStack())) {
+                            var resource = view.getResource().toStack((int) view.getAmount());
+                            if (packet.request().test(resource)) {
                                 positions.add(pos.immutable());
                                 break invCheck;
                             }
@@ -38,6 +40,7 @@ public class SearchHandler {
                 }
             }
         }
-        WhereIsIt.LOGGER.info(positions.toString());
+        WhereIsIt.LOGGER.debug(positions.toString());
+        response.sendPacket(new ClientboundPositionPacket(positions));
     }
 }
