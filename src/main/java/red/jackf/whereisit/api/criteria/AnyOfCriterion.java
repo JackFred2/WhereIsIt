@@ -10,6 +10,7 @@ import red.jackf.whereisit.criteria.VanillaCriteria;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,11 @@ public class AnyOfCriterion extends Criterion implements Consumer<Criterion> {
     }
 
     @Override
+    public void accept(Criterion criterion) {
+        this.criteria.add(criterion);
+    }
+
+    @Override
     public String toString() {
         return "AnyOfCriterion[" +
                 criteria.stream().map(Criterion::toString).collect(Collectors.joining(", ")) +
@@ -73,7 +79,15 @@ public class AnyOfCriterion extends Criterion implements Consumer<Criterion> {
     }
 
     @Override
-    public void accept(Criterion criterion) {
-        this.criteria.add(criterion);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AnyOfCriterion that = (AnyOfCriterion) o;
+        return Objects.equals(criteria, that.criteria);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(criteria);
     }
 }

@@ -110,12 +110,12 @@ public class SearchRequest implements Consumer<Criterion> {
     }
 
     @Override
-    public String toString() {
-        return "SearchRequest[" + criteria.stream().map(Criterion::toString).collect(Collectors.joining(", ")) + "]";
+    public void accept(Criterion criterion) {
+        this.add(criterion);
     }
 
     @Override
-    public void accept(Criterion criterion) {
-        this.add(criterion);
+    public String toString() {
+        return "SearchRequest[" + criteria.stream().map(Criterion::toString).collect(Collectors.joining(", ")) + "]";
     }
 }

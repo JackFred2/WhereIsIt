@@ -12,6 +12,8 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import red.jackf.whereisit.criteria.VanillaCriteria;
 
+import java.util.Objects;
+
 public class FluidCriterion extends Criterion {
     private static final String KEY = "FluidId";
     private Fluid fluid = Fluids.EMPTY;
@@ -57,5 +59,18 @@ public class FluidCriterion extends Criterion {
         return "FluidCriterion{" +
                 "fluid=" + fluid +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FluidCriterion that = (FluidCriterion) o;
+        return Objects.equals(fluid, that.fluid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fluid);
     }
 }

@@ -10,16 +10,16 @@ import red.jackf.whereisit.api.SearchRequest;
  * Takes a {@link Screen}, and attempts to add search criteria to a given request. Goes through all populators until
  * one adds criteria.
  * <p>
- * Normally, this just involves adding an {@link ItemStack} using {@link red.jackf.whereisit.api.criteria.ItemCriterion},
- * however it may be used to add more specific criteria, such as a {@link red.jackf.whereisit.api.criteria.TagCriterion}
- * in a recipe viewer, or fluid/energy levels.
+ * Normally, this just involves parsing a hovered {@link ItemStack}, using {@link red.jackf.whereisit.api.criteria.ItemCriterion}.
+ * It may also be used to add more specific criteria, such as a {@link red.jackf.whereisit.api.criteria.TagCriterion}
+ * in a recipe viewer, or fluids/energy if hovered over a tank/battery.
  * </p>
  */
 public interface SearchRequestPopulator {
     Event<SearchRequestPopulator> EVENT = EventFactory.createArrayBacked(SearchRequestPopulator.class, listeners -> (request, screen, mouseX, mouseY) -> {
         for (SearchRequestPopulator listener : listeners) {
             listener.grabStack(request, screen, mouseX, mouseY);
-            if (request.hasCriteria()) break;
+            // if (request.hasCriteria()) break;
         }
     });
 

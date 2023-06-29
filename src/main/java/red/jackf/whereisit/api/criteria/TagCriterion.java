@@ -9,6 +9,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import red.jackf.whereisit.criteria.VanillaCriteria;
 
+import java.util.Objects;
+
 /**
  * Checks against an item tag
  */
@@ -52,5 +54,18 @@ public class TagCriterion extends Criterion {
         return "TagCriterion{" +
                 "tag=" + tag +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TagCriterion that = (TagCriterion) o;
+        return Objects.equals(tag, that.tag);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tag);
     }
 }

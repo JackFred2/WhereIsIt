@@ -12,6 +12,9 @@ import red.jackf.whereisit.api.criteria.TagCriterion;
 
 import java.util.ArrayList;
 
+/**
+ * Populates a request from the vanilla GUIs/recipe book
+ */
 public class DefaultRequestPopulator {
     public static void populate(SearchRequest request, Screen screen, int mouseX, int mouseY) {
         // normal item

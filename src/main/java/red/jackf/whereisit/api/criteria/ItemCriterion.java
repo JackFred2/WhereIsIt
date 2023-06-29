@@ -8,6 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import red.jackf.whereisit.criteria.VanillaCriteria;
 
+import java.util.Objects;
+
 /**
  * Checks against an item ID
  */
@@ -50,5 +52,18 @@ public class ItemCriterion extends Criterion {
         return "ItemCriterion{" +
                 "item=" + item +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ItemCriterion that = (ItemCriterion) o;
+        return Objects.equals(item, that.item);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(item);
     }
 }

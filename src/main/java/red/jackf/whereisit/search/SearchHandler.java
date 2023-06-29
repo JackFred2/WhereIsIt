@@ -6,7 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import red.jackf.whereisit.WhereIsIt;
-import red.jackf.whereisit.networking.ClientboundPositionPacket;
+import red.jackf.whereisit.api.SearchResult;
+import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 
 import java.util.HashSet;
@@ -19,7 +20,8 @@ public class SearchHandler {
         var startPos = player.blockPosition();
         var level = player.level();
         var pos = new BlockPos.MutableBlockPos();
-        var positions = new HashSet<BlockPos>();
+        var results = new HashSet<SearchResult>();
+        WhereIsIt.LOGGER.debug("Server search id %d: %s".formatted(packet.id(), packet.request().toString()));
         for (int x = startPos.getX() - RANGE; x <= startPos.getX() + RANGE; x++) {
             pos.setX(x);
             for (int y = startPos.getY() - RANGE; y <= startPos.getY() + RANGE; y++) {
@@ -32,7 +34,7 @@ public class SearchHandler {
                         if (storage != null) for (var view : storage) {
                             var resource = view.getResource().toStack((int) view.getAmount());
                             if (packet.request().test(resource)) {
-                                positions.add(pos.immutable());
+                                results.add(new SearchResult(pos.immutable(), resource));
                                 break invCheck;
                             }
                         }
@@ -40,7 +42,8 @@ public class SearchHandler {
                 }
             }
         }
-        WhereIsIt.LOGGER.debug(positions.toString());
-        response.sendPacket(new ClientboundPositionPacket(positions));
+        WhereIsIt.LOGGER.debug("Server search results id %d: %s".formatted(packet.id(), results.toString()));
+        if (results.size() > 0)
+            response.sendPacket(new ClientboundResultsPacket(packet.id(), results));
     }
 }

@@ -6,11 +6,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 
-public record ServerboundSearchForItemPacket(SearchRequest request) implements FabricPacket {
+public record ServerboundSearchForItemPacket(long id, SearchRequest request) implements FabricPacket {
     public static final PacketType<ServerboundSearchForItemPacket> TYPE = PacketType.create(WhereIsIt.id("c2s_searchforitem"), ServerboundSearchForItemPacket::new);
 
     public ServerboundSearchForItemPacket(FriendlyByteBuf buf) {
-        this(getRequest(buf));
+        this(buf.readLong(), getRequest(buf));
     }
 
     private static SearchRequest getRequest(FriendlyByteBuf buf) {
@@ -20,6 +20,7 @@ public record ServerboundSearchForItemPacket(SearchRequest request) implements F
 
     @Override
     public void write(FriendlyByteBuf buf) {
+        buf.writeLong(id);
         var packed = request.pack();
         buf.writeNbt(packed);
     }

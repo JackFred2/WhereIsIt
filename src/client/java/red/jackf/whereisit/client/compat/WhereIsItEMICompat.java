@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * Populates a request from the overlays or recipe screens. <br />
+ *
  * Internal usages: <br />
  * - filtering ingredients by tag or not, and stacks by item or fluids <br />
  * - getting the hovered item in a recipe screen
@@ -33,6 +35,7 @@ public class WhereIsItEMICompat implements EmiPlugin {
         SearchRequestPopulator.EVENT.register(WhereIsItEMICompat::populate);
     }
 
+    // TODO support the recipe tree screen
     private static void populate(SearchRequest request, Screen screen, int mouseX, int mouseY) {
         var ingredient = EmiApi.getHoveredStack(mouseX, mouseY, true).getStack();
         if (ingredient.isEmpty() && screen instanceof RecipeScreen recipeScreen)
