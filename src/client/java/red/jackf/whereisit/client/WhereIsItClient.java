@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.client.api.SearchInvoker;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.client.render.RenderingObjects;
 import red.jackf.whereisit.client.render.ResultRenderer;
 import red.jackf.whereisit.client.util.NotificationToast;
 
@@ -57,6 +58,7 @@ public class WhereIsItClient implements ClientModInitializer {
         SearchRequestPopulator.EVENT.register(DefaultRequestPopulator::populate);
         DefaultSearchInvoker.setup();
 
+        RenderingObjects.setup();
         ResultRenderer.setup();
     }
 }

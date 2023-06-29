@@ -1,17 +1,12 @@
 package red.jackf.whereisit.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import red.jackf.whereisit.api.SearchResult;
 
@@ -19,20 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class ResultRenderer {
-    // thank u Modular Routers https://github.com/desht/ModularRouters/blob/MC1.19.2-master/src/main/java/me/desht/modularrouters/client/render/ModRenderTypes.java#L42
-    public static final RenderType BLOCK_HIGHLIGHT = RenderType.create("whereisit_block_highlight",
-            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 256 * 256, false, false,
-            RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
-                    .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
-                    .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                    .setTextureState(RenderStateShard.NO_TEXTURE)
-                    .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
-                    .setCullState(RenderStateShard.CULL)
-                    .setLightmapState(RenderStateShard.NO_LIGHTMAP)
-                    .setWriteMaskState(RenderStateShard.COLOR_WRITE)
-                    .createCompositeState(false));
-
     private static Collection<SearchResult> results = Collections.emptyList();
     // if -1, update next refresh
     private static long lastSetTime = 0;
@@ -64,73 +45,70 @@ public class ResultRenderer {
         pose.translate(-projected.x, -projected.y, -projected.z);
 
         // from 80% to 25%
-        var alpha = (int) ((0.8 - (progress / 2f)) * 255);
-        var colour = Mth.hsvToRgb(progress, 1f, 1f);
+        var alpha = (1.0f - (progress / 2f));
         var scale = easingFunc(progress);
+
+        var consumer = buffer.getBuffer(RenderingObjects.BLOCK_HIGHLIGHT);
 
         results.forEach(result -> renderIndividual(
                 result,
-                buffer,
+                consumer,
                 pose,
-                FastColor.ARGB32.red(colour),
-                FastColor.ARGB32.green(colour),
-                FastColor.ARGB32.blue(colour),
-                alpha,
                 scale
         ));
+
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
+
+        buffer.endBatch(RenderingObjects.BLOCK_HIGHLIGHT);
 
         pose.popPose();
 
     }
 
-    private static void renderIndividual(SearchResult searchResult, MultiBufferSource.BufferSource buffer, PoseStack pose, int r, int g, int b, int alpha, float scale) {
+    private static void renderIndividual(SearchResult searchResult, VertexConsumer consumer, PoseStack pose, float scale) {
         pose.pushPose();
         pose.translate(searchResult.pos().getX() + 0.5f, searchResult.pos().getY() + 0.5f, searchResult.pos()
                 .getZ() + 0.5f);
         pose.scale(scale * 0.5f, scale * 0.5f, scale * 0.5f);
         var resultMatrix = pose.last().pose();
 
-        var consumer = buffer.getBuffer(BLOCK_HIGHLIGHT);
-
         // -Z
-        consumer.vertex(resultMatrix, -1, -1, -1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, -1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, -1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, -1).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, -1).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, -1).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, -1).endVertex();
 
         // +Z
-        consumer.vertex(resultMatrix, -1, -1, 1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, 1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, 1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, 1).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, 1).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, 1).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, 1).endVertex();
 
         // -Y
-        consumer.vertex(resultMatrix, -1, -1, -1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, -1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, 1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, -1, -1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, -1).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, -1).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, 1).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, 1).endVertex();
 
         // +Y
-        consumer.vertex(resultMatrix, -1, 1, -1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, 1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, 1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, -1).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, 1).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, 1).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, -1).endVertex();
 
         // -X
-        consumer.vertex(resultMatrix, -1, -1, -1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, -1, -1, 1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, 1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, -1).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, 1).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, 1).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, -1).endVertex();
 
         // +X
-        consumer.vertex(resultMatrix, 1, -1, -1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, -1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, 1).color(r, g, b, alpha).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, -1).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, -1).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, 1).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, 1).endVertex();
 
         RenderSystem.disableDepthTest();
-
-        buffer.endBatch(BLOCK_HIGHLIGHT);
 
         pose.popPose();
     }
