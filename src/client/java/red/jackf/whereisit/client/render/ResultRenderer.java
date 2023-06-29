@@ -23,7 +23,7 @@ public class ResultRenderer {
     public static final RenderType BLOCK_HIGHLIGHT = RenderType.create("whereisit_block_highlight",
             DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 256 * 256, false, false,
             RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER)
+                    .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
                     .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
                     .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
                     .setTextureState(RenderStateShard.NO_TEXTURE)
@@ -64,7 +64,7 @@ public class ResultRenderer {
         pose.translate(-projected.x, -projected.y, -projected.z);
 
         // from 80% to 25%
-        var alpha = (int) ((0.8 - (progress / 25f)) * 255);
+        var alpha = (int) ((0.8 - (progress / 2f)) * 255);
         var colour = Mth.hsvToRgb(progress, 1f, 1f);
         var scale = easingFunc(progress);
 
