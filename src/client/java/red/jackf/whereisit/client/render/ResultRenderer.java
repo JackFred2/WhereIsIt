@@ -21,7 +21,7 @@ import java.util.Collections;
 public class ResultRenderer {
     // thank u Modular Routers https://github.com/desht/ModularRouters/blob/MC1.19.2-master/src/main/java/me/desht/modularrouters/client/render/ModRenderTypes.java#L42
     public static final RenderType BLOCK_HIGHLIGHT = RenderType.create("whereisit_block_highlight",
-            DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.QUADS, 256, false, false,
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 256 * 256, false, false,
             RenderType.CompositeState.builder()
                     .setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER)
                     .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
@@ -93,40 +93,40 @@ public class ResultRenderer {
         var consumer = buffer.getBuffer(BLOCK_HIGHLIGHT);
 
         // -Z
-        consumer.vertex(resultMatrix, -1, -1, -1).color(r, g, b, alpha).normal(0, 0, -1).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, -1).color(r, g, b, alpha).normal(0, 0, -1).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, -1).color(r, g, b, alpha).normal(0, 0, -1).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, -1).color(r, g, b, alpha).normal(0, 0, -1).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, -1).color(r, g, b, alpha).endVertex();
 
         // +Z
-        consumer.vertex(resultMatrix, -1, -1, 1).color(r, g, b, alpha).normal(0, 0, 1).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, 1).color(r, g, b, alpha).normal(0, 0, 1).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, 1).color(r, g, b, alpha).normal(0, 0, 1).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, 1).color(r, g, b, alpha).normal(0, 0, 1).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, 1).color(r, g, b, alpha).endVertex();
 
         // -Y
-        consumer.vertex(resultMatrix, -1, -1, -1).color(r, g, b, alpha).normal(0, -1, 0).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, -1).color(r, g, b, alpha).normal(0, -1, 0).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, 1).color(r, g, b, alpha).normal(0, -1, 0).endVertex();
-        consumer.vertex(resultMatrix, -1, -1, 1).color(r, g, b, alpha).normal(0, -1, 0).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, 1).color(r, g, b, alpha).endVertex();
 
         // +Y
-        consumer.vertex(resultMatrix, -1, 1, -1).color(r, g, b, alpha).normal(0, 1, 0).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, 1).color(r, g, b, alpha).normal(0, 1, 0).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, 1).color(r, g, b, alpha).normal(0, 1, 0).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, -1).color(r, g, b, alpha).normal(0, 1, 0).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, -1).color(r, g, b, alpha).endVertex();
 
         // -X
-        consumer.vertex(resultMatrix, -1, -1, -1).color(r, g, b, alpha).normal(-1, 0, 0).endVertex();
-        consumer.vertex(resultMatrix, -1, -1, 1).color(r, g, b, alpha).normal(-1, 0, 0).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, 1).color(r, g, b, alpha).normal(-1, 0, 0).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, -1).color(r, g, b, alpha).normal(-1, 0, 0).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, -1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, -1, 1, -1).color(r, g, b, alpha).endVertex();
 
         // +X
-        consumer.vertex(resultMatrix, 1, -1, -1).color(r, g, b, alpha).normal(1, 0, 0).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, -1).color(r, g, b, alpha).normal(1, 0, 0).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, 1).color(r, g, b, alpha).normal(1, 0, 0).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, 1).color(r, g, b, alpha).normal(1, 0, 0).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, -1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, 1, 1).color(r, g, b, alpha).endVertex();
+        consumer.vertex(resultMatrix, 1, -1, 1).color(r, g, b, alpha).endVertex();
 
         RenderSystem.disableDepthTest();
 
