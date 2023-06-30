@@ -52,7 +52,6 @@
 	},
 	"suggests": {
 		"emi": "*",
-		"roughlyenoughitems": "*",
-		"emi": "*"
+		"roughlyenoughitems": "*"
 	}
 }

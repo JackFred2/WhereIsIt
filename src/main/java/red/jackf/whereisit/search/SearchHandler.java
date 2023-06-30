@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
@@ -55,17 +54,11 @@ public class SearchHandler {
                 for (var view : storage) {
                     if (view.isResourceBlank()) continue;
                     var resource = view.getResource().toStack((int) view.getAmount());
-                    if (checkStack(request, resource)) {
+                    if (NestedItemStackSearcher.check(resource, request)) {
                         results.add(new SearchResult(pos.immutable(), resource));
                     }
                 }
             }
         }
-    }
-
-    // check items
-    private static boolean checkStack(SearchRequest request, ItemStack resource) {
-        if (request.test(resource)) return true;
-        return NestedItemStackSearcher.EVENT.invoker().check(resource, request::test);
     }
 }

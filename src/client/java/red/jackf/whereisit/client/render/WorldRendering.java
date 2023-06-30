@@ -13,12 +13,14 @@ import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import org.lwjgl.opengl.GL11;
 import red.jackf.whereisit.api.SearchResult;
+import red.jackf.whereisit.client.WhereIsItClient;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @SuppressWarnings("resource") // i really don't want to call ClientLevel#close() thanks
-public class ResultRenderer {
+public class WorldRendering {
     // had a nice shader going but alas, https://github.com/IrisShaders/Iris/blob/1.19.4/docs/development/compatibility/core-shaders.md
     // they're right btw don't put this on iris
     @SuppressWarnings("unused")
@@ -35,9 +37,7 @@ public class ResultRenderer {
                     .setWriteMaskState(RenderStateShard.COLOR_WRITE)
                     .createCompositeState(false));
 
-    private static Collection<SearchResult> results = Collections.emptyList();
-    // if -1, update next refresh
-    private static long lastSetTime = 0;
+    private static final List<SearchResult> results = new ArrayList<>();
     private static final long LIFESPAN = 10 * SharedConstants.TICKS_PER_SECOND;
 
     private static float progress = 1f;
@@ -45,12 +45,10 @@ public class ResultRenderer {
     public static void setup() {
         WorldRenderEvents.END.register(context -> {
             if (results.isEmpty()) return;
-            if (lastSetTime == -1) lastSetTime = context.world().getGameTime();
 
-            progress = (context.world().getGameTime() + context.tickDelta() - lastSetTime) / LIFESPAN;
+            progress = Mth.clamp((context.world().getGameTime() + context.tickDelta() - WhereIsItClient.lastSearchTime) / LIFESPAN, 0f, 1f);
 
             if (context.world() == null || progress > 1f) {
-                results = Collections.emptyList();
                 return;
             }
 
@@ -153,13 +151,15 @@ public class ResultRenderer {
     }
 
     private static float easingFunc(float progress) {
-        progress = Mth.clamp(progress, 0, 1);
         var power = 32f;
         return (float) ((1 - Math.pow(progress, power)) * (1 - Math.pow(1 - progress, power)) * (1 - (progress / 4f)));
     }
 
-    public static void setResults(Collection<SearchResult> newResults) {
-        results = newResults;
-        lastSetTime = -1;
+    public static void addResults(Collection<SearchResult> newResults) {
+        results.addAll(newResults);
+    }
+
+    public static void clearResults() {
+        results.clear();
     }
 }
