@@ -1,5 +1,10 @@
 {
   "key.whereisit.search": "Search for item",
   "key.categories.whereisit": "Where Is It",
-  "gui.whereisit.not_installed_serverside": "Not installed on server."
+  "gui.whereisit.not_installed_serverside": "Not installed on server.",
+
+  "whereisit.config.title": "WhereIsIt",
+  "whereisit.config.common": "Common Options",
+  "whereisit.config.common.searchRange": "Search Range",
+  "whereisit.config.common.searchRange.slider": "%s Blocks"
 }

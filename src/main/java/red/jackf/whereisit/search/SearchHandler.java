@@ -13,27 +13,28 @@ import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.api.search.NestedItemStackSearcher;
+import red.jackf.whereisit.config.WhereIsItConfig;
 import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 
 import java.util.HashSet;
 
 public class SearchHandler {
-    private static final int RANGE = 8;
 
     public static void handle(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender response) {
         var startPos = player.blockPosition();
         var level = player.level();
         var pos = new BlockPos.MutableBlockPos();
         var results = new HashSet<SearchResult>();
+        var range = WhereIsItConfig.INSTANCE.getConfig().common.searchRange;
         WhereIsIt.LOGGER.debug("Server search id %d: %s".formatted(packet.id(), packet.request().toString()));
-        for (int x = startPos.getX() - RANGE; x <= startPos.getX() + RANGE; x++) {
+        for (int x = startPos.getX() - range; x <= startPos.getX() + range; x++) {
             pos.setX(x);
-            for (int y = startPos.getY() - RANGE; y <= startPos.getY() + RANGE; y++) {
+            for (int y = startPos.getY() - range; y <= startPos.getY() + range; y++) {
                 pos.setY(y);
-                for (int z = startPos.getZ() - RANGE; z <= startPos.getZ() + RANGE; z++) {
+                for (int z = startPos.getZ() - range; z <= startPos.getZ() + range; z++) {
                     pos.setZ(z);
-                    if (pos.distSqr(startPos) > RANGE * RANGE) continue;
+                    if (pos.distSqr(startPos) > range * range) continue;
                     checkPosition(packet.request(), level, pos, results);
                 }
             }
