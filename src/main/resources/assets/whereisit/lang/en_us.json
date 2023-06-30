@@ -3,8 +3,13 @@
   "key.categories.whereisit": "Where Is It",
   "gui.whereisit.not_installed_serverside": "Not installed on server.",
 
-  "whereisit.config.title": "WhereIsIt",
+  "whereisit.config.title": "Where Is It",
+  "whereisit.config.client": "Client Options",
+  "whereisit.config.client.fadeoutTime": "Fade Out Time",
+  "whereisit.config.client.fadeoutTime.description": "How long it takes world and slot highlights to fade out.",
+  "whereisit.config.client.fadeoutTime.slider": "%s seconds",
   "whereisit.config.common": "Common Options",
   "whereisit.config.common.searchRange": "Search Range",
-  "whereisit.config.common.searchRange.slider": "%s Blocks"
+  "whereisit.config.common.searchRange.description": "Radius from the player's position to search for items.",
+  "whereisit.config.common.searchRange.slider": "%s blocks"
 }

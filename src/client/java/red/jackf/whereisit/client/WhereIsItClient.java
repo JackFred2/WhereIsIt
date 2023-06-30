@@ -70,7 +70,7 @@ public class WhereIsItClient implements ClientModInitializer {
         ClientTickEvents.START_WORLD_TICK.register(level -> {
             if (lastSearchTime == -1) {
                 lastSearchTime = level.getGameTime();
-            } else if (level.getGameTime() > lastSearchTime + WhereIsItConfig.INSTANCE.getConfig().getClient().fadeoutTime) {
+            } else if (level.getGameTime() > lastSearchTime + WhereIsItConfig.INSTANCE.getConfig().getClient().fadeoutTimeTicks) {
                 lastRequest = null;
                 WorldRendering.clearResults();
             }

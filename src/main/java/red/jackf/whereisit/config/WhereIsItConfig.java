@@ -4,9 +4,10 @@ import dev.isxander.yacl3.config.ConfigEntry;
 import dev.isxander.yacl3.config.GsonConfigInstance;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.SharedConstants;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
+
+import static net.minecraft.SharedConstants.TICKS_PER_SECOND;
 
 public class WhereIsItConfig {
     public static final GsonConfigInstance<WhereIsItConfig> INSTANCE
@@ -25,7 +26,7 @@ public class WhereIsItConfig {
 
     public void validate() {
         if (this.client != null) this.client.validate();
-        this.common.searchRange = Mth.clamp(this.common.searchRange, 4, 16);
+        this.common.searchRangeBlocks = Mth.clamp(this.common.searchRangeBlocks, 4, 16);
     }
 
     public Client getClient() {
@@ -35,15 +36,15 @@ public class WhereIsItConfig {
 
     public static class Client {
         @ConfigEntry
-        public int fadeoutTime = 10 * SharedConstants.TICKS_PER_SECOND;
+        public int fadeoutTimeTicks = 10 * TICKS_PER_SECOND;
 
         public void validate() {
-            this.fadeoutTime = Mth.clamp(this.fadeoutTime, 5 * SharedConstants.TICKS_PER_SECOND, 20 * SharedConstants.TICKS_PER_SECOND);
+            this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 20 * TICKS_PER_SECOND);
         }
     }
 
     public static class Common {
         @ConfigEntry
-        public int searchRange = 8;
+        public int searchRangeBlocks = 8;
     }
 }
