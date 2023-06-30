@@ -17,6 +17,7 @@ import red.jackf.whereisit.api.SearchResult;
 import java.util.Collection;
 import java.util.Collections;
 
+@SuppressWarnings("resource") // i really don't want to call ClientLevel#close() thanks
 public class ResultRenderer {
     // had a nice shader going but alas, https://github.com/IrisShaders/Iris/blob/1.19.4/docs/development/compatibility/core-shaders.md
     // they're right btw don't put this on iris
@@ -41,7 +42,6 @@ public class ResultRenderer {
 
     private static float progress = 1f;
 
-    @SuppressWarnings("resource")
     public static void setup() {
         WorldRenderEvents.END.register(context -> {
             if (results.isEmpty()) return;
@@ -69,7 +69,8 @@ public class ResultRenderer {
 
         // from 100% to 50%
         var alpha = 1 - (progress / 2f);
-        var colour = Mth.hsvToRgb(progress, 1f, 1f);
+        var hue = ((context.world().getGameTime() + context.tickDelta()) % 80) / 80;
+        var colour = Mth.hsvToRgb(hue, 1f, 1f);
         var scale = easingFunc(progress);
 
         var tesselator = Tesselator.getInstance();
