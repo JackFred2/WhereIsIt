@@ -13,3 +13,5 @@ accessible field net/minecraft/world/item/crafting/Ingredient$ItemValue item Lne
 
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
+
+accessible method net/minecraft/world/item/BundleItem getContents (Lnet/minecraft/world/item/ItemStack;)Ljava/util/stream/Stream;

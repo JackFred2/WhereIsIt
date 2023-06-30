@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import red.jackf.whereisit.criteria.VanillaCriteria;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
+import red.jackf.whereisit.search.DefaultNestedItemStackSearchers;
 import red.jackf.whereisit.search.SearchHandler;
 
 public class WhereIsIt implements ModInitializer {
@@ -20,6 +21,7 @@ public class WhereIsIt implements ModInitializer {
 	public void onInitialize() {
 		LOGGER.debug("Setup Common");
 		VanillaCriteria.setup();
+		DefaultNestedItemStackSearchers.setup();
 
 		ServerPlayNetworking.registerGlobalReceiver(ServerboundSearchForItemPacket.TYPE, SearchHandler::handle);
 	}
