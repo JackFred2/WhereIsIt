@@ -1,4 +1,4 @@
-package red.jackf.whereisit.client.compat;
+package red.jackf.whereisit.client.compat.recipeviewers;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.constants.VanillaTypes;
@@ -6,6 +6,7 @@ import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.api.runtime.IRecipesGui;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import red.jackf.whereisit.WhereIsIt;
@@ -14,6 +15,7 @@ import red.jackf.whereisit.api.criteria.FluidCriterion;
 import red.jackf.whereisit.api.criteria.ItemCriterion;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.config.WhereIsItConfig;
 
 public final class WhereIsItJEIPlugin implements IModPlugin {
     private boolean setup = false;
@@ -27,9 +29,11 @@ public final class WhereIsItJEIPlugin implements IModPlugin {
 
     @Override
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+        if (FabricLoader.getInstance().isModLoaded("emi")) return; // JEMI
         if (!setup) {
-            WhereIsItClient.LOGGER.info("Enabling JEI Support");
+            WhereIsItClient.LOGGER.info("Hooking into JEI");
             SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
+                if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.jeiSupport) return;
                 if (runtime != null) {
                     var ingredientsStack = parseIngredient(request, runtime.getIngredientListOverlay()::getIngredientUnderMouse);
                     if (ingredientsStack) return;

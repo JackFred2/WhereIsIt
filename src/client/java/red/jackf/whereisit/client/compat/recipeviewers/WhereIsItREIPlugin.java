@@ -1,4 +1,4 @@
-package red.jackf.whereisit.client.compat;
+package red.jackf.whereisit.client.compat.recipeviewers;
 
 import dev.architectury.fluid.FluidStack;
 import me.shedaniel.rei.api.client.REIRuntime;
@@ -17,6 +17,7 @@ import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.*;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.function.Consumer;
 
@@ -27,9 +28,10 @@ import java.util.function.Consumer;
 public class WhereIsItREIPlugin implements REIClientPlugin {
     public WhereIsItREIPlugin() {
         super();
-        WhereIsItClient.LOGGER.info("Enabling REI Support");
+        WhereIsItClient.LOGGER.info("Hooking into REI");
 
         SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
+            if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.reiSupport) return;
             if (REIRuntime.getInstance().isOverlayVisible()) {
                 if (getFromOverlay(request)) return;
             }

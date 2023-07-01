@@ -71,6 +71,19 @@ public class WhereIsItConfig {
             this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
             this.solidColour = new Color(this.solidColour.getRGB() | 0xFF_000000);
         }
+
+        @ConfigEntry
+        public Compatibility compatibility = new Compatibility();
+
+        public static class Compatibility {
+
+            @ConfigEntry
+            public boolean jeiSupport = true;
+            @ConfigEntry
+            public boolean reiSupport = true;
+            @ConfigEntry
+            public boolean emiSupport = true;
+        }
     }
 
     public static class Common {

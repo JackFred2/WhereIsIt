@@ -26,13 +26,13 @@
 			"red.jackf.whereisit.client.compat.WhereIsItModMenu"
 		],
 		"jei_mod_plugin": [
-			"red.jackf.whereisit.client.compat.WhereIsItJEIPlugin"
+			"red.jackf.whereisit.client.compat.recipeviewers.WhereIsItJEIPlugin"
 		],
 		"rei_client": [
-			"red.jackf.whereisit.client.compat.WhereIsItREIPlugin"
+			"red.jackf.whereisit.client.compat.recipeviewers.WhereIsItREIPlugin"
 		],
 		"emi": [
-			"red.jackf.whereisit.client.compat.WhereIsItEMICompat"
+			"red.jackf.whereisit.client.compat.recipeviewers.WhereIsItEMIPlugin"
 		]
 	},
 	"mixins": [

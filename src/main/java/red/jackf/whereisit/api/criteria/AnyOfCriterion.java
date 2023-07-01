@@ -63,7 +63,7 @@ public class AnyOfCriterion extends Criterion implements Consumer<Criterion> {
 
     @Override
     public boolean test(ItemStack stack) {
-        return criteria.stream().allMatch(c -> c.test(stack));
+        return criteria.stream().anyMatch(c -> c.test(stack));
     }
 
     @Override

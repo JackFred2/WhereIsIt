@@ -1,4 +1,4 @@
-package red.jackf.whereisit.client.compat;
+package red.jackf.whereisit.client.compat.recipeviewers;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiPlugin;
@@ -17,6 +17,7 @@ import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.*;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,10 +30,13 @@ import java.util.Objects;
  * - getting the hovered item in a recipe screen
  */
 @SuppressWarnings("UnstableApiUsage")
-public class WhereIsItEMICompat implements EmiPlugin {
+public class WhereIsItEMIPlugin implements EmiPlugin {
     static {
-        WhereIsItClient.LOGGER.info("Enabling EMI Support");
-        SearchRequestPopulator.EVENT.register(WhereIsItEMICompat::populate);
+        WhereIsItClient.LOGGER.info("Hooking into EMI");
+        SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
+            if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.emiSupport) return;
+            populate(request, screen, mouseX, mouseY);
+        });
     }
 
     // TODO support the recipe tree screen
@@ -47,7 +51,7 @@ public class WhereIsItEMICompat implements EmiPlugin {
             request.add(new TagCriterion((TagKey<Item>) tagIngredient.key));
         } else {
             List<Criterion> criterion = ingredient.getEmiStacks().stream()
-                    .map(WhereIsItEMICompat::getCriterion)
+                    .map(WhereIsItEMIPlugin::getCriterion)
                     .filter(Objects::nonNull)
                     .toList();
             request.add(new AnyOfCriterion(criterion).compact());

@@ -113,7 +113,6 @@ public class WhereIsItClient implements ClientModInitializer {
             }
         });
 
-
         // mod default handlers
         SearchRequestPopulator.EVENT.register(DefaultRequestPopulator::populate);
         DefaultSearchInvoker.setup();

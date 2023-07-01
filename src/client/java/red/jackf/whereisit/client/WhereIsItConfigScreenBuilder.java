@@ -6,6 +6,7 @@ import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
 import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.gui.ImageRenderer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
@@ -14,6 +15,8 @@ import red.jackf.whereisit.config.ColourScheme;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.awt.*;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -42,6 +45,97 @@ public class WhereIsItConfigScreenBuilder {
     }
 
     private static OptionGroup makeClientGroup(WhereIsItConfig defaults, WhereIsItConfig config) {
+        return OptionGroup.createBuilder()
+                .name(translatable("whereisit.config.client"))
+                .option(Option.<Integer>createBuilder()
+                        .name(translatable("whereisit.config.client.fadeoutTime"))
+                        .binding(
+                                defaults.getClient().fadeoutTimeTicks,
+                                () -> config.getClient().fadeoutTimeTicks,
+                                i -> config.getClient().fadeoutTimeTicks = i
+                        )
+                        .description(OptionDescription.of(translatable("whereisit.config.client.fadeoutTime.description")))
+                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                .range(5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND)
+                                .step(1)
+                                .valueFormatter(i -> translatable("whereisit.config.client.fadeoutTime.slider", "%.2f".formatted(i.floatValue() / 20))))
+                        .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.client.showSlotHighlights"))
+                        .binding(
+                                defaults.getClient().showSlotHighlights,
+                                () -> config.getClient().showSlotHighlights,
+                                b -> config.getClient().showSlotHighlights = b
+                        )
+                        .description(b -> OptionDescription.createBuilder()
+                                .text(translatable("whereisit.config.client.showSlotHighlights.description"))
+                                .image(WhereIsIt.id("textures/gui/config/slot_highlight_example_%s.png".formatted(b ? "enabled" : "disabled")), 108, 44)
+                                .build()
+                        )
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .onOffFormatter())
+                        .build())
+                .options(makeColourOptions(defaults, config))
+                .option(LabelOption.create(translatable("whereisit.config.compatibilityPrefix")))
+                .options(makeClientCompatibilityGroup(defaults, config))
+                .build();
+    }
+
+    private static Collection<? extends Option<?>> makeClientCompatibilityGroup(WhereIsItConfig defaults, WhereIsItConfig config) {
+        var jeiSupport = Option.<Boolean>createBuilder()
+                .name(translatable("whereisit.config.client.compatibility.jeiSupport"))
+                .binding(
+                        defaults.getClient().compatibility.jeiSupport,
+                        () -> config.getClient().compatibility.jeiSupport,
+                        b -> config.getClient().compatibility.jeiSupport = b
+                )
+                .description(OptionDescription.createBuilder().text(
+                                translatable("whereisit.config.client.compatibility.jeiSupport.description"),
+                                translatable("whereisit.config.client.compatibility.requiresModInstalled")
+                        )
+                        .build())
+                .available(FabricLoader.getInstance().isModLoaded("jei"))
+                .controller(opt -> BooleanControllerBuilder.create(opt)
+                        .coloured(true)
+                        .onOffFormatter())
+                .build();
+        var reiSupport = Option.<Boolean>createBuilder()
+                .name(translatable("whereisit.config.client.compatibility.reiSupport"))
+                .binding(
+                        defaults.getClient().compatibility.reiSupport,
+                        () -> config.getClient().compatibility.reiSupport,
+                        b -> config.getClient().compatibility.reiSupport = b
+                )
+                .description(OptionDescription.of(
+                        translatable("whereisit.config.client.compatibility.reiSupport.description"),
+                        translatable("whereisit.config.client.compatibility.requiresModInstalled")
+                ))
+                .available(FabricLoader.getInstance().isModLoaded("roughlyenoughitems"))
+                .controller(opt -> BooleanControllerBuilder.create(opt)
+                        .coloured(true)
+                        .onOffFormatter())
+                .build();
+        var emiSupport = Option.<Boolean>createBuilder()
+                .name(translatable("whereisit.config.client.compatibility.emiSupport"))
+                .binding(
+                        defaults.getClient().compatibility.emiSupport,
+                        () -> config.getClient().compatibility.emiSupport,
+                        b -> config.getClient().compatibility.emiSupport = b
+                )
+                .description(OptionDescription.of(
+                        translatable("whereisit.config.client.compatibility.emiSupport.description"),
+                        translatable("whereisit.config.client.compatibility.requiresModInstalled")
+                ))
+                .available(FabricLoader.getInstance().isModLoaded("emi"))
+                .controller(opt -> BooleanControllerBuilder.create(opt)
+                        .coloured(true)
+                        .onOffFormatter())
+                .build();
+        return List.of(jeiSupport, reiSupport, emiSupport);
+    }
+
+    private static Collection<? extends Option<?>> makeColourOptions(WhereIsItConfig defaults, WhereIsItConfig config) {
         var solidColourOption = Option.<Color>createBuilder()
                 .name(translatable("whereisit.config.client.solidColour"))
                 .binding(
@@ -87,41 +181,7 @@ public class WhereIsItConfigScreenBuilder {
                 })
                 .build();
 
-        return OptionGroup.createBuilder()
-                .name(translatable("whereisit.config.client"))
-                .option(Option.<Integer>createBuilder()
-                        .name(translatable("whereisit.config.client.fadeoutTime"))
-                        .binding(
-                                defaults.getClient().fadeoutTimeTicks,
-                                () -> config.getClient().fadeoutTimeTicks,
-                                i -> config.getClient().fadeoutTimeTicks = i
-                        )
-                        .description(OptionDescription.of(translatable("whereisit.config.client.fadeoutTime.description")))
-                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                .range(5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND)
-                                .step(1)
-                                .valueFormatter(i -> translatable("whereisit.config.client.fadeoutTime.slider", "%.2f".formatted(i.floatValue() / 20))))
-                        .build())
-                .option(Option.<Boolean>createBuilder()
-                        .name(translatable("whereisit.config.client.showSlotHighlights"))
-                        .binding(
-                                defaults.getClient().showSlotHighlights,
-                                () -> config.getClient().showSlotHighlights,
-                                b -> config.getClient().showSlotHighlights = b
-                        )
-                        .description(b -> OptionDescription.createBuilder()
-                                .text(translatable("whereisit.config.client.showSlotHighlights.description"))
-                                .image(WhereIsIt.id("textures/gui/config/slot_highlight_example_%s.png".formatted(b ? "enabled" : "disabled")), 108, 44)
-                                .build()
-                        )
-                        .controller(opt -> BooleanControllerBuilder.create(opt)
-                                .coloured(true)
-                                .onOffFormatter())
-                        .build())
-                .option(randomSchemeOption)
-                .option(colourSchemeOption)
-                .option(solidColourOption)
-                .build();
+        return List.of(randomSchemeOption, colourSchemeOption, solidColourOption);
     }
 
     private static Optional<ImageRenderer> getPreviewImage(ColourScheme scheme, Color solid) {
@@ -144,7 +204,8 @@ public class WhereIsItConfigScreenBuilder {
                 blit(graphics, borderThickness, 0, width, borderThickness, borderThickness, 0, borderThickness, borderThickness); // top
                 blit(graphics, borderThickness, height - borderThickness, width, borderThickness, borderThickness, height - borderThickness, borderThickness, borderThickness); // bottom
                 for (int i = 0; i < width; i += 1) {
-                    graphics.fill(i + borderThickness, borderThickness, i + borderThickness + 1, 56, scheme == ColourScheme.SOLID ? solid.getRGB() : scheme.getGradient().eval(((float) i) / width));
+                    graphics.fill(i + borderThickness, borderThickness, i + borderThickness + 1, 56, scheme == ColourScheme.SOLID ? solid.getRGB() : scheme.getGradient()
+                            .eval(((float) i) / width));
                 }
                 graphics.pose().popPose();
 
