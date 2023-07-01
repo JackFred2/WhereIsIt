@@ -27,6 +27,11 @@ public class WhereIsItConfig {
     @ConfigEntry
     private Common common = new Common();
 
+    @SuppressWarnings("FieldMayBeFinal")
+    @ConfigEntry
+    @Nullable
+    private Server server = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER ? new Server() : null;
+
     public void validate() {
         if (this.client != null) this.client.validate();
         this.common.validate();
@@ -35,6 +40,11 @@ public class WhereIsItConfig {
     public Client getClient() {
         if (client != null) return client;
         throw new AssertionError("Attempted to get client config on dedicated server");
+    }
+
+    public Server getServer() {
+        if (server != null) return server;
+        throw new AssertionError("Attempted to get server config on client");
     }
 
     public Common getCommon() {
@@ -59,6 +69,7 @@ public class WhereIsItConfig {
 
         public void validate() {
             this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
+            this.solidColour = new Color(this.solidColour.getRGB() | 0xFF_000000);
         }
     }
 
@@ -72,5 +83,10 @@ public class WhereIsItConfig {
         public void validate() {
             this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 16);
         }
+    }
+
+    public static class Server {
+        @ConfigEntry
+        public boolean rateLimit = true;
     }
 }

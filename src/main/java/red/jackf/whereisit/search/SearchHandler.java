@@ -1,11 +1,15 @@
 package red.jackf.whereisit.search;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import red.jackf.whereisit.WhereIsIt;
@@ -15,12 +19,23 @@ import red.jackf.whereisit.api.search.NestedItemStackSearcher;
 import red.jackf.whereisit.config.WhereIsItConfig;
 import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
+import red.jackf.whereisit.util.RateLimiter;
 
 import java.util.HashSet;
 
 public class SearchHandler {
 
     public static void handle(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender response) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER && WhereIsItConfig.INSTANCE.getConfig().getServer().rateLimit) {
+            var time = player.level().getGameTime();
+            if (RateLimiter.rateLimited(player, time)) {
+                player.sendSystemMessage(Component.literal("[WhereIsIt] Slow down!").withStyle(ChatFormatting.RED));
+                return;
+            }
+
+            RateLimiter.add(player, time);
+        }
+
         var startPos = player.blockPosition();
         var level = player.level();
         var pos = new BlockPos.MutableBlockPos();
