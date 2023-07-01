@@ -109,9 +109,9 @@ public class WhereIsItConfigScreenBuilder {
                                 () -> config.getClient().showSlotHighlights,
                                 b -> config.getClient().showSlotHighlights = b
                         )
-                        .description(OptionDescription.createBuilder()
+                        .description(b -> OptionDescription.createBuilder()
                                 .text(translatable("whereisit.config.client.showSlotHighlights.description"))
-                                .image(WhereIsIt.id("textures/gui/config/slot_highlight_example.png"), 108, 44)
+                                .image(WhereIsIt.id("textures/gui/config/slot_highlight_example_%s.png".formatted(b ? "enabled" : "disabled")), 108, 44)
                                 .build()
                         )
                         .controller(opt -> BooleanControllerBuilder.create(opt)

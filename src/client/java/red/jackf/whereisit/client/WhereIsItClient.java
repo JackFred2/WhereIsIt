@@ -22,8 +22,6 @@ import red.jackf.whereisit.config.ColourScheme;
 import red.jackf.whereisit.config.WhereIsItConfig;
 import red.jackf.whereisit.util.ColourGetter;
 
-import java.util.Arrays;
-
 public class WhereIsItClient implements ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     private static final KeyMapping SEARCH = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.whereisit.search", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y, "key.categories.whereisit"));

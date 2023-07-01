@@ -6,7 +6,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
-import red.jackf.whereisit.util.ColourGetter;
 
 import java.awt.*;
 

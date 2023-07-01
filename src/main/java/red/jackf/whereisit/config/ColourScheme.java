@@ -1,6 +1,5 @@
 package red.jackf.whereisit.config;
 
-import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.util.ColourGetter;
 
 public enum ColourScheme {

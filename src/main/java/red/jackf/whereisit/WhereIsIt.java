@@ -11,9 +11,6 @@ import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 import red.jackf.whereisit.search.DefaultNestedItemStackSearchers;
 import red.jackf.whereisit.search.SearchHandler;
 
-import java.io.IOException;
-import java.nio.file.Files;
-
 public class WhereIsIt implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
 	public static final String MODID = "whereisit";

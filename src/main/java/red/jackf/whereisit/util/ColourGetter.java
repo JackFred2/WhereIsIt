@@ -2,11 +2,9 @@ package red.jackf.whereisit.util;
 
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
-import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.function.Consumer;
 
 public interface ColourGetter {
     int eval(Float point);
