@@ -13,5 +13,7 @@
   "whereisit.config.common": "Common Options",
   "whereisit.config.common.searchRange": "Search Range",
   "whereisit.config.common.searchRange.description": "Radius from the player's position to search for items.",
-  "whereisit.config.common.searchRange.slider": "%s blocks"
+  "whereisit.config.common.searchRange.slider": "%s blocks",
+  "whereisit.config.common.nestedSearching": "Nested Searching",
+  "whereisit.config.common.nestedSearching.description": "Whether to search within certain items that contain other items, such as Shulker Boxes or Bundles."
 }

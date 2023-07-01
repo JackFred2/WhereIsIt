@@ -55,6 +55,9 @@ public class WhereIsItConfig {
         @ConfigEntry
         public int searchRangeBlocks = 8;
 
+        @ConfigEntry
+        public boolean doNestedSearch = true;
+
         public void validate() {
             this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 16);
         }

@@ -14,7 +14,7 @@ public class WhereIsItConfigScreenBuilder {
 
     public static Screen build(Screen parent) {
         return YetAnotherConfigLib.create(WhereIsItConfig.INSTANCE, (defaults, config, builder) -> builder
-            .title(translatable("whereisit.config.title"))
+                .title(translatable("whereisit.config.title"))
                 .category(ConfigCategory.createBuilder()
                         .name(translatable("whereisit.config.title"))
                         .group(OptionGroup.createBuilder()
@@ -22,7 +22,7 @@ public class WhereIsItConfigScreenBuilder {
                                 .option(Option.<Integer>createBuilder()
                                         .name(translatable("whereisit.config.client.fadeoutTime"))
                                         .binding(
-                                                config.getClient().fadeoutTimeTicks,
+                                                defaults.getClient().fadeoutTimeTicks,
                                                 () -> config.getClient().fadeoutTimeTicks,
                                                 i -> config.getClient().fadeoutTimeTicks = i
                                         )
@@ -35,7 +35,7 @@ public class WhereIsItConfigScreenBuilder {
                                 .option(Option.<Boolean>createBuilder()
                                         .name(translatable("whereisit.config.client.showSlotHighlights"))
                                         .binding(
-                                                config.getClient().showSlotHighlights,
+                                                defaults.getClient().showSlotHighlights,
                                                 () -> config.getClient().showSlotHighlights,
                                                 b -> config.getClient().showSlotHighlights = b
                                         )
@@ -63,6 +63,22 @@ public class WhereIsItConfigScreenBuilder {
                                                 .range(4, 16)
                                                 .step(1)
                                                 .valueFormatter(i -> translatable("whereisit.config.common.searchRange.slider", i)))
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(translatable("whereisit.config.common.nestedSearching"))
+                                        .binding(
+                                                defaults.getCommon().doNestedSearch,
+                                                () -> config.getCommon().doNestedSearch,
+                                                b -> config.getCommon().doNestedSearch = b
+                                        )
+                                        .description(b -> OptionDescription.createBuilder()
+                                                .text(translatable("whereisit.config.common.nestedSearching.description"))
+                                                .image(WhereIsIt.id("textures/gui/config/nested_search_example_%s.png".formatted(b ? "enabled" : "disabled")), 200, 92)
+                                                .build()
+                                        )
+                                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                                .coloured(true)
+                                                .onOffFormatter())
                                         .build())
                                 .build())
                         .build())
