@@ -11,6 +11,9 @@ import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 import red.jackf.whereisit.search.DefaultNestedItemStackSearchers;
 import red.jackf.whereisit.search.SearchHandler;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
 public class WhereIsIt implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
 	public static final String MODID = "whereisit";
@@ -20,8 +23,12 @@ public class WhereIsIt implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		WhereIsItConfig.INSTANCE.load();
-		WhereIsItConfig.INSTANCE.getConfig().validate();
+		try {
+			WhereIsItConfig.INSTANCE.load();
+			WhereIsItConfig.INSTANCE.getConfig().validate();
+		} catch (Exception ex) {
+			LOGGER.error("Error loading WhereIsIt config, restoring default", ex);
+		}
 		WhereIsItConfig.INSTANCE.save();
 		LOGGER.debug("Setup Common");
 		VanillaCriteria.setup();

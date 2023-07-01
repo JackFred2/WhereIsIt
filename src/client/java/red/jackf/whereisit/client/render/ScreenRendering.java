@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.Slot;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.search.NestedItemStackSearcher;
 import red.jackf.whereisit.client.WhereIsItClient;
+import red.jackf.whereisit.config.WhereIsItConfig;
 
 public class ScreenRendering {
     private static final ResourceLocation SLOT_HIGHLIGHT = WhereIsIt.id("textures/gui/slot_highlight.png");
@@ -20,8 +21,9 @@ public class ScreenRendering {
                         NestedItemStackSearcher.check(slot.getItem(), WhereIsItClient.lastRequest)) {
                     var x = slot.x + containerScreen.leftPos;
                     var y = slot.y + containerScreen.topPos;
-                    var progress = (slot.x + (mouseX / 8) + (mouseY / 8) + time) % 256;
-                    graphics.blit(SLOT_HIGHLIGHT, x, y, (int) progress, 0, 16, 16);
+                    var progress = (float) ((slot.x + (mouseX / 8) + (mouseY / 8) + (2 * time)) % 256) / 256;
+                    var colour = WhereIsItClient.getColour(progress);
+                    graphics.fill(x, y, x + 16, y + 16, colour);
                 }
             }
         }

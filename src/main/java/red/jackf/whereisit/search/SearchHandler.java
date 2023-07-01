@@ -56,6 +56,7 @@ public class SearchHandler {
                     var resource = view.getResource().toStack((int) view.getAmount());
                     if (NestedItemStackSearcher.check(resource, request)) {
                         results.add(new SearchResult(pos.immutable(), resource));
+                        return;
                     }
                 }
             }

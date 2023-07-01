@@ -6,6 +6,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
+import red.jackf.whereisit.util.ColourGetter;
+
+import java.awt.*;
 
 import static net.minecraft.SharedConstants.TICKS_PER_SECOND;
 
@@ -45,6 +48,15 @@ public class WhereIsItConfig {
 
         @ConfigEntry
         public boolean showSlotHighlights = true;
+
+        @ConfigEntry
+        public boolean randomScheme = true;
+
+        @ConfigEntry
+        public ColourScheme colourScheme = ColourScheme.PRIDE;
+
+        @ConfigEntry
+        public Color solidColour = new Color(0xFFBADA55);
 
         public void validate() {
             this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);

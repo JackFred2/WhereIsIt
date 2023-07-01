@@ -14,6 +14,7 @@ import net.minecraft.util.Mth;
 import org.lwjgl.opengl.GL11;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.WhereIsItClient;
+import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +39,6 @@ public class WorldRendering {
                     .createCompositeState(false));
 
     private static final List<SearchResult> results = new ArrayList<>();
-    private static final long LIFESPAN = 10 * SharedConstants.TICKS_PER_SECOND;
 
     private static float progress = 1f;
 
@@ -46,7 +46,7 @@ public class WorldRendering {
         WorldRenderEvents.END.register(context -> {
             if (results.isEmpty()) return;
 
-            progress = Mth.clamp((context.world().getGameTime() + context.tickDelta() - WhereIsItClient.lastSearchTime) / LIFESPAN, 0f, 1f);
+            progress = Mth.clamp((context.world().getGameTime() + context.tickDelta() - WhereIsItClient.lastSearchTime) / WhereIsItConfig.INSTANCE.getConfig().getClient().fadeoutTimeTicks, 0f, 1f);
 
             if (context.world() == null || progress > 1f) {
                 return;
@@ -67,8 +67,7 @@ public class WorldRendering {
 
         // from 100% to 50%
         var alpha = 1 - (progress / 2f);
-        var hue = ((context.world().getGameTime() + context.tickDelta()) % 80) / 80;
-        var colour = Mth.hsvToRgb(hue, 1f, 1f);
+        var colour = WhereIsItClient.getColour(((context.world().getGameTime() + context.tickDelta()) % 80) / 80);
         var scale = easingFunc(progress);
 
         var tesselator = Tesselator.getInstance();

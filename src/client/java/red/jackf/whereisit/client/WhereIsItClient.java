@@ -18,7 +18,11 @@ import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.client.render.ScreenRendering;
 import red.jackf.whereisit.client.render.WorldRendering;
 import red.jackf.whereisit.client.util.NotificationToast;
+import red.jackf.whereisit.config.ColourScheme;
 import red.jackf.whereisit.config.WhereIsItConfig;
+import red.jackf.whereisit.util.ColourGetter;
+
+import java.util.Arrays;
 
 public class WhereIsItClient implements ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -29,9 +33,42 @@ public class WhereIsItClient implements ClientModInitializer {
     public static SearchRequest lastRequest = null;
     public static long lastSearchTime = 0;
 
+    private static ColourGetter getter = f -> 0; // replaced in mod init
+
+    private static final ColourScheme[] RANDOM_CANDIDATES = new ColourScheme[] {
+            ColourScheme.PRIDE,
+            ColourScheme.GAY,
+            ColourScheme.LESBIAN,
+            ColourScheme.BISEXUAL,
+            ColourScheme.PANSEXUAL,
+            ColourScheme.NONBINARY,
+            ColourScheme.INTERSEX,
+            ColourScheme.TRANS,
+            ColourScheme.ACE,
+            ColourScheme.ARO,
+    };
+
+    public static void updateScheme() {
+        if (WhereIsItConfig.INSTANCE.getConfig().getClient().randomScheme) {
+            getter = RANDOM_CANDIDATES[(int) (Math.random() * RANDOM_CANDIDATES.length)].getGradient();
+        } else {
+            var scheme = WhereIsItConfig.INSTANCE.getConfig().getClient().colourScheme;
+            if (scheme == ColourScheme.SOLID) {
+                getter = f -> WhereIsItConfig.INSTANCE.getConfig().getClient().solidColour.getRGB();
+            } else {
+                getter = scheme.getGradient();
+            }
+        }
+    }
+
+    public static int getColour(float factor) {
+        return getter.eval(factor);
+    }
+
     @Override
     public void onInitializeClient() {
         LOGGER.debug("Setup Client");
+        updateScheme();
 
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 
@@ -52,6 +89,7 @@ public class WhereIsItClient implements ClientModInitializer {
                             lastRequest = request;
                             lastSearchTime = -1;
                             WorldRendering.clearResults();
+                            updateScheme();
                             LOGGER.debug("Starting request: %s".formatted(request));
                             var anySucceeded = SearchInvoker.EVENT.invoker().search(request, results -> {
                                 WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
