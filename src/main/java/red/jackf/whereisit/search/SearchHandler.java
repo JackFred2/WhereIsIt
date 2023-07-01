@@ -25,7 +25,7 @@ public class SearchHandler {
         var level = player.level();
         var pos = new BlockPos.MutableBlockPos();
         var results = new HashSet<SearchResult>();
-        var range = WhereIsItConfig.INSTANCE.getConfig().common.searchRangeBlocks;
+        var range = WhereIsItConfig.INSTANCE.getConfig().getCommon().searchRangeBlocks;
         WhereIsIt.LOGGER.debug("Server search id %d: %s".formatted(packet.id(), packet.request().toString()));
         for (int x = startPos.getX() - range; x <= startPos.getX() + range; x++) {
             pos.setX(x);

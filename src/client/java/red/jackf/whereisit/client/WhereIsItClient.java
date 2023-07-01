@@ -36,7 +36,8 @@ public class WhereIsItClient implements ClientModInitializer {
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 
 			if (inGame) {
-                ScreenEvents.afterRender(screen).register((screen2, graphics, mouseX1, mouseY1, tickDelta) -> ScreenRendering.render(screen2, graphics, mouseX1, mouseY1));
+                if (WhereIsItConfig.INSTANCE.getConfig().getClient().showSlotHighlights)
+                    ScreenEvents.afterRender(screen).register((screen2, graphics, mouseX1, mouseY1, tickDelta) -> ScreenRendering.render(screen2, graphics, mouseX1, mouseY1));
 
                 // listen for keypress
                 ScreenKeyboardEvents.afterKeyPress(screen).register((screen1, key, scancode, modifiers) -> {

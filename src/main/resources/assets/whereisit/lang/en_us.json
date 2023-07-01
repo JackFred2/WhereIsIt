@@ -8,6 +8,8 @@
   "whereisit.config.client.fadeoutTime": "Fade Out Time",
   "whereisit.config.client.fadeoutTime.description": "How long it takes world and slot highlights to fade out.",
   "whereisit.config.client.fadeoutTime.slider": "%s seconds",
+  "whereisit.config.client.showSlotHighlights": "Slot Highlights",
+  "whereisit.config.client.showSlotHighlights.description": "Whether to highlight slots that matched the last search.",
   "whereisit.config.common": "Common Options",
   "whereisit.config.common.searchRange": "Search Range",
   "whereisit.config.common.searchRange.description": "Radius from the player's position to search for items.",

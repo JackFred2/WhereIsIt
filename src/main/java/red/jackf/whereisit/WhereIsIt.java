@@ -22,6 +22,7 @@ public class WhereIsIt implements ModInitializer {
 	public void onInitialize() {
 		WhereIsItConfig.INSTANCE.load();
 		WhereIsItConfig.INSTANCE.getConfig().validate();
+		WhereIsItConfig.INSTANCE.save();
 		LOGGER.debug("Setup Common");
 		VanillaCriteria.setup();
 		DefaultNestedItemStackSearchers.setup();

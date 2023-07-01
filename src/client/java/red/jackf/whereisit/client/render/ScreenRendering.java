@@ -20,7 +20,7 @@ public class ScreenRendering {
                         NestedItemStackSearcher.check(slot.getItem(), WhereIsItClient.lastRequest)) {
                     var x = slot.x + containerScreen.leftPos;
                     var y = slot.y + containerScreen.topPos;
-                    var progress = ((slot.x + 2 - slot.y + (mouseX / 8) + (mouseY / 8)) + time) % 256;
+                    var progress = (slot.x + (mouseX / 8) + (mouseY / 8) + time) % 256;
                     graphics.blit(SLOT_HIGHLIGHT, x, y, (int) progress, 0, 16, 16);
                 }
             }

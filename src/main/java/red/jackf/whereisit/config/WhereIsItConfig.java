@@ -21,12 +21,13 @@ public class WhereIsItConfig {
     @Nullable
     private Client client = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? new Client() : null;
 
+    @SuppressWarnings("FieldMayBeFinal")
     @ConfigEntry
-    public Common common = new Common();
+    private Common common = new Common();
 
     public void validate() {
         if (this.client != null) this.client.validate();
-        this.common.searchRangeBlocks = Mth.clamp(this.common.searchRangeBlocks, 4, 16);
+        this.common.validate();
     }
 
     public Client getClient() {
@@ -34,17 +35,28 @@ public class WhereIsItConfig {
         throw new AssertionError("Attempted to get client config on dedicated server");
     }
 
+    public Common getCommon() {
+        return common;
+    }
+
     public static class Client {
         @ConfigEntry
         public int fadeoutTimeTicks = 10 * TICKS_PER_SECOND;
 
+        @ConfigEntry
+        public boolean showSlotHighlights = true;
+
         public void validate() {
-            this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 20 * TICKS_PER_SECOND);
+            this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
         }
     }
 
     public static class Common {
         @ConfigEntry
         public int searchRangeBlocks = 8;
+
+        public void validate() {
+            this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 16);
+        }
     }
 }
