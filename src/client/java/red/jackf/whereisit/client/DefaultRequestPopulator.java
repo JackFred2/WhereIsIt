@@ -7,8 +7,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.AnyOfCriterion;
 import red.jackf.whereisit.api.criteria.Criterion;
-import red.jackf.whereisit.api.criteria.ItemCriterion;
-import red.jackf.whereisit.api.criteria.TagCriterion;
+import red.jackf.whereisit.api.criteria.ItemTagCriterion;
+import red.jackf.whereisit.client.api.SearchRequestPopulator;
 
 import java.util.ArrayList;
 
@@ -23,7 +23,7 @@ public class DefaultRequestPopulator {
             if (containerScreen.hoveredSlot != null) {
                 var stack = containerScreen.hoveredSlot.getItem();
                 if (!stack.isEmpty()) {
-                    request.add(new ItemCriterion(stack.getItem()));
+                    SearchRequestPopulator.addItemStack(request, stack, Screen.hasShiftDown() ? SearchRequestPopulator.Context.INVENTORY_PRECISE : SearchRequestPopulator.Context.INVENTORY);
                 }
             }
 
@@ -40,12 +40,12 @@ public class DefaultRequestPopulator {
                             var criteria = new ArrayList<Criterion>();
                             for (Ingredient.Value value : ghost.ingredient.values) {
                                 if (value instanceof Ingredient.ItemValue item) {
-                                    criteria.add(new ItemCriterion(item.item.getItem()));
+                                    SearchRequestPopulator.addItemStack(criteria::add, item.item, SearchRequestPopulator.Context.RECIPE);
                                 } else if (value instanceof Ingredient.TagValue tag) {
-                                    criteria.add(new TagCriterion(tag.tag));
+                                    criteria.add(new ItemTagCriterion(tag.tag));
                                 }
                             }
-                            request.add(new AnyOfCriterion(criteria).compact());
+                            request.accept(new AnyOfCriterion(criteria).compact());
                             break;
                         }
                     }

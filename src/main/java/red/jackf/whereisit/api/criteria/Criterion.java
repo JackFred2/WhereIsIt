@@ -38,6 +38,13 @@ public abstract class Criterion {
     }
 
     /**
+     * Returns a compacted version of the criteria. Use this to simplify if needed, such as in {@link AnyOfCriterion#compact()}
+     */
+    public Criterion compact() {
+        return this;
+    }
+
+    /**
      * Test against a given ItemStack. This will only be called if {@link Criterion#readTag(CompoundTag)} returns true.
      * @param stack Stack to test again with loaded data
      * @return If this criterion matches the stack.

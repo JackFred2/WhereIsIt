@@ -7,6 +7,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.FluidEmiStack;
 import dev.emi.emi.api.stack.ItemEmiStack;
 import dev.emi.emi.api.stack.TagEmiIngredient;
+import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.Registries;
@@ -19,8 +20,10 @@ import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Populates a request from the overlays or recipe screens. <br />
@@ -39,32 +42,36 @@ public class WhereIsItEMIPlugin implements EmiPlugin {
         });
     }
 
+    // TODO fix adding ingredients from both this and the vanilla handler, as #getHoveredStack() also looks in GUIs.
+    //      not too important though
     // TODO support the recipe tree screen
     private static void populate(SearchRequest request, Screen screen, int mouseX, int mouseY) {
         var ingredient = EmiApi.getHoveredStack(mouseX, mouseY, true).getStack();
-        if (ingredient.isEmpty() && screen instanceof RecipeScreen recipeScreen)
+        //            we want favourites, but not the crafting history or craftables
+        var context = ingredient.getClass() == EmiFavorite.class ? SearchRequestPopulator.Context.FAVOURITE : SearchRequestPopulator.Context.OVERLAY;
+        if (ingredient.isEmpty() && screen instanceof RecipeScreen recipeScreen) {
             ingredient = recipeScreen.getHoveredStack();
+            context = SearchRequestPopulator.Context.RECIPE;
+        }
         if (ingredient.isEmpty()) return;
 
         if (ingredient instanceof TagEmiIngredient tagIngredient && tagIngredient.key.registry() == Registries.ITEM) {
             //noinspection unchecked
-            request.add(new TagCriterion((TagKey<Item>) tagIngredient.key));
+            request.accept(new ItemTagCriterion((TagKey<Item>) tagIngredient.key));
         } else {
-            List<Criterion> criterion = ingredient.getEmiStacks().stream()
-                    .map(WhereIsItEMIPlugin::getCriterion)
-                    .filter(Objects::nonNull)
-                    .toList();
-            request.add(new AnyOfCriterion(criterion).compact());
+            List<Criterion> criterion = new ArrayList<>();
+            for (EmiStack emiStack : ingredient.getEmiStacks())
+                getCriterion(criterion::add, emiStack, context);
+            if (!criterion.isEmpty())
+                request.accept(new AnyOfCriterion(criterion).compact());
         }
     }
 
-    private static Criterion getCriterion(EmiStack emiStack) {
+    private static void getCriterion(Consumer<Criterion> consumer, EmiStack emiStack, SearchRequestPopulator.Context context) {
         if (emiStack instanceof ItemEmiStack itemStack) {
-            return new ItemCriterion(itemStack.getItemStack().getItem());
+            SearchRequestPopulator.addItemStack(consumer, itemStack.getItemStack(), context);
         } else if (emiStack instanceof FluidEmiStack fluidStack) {
-            return new FluidCriterion((Fluid) fluidStack.getKey());
-        } else {
-            return null;
+            consumer.accept(new FluidCriterion((Fluid) fluidStack.getKey()));
         }
     }
 

@@ -19,7 +19,7 @@ public class SearchRequest implements Consumer<Criterion> {
     private static final String DATA = "Data";
     private final List<Criterion> criteria = new ArrayList<>();
 
-    public void add(Criterion criterion) {
+    public void accept(Criterion criterion) {
         if (criterion.valid()) {
             this.criteria.add(criterion);
         } else {
@@ -83,35 +83,35 @@ public class SearchRequest implements Consumer<Criterion> {
     }
 
     public static SearchRequest load(CompoundTag root) {
-        var request = new SearchRequest();
-        if (root.contains(DATA, Tag.TAG_LIST)) {
-            var list = root.getList(DATA, Tag.TAG_COMPOUND);
-            for (Tag tag : list) {
-                if (tag instanceof CompoundTag compound
-                        && compound.contains(ID, Tag.TAG_STRING)
-                        && compound.contains(DATA, Tag.TAG_COMPOUND)) {
-                    var criterion = fromTag(compound);
-                    if (criterion != null)
-                        request.add(criterion);
-                } else {
-                    WhereIsIt.LOGGER.warn("Invalid criterion tag: " + tag);
+        try {
+            var request = new SearchRequest();
+            if (root.contains(DATA, Tag.TAG_LIST)) {
+                var list = root.getList(DATA, Tag.TAG_COMPOUND);
+                for (Tag tag : list) {
+                    if (tag instanceof CompoundTag compound
+                            && compound.contains(ID, Tag.TAG_STRING)
+                            && compound.contains(DATA, Tag.TAG_COMPOUND)) {
+                        var criterion = fromTag(compound);
+                        if (criterion != null)
+                            request.accept(criterion);
+                    } else {
+                        WhereIsIt.LOGGER.warn("Invalid criterion tag: " + tag);
+                    }
                 }
+            } else {
+                WhereIsIt.LOGGER.warn("No data for search request");
             }
-        } else {
-            WhereIsIt.LOGGER.warn("No data for search request");
+            return request;
+        } catch (Exception ex) {
+            WhereIsIt.LOGGER.error("Error decoding search request", ex);
+            return new SearchRequest();
         }
-        return request;
     }
 
     public boolean test(ItemStack stack) {
         for (Criterion criterion : criteria)
             if (!criterion.test(stack)) return false;
         return true;
-    }
-
-    @Override
-    public void accept(Criterion criterion) {
-        this.add(criterion);
     }
 
     @Override

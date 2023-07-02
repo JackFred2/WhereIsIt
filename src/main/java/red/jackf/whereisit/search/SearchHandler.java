@@ -36,6 +36,11 @@ public class SearchHandler {
             RateLimiter.add(player, time);
         }
 
+        if (!packet.request().hasCriteria()) {
+            WhereIsIt.LOGGER.warn("Empty request from {}", player.getGameProfile().getName());
+            return;
+        }
+
         var startPos = player.blockPosition();
         var level = player.level();
         var pos = new BlockPos.MutableBlockPos();

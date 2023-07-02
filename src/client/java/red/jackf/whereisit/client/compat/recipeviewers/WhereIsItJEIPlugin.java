@@ -35,10 +35,10 @@ public final class WhereIsItJEIPlugin implements IModPlugin {
             SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
                 if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.jeiSupport) return;
                 if (runtime != null) {
-                    var ingredientsStack = parseIngredient(request, runtime.getIngredientListOverlay()::getIngredientUnderMouse);
+                    var ingredientsStack = parseIngredient(request, runtime.getIngredientListOverlay()::getIngredientUnderMouse, SearchRequestPopulator.Context.OVERLAY);
                     if (ingredientsStack) return;
 
-                    var bookmarkStack = parseIngredient(request, runtime.getBookmarkOverlay()::getIngredientUnderMouse);
+                    var bookmarkStack = parseIngredient(request, runtime.getBookmarkOverlay()::getIngredientUnderMouse, SearchRequestPopulator.Context.FAVOURITE);
                     if (bookmarkStack) return;
 
                     getRecipeStack(request, runtime.getRecipesGui());
@@ -49,29 +49,30 @@ public final class WhereIsItJEIPlugin implements IModPlugin {
         this.runtime = jeiRuntime;
     }
 
+    // TODO support multiple ingredients
     private void getRecipeStack(SearchRequest request, IRecipesGui recipe) {
         var stack = recipe.getIngredientUnderMouse(VanillaTypes.ITEM_STACK);
         if (stack.isPresent()) {
-            request.add(new ItemCriterion(stack.get().getItem()));
+            request.accept(new ItemCriterion(stack.get().getItem()));
             return;
         }
         var fluid = recipe.getIngredientUnderMouse(FabricTypes.FLUID_STACK);
-        fluid.ifPresent(fluidIngredient -> request.add(new FluidCriterion(fluidIngredient.getFluid())));
+        fluid.ifPresent(fluidIngredient -> request.accept(new FluidCriterion(fluidIngredient.getFluid())));
     }
 
     private interface OverlayGetter {
         <I> I get(IIngredientType<I> type);
     }
 
-    private boolean parseIngredient(SearchRequest request, OverlayGetter getter) {
+    private boolean parseIngredient(SearchRequest request, OverlayGetter getter, SearchRequestPopulator.Context context) {
         var stack = getter.get(VanillaTypes.ITEM_STACK);
         if (stack != null) {
-            request.add(new ItemCriterion(stack.getItem()));
+            SearchRequestPopulator.addItemStack(request, stack, context);
             return true;
         }
         var fluidIngredient = getter.get(FabricTypes.FLUID_STACK);
         if (fluidIngredient != null) {
-            request.add(new FluidCriterion(fluidIngredient.getFluid()));
+            request.accept(new FluidCriterion(fluidIngredient.getFluid()));
             return true;
         }
         return false;

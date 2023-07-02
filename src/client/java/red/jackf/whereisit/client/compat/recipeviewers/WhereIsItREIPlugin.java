@@ -48,14 +48,14 @@ public class WhereIsItREIPlugin implements REIClientPlugin {
         var overlay = overlayOpt.get();
         var hoveredEntry = overlay.getEntryList().getFocusedStack();
         if (!hoveredEntry.isEmpty()) {
-            parseEntryStack(request, hoveredEntry);
+            parseEntryStack(request, hoveredEntry, SearchRequestPopulator.Context.OVERLAY);
             return true;
         }
         var favourites = overlay.getFavoritesList();
         if (favourites.isPresent()) {
             var hoveredFavourite = favourites.get().getFocusedStack();
             if (!hoveredFavourite.isEmpty()) {
-                parseEntryStack(request, hoveredFavourite);
+                parseEntryStack(request, hoveredFavourite, SearchRequestPopulator.Context.FAVOURITE);
                 return true;
             }
         }
@@ -68,17 +68,18 @@ public class WhereIsItREIPlugin implements REIClientPlugin {
                 g instanceof Slot slot && slot.isMouseOver(mouseX, mouseY)
         )) {
             var slot = (Slot) widget;
+            // TODO support fluid tags
             if (slot instanceof EntryWidget entryWidget && entryWidget.tagMatch != null) {
                 var key = TagKey.create(Registries.ITEM, entryWidget.tagMatch);
                 if (BuiltInRegistries.ITEM.getTag(key).isPresent()) {
-                    request.add(new TagCriterion(key));
+                    request.accept(new ItemTagCriterion(key));
                 }
             } else {
                 var criteria = new AnyOfCriterion();
                 for (EntryStack<?> entry : slot.getEntries()) {
-                    parseEntryStack(criteria, entry);
+                    parseEntryStack(criteria, entry, SearchRequestPopulator.Context.RECIPE);
                 }
-                request.add(criteria.compact());
+                request.accept(criteria.compact());
             }
             return;
         }
@@ -87,10 +88,10 @@ public class WhereIsItREIPlugin implements REIClientPlugin {
     /**
      * Parses an REI EntryStack, then passes 0 or more Criterion to <code>consumer</code>.
      */
-    private static void parseEntryStack(Consumer<Criterion> consumer, EntryStack<?> entryStack) {
+    private static void parseEntryStack(Consumer<Criterion> consumer, EntryStack<?> entryStack, SearchRequestPopulator.Context context) {
         var value = entryStack.getValue();
         if (value instanceof ItemStack stack) {
-            consumer.accept(new ItemCriterion(stack.getItem()));
+            SearchRequestPopulator.addItemStack(consumer, stack, context);
         } else if (value instanceof FluidStack fluidStack) {
             consumer.accept(new FluidCriterion(fluidStack.getFluid()));
         }

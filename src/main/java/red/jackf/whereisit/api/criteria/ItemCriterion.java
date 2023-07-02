@@ -11,7 +11,7 @@ import red.jackf.whereisit.criteria.VanillaCriteria;
 import java.util.Objects;
 
 /**
- * Checks against an item ID
+ * Checks against an item ID.
  */
 public class ItemCriterion extends Criterion {
     private static final String KEY = "ItemId";

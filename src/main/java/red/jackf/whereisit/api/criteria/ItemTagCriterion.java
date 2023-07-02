@@ -12,16 +12,16 @@ import red.jackf.whereisit.criteria.VanillaCriteria;
 import java.util.Objects;
 
 /**
- * Checks against an item tag
+ * Checks against an item tag.
  */
-public class TagCriterion extends Criterion {
+public class ItemTagCriterion extends Criterion {
     private static final String KEY = "TagId";
     private TagKey<Item> tag = null;
-    public TagCriterion() {
+    public ItemTagCriterion() {
         super(VanillaCriteria.TAG);
     }
 
-    public TagCriterion(TagKey<Item> tag) {
+    public ItemTagCriterion(TagKey<Item> tag) {
         this();
         this.tag = tag;
     }
@@ -51,7 +51,7 @@ public class TagCriterion extends Criterion {
 
     @Override
     public String toString() {
-        return "TagCriterion{" +
+        return "ItemTagCriterion{" +
                 "tag=" + tag +
                 '}';
     }
@@ -60,7 +60,7 @@ public class TagCriterion extends Criterion {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TagCriterion that = (TagCriterion) o;
+        ItemTagCriterion that = (ItemTagCriterion) o;
         return Objects.equals(tag, that.tag);
     }
 

@@ -35,13 +35,7 @@
 			"red.jackf.whereisit.client.compat.recipeviewers.WhereIsItEMIPlugin"
 		]
 	},
-	"mixins": [
-		"whereisit.mixins.json",
-		{
-			"config": "whereisit.client.mixins.json",
-			"environment": "client"
-		}
-	],
+	"mixins": [],
 	"accessWidener": "whereisit.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.14.21",

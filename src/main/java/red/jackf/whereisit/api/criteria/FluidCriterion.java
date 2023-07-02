@@ -14,6 +14,9 @@ import red.jackf.whereisit.criteria.VanillaCriteria;
 
 import java.util.Objects;
 
+/**
+ * Matches against a specific fluid, by targeting buckets, bottles and similar containers. Uses Fabric's Transfer API.
+ */
 public class FluidCriterion extends Criterion {
     private static final String KEY = "FluidId";
     private Fluid fluid = Fluids.EMPTY;
