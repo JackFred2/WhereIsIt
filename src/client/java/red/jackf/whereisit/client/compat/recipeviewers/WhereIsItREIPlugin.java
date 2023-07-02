@@ -48,7 +48,7 @@ public class WhereIsItREIPlugin implements REIClientPlugin {
         var overlay = overlayOpt.get();
         var hoveredEntry = overlay.getEntryList().getFocusedStack();
         if (!hoveredEntry.isEmpty()) {
-            parseEntryStack(request, hoveredEntry, SearchRequestPopulator.Context.OVERLAY);
+            parseEntryStack(request, hoveredEntry, SearchRequestPopulator.Context.overlay());
             return true;
         }
         var favourites = overlay.getFavoritesList();

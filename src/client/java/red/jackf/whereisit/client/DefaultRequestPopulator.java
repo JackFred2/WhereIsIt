@@ -23,7 +23,7 @@ public class DefaultRequestPopulator {
             if (containerScreen.hoveredSlot != null) {
                 var stack = containerScreen.hoveredSlot.getItem();
                 if (!stack.isEmpty()) {
-                    SearchRequestPopulator.addItemStack(request, stack, Screen.hasShiftDown() ? SearchRequestPopulator.Context.INVENTORY_PRECISE : SearchRequestPopulator.Context.INVENTORY);
+                    SearchRequestPopulator.addItemStack(request, stack, SearchRequestPopulator.Context.inventory());
                 }
             }
 

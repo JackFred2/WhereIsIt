@@ -35,7 +35,7 @@ public final class WhereIsItJEIPlugin implements IModPlugin {
             SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
                 if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.jeiSupport) return;
                 if (runtime != null) {
-                    var ingredientsStack = parseIngredient(request, runtime.getIngredientListOverlay()::getIngredientUnderMouse, SearchRequestPopulator.Context.OVERLAY);
+                    var ingredientsStack = parseIngredient(request, runtime.getIngredientListOverlay()::getIngredientUnderMouse, SearchRequestPopulator.Context.overlay());
                     if (ingredientsStack) return;
 
                     var bookmarkStack = parseIngredient(request, runtime.getBookmarkOverlay()::getIngredientUnderMouse, SearchRequestPopulator.Context.FAVOURITE);
@@ -49,7 +49,7 @@ public final class WhereIsItJEIPlugin implements IModPlugin {
         this.runtime = jeiRuntime;
     }
 
-    // TODO support multiple ingredients
+    // TODO support multiple ingredients/tags
     private void getRecipeStack(SearchRequest request, IRecipesGui recipe) {
         var stack = recipe.getIngredientUnderMouse(VanillaTypes.ITEM_STACK);
         if (stack.isPresent()) {

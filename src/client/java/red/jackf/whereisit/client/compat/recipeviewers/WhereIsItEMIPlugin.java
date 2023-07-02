@@ -15,14 +15,16 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
 import red.jackf.whereisit.api.SearchRequest;
-import red.jackf.whereisit.api.criteria.*;
+import red.jackf.whereisit.api.criteria.AnyOfCriterion;
+import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.criteria.FluidCriterion;
+import red.jackf.whereisit.api.criteria.ItemTagCriterion;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -48,7 +50,7 @@ public class WhereIsItEMIPlugin implements EmiPlugin {
     private static void populate(SearchRequest request, Screen screen, int mouseX, int mouseY) {
         var ingredient = EmiApi.getHoveredStack(mouseX, mouseY, true).getStack();
         //            we want favourites, but not the crafting history or craftables
-        var context = ingredient.getClass() == EmiFavorite.class ? SearchRequestPopulator.Context.FAVOURITE : SearchRequestPopulator.Context.OVERLAY;
+        var context = ingredient.getClass() == EmiFavorite.class ? SearchRequestPopulator.Context.FAVOURITE : SearchRequestPopulator.Context.overlay();
         if (ingredient.isEmpty() && screen instanceof RecipeScreen recipeScreen) {
             ingredient = recipeScreen.getHoveredStack();
             context = SearchRequestPopulator.Context.RECIPE;
