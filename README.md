@@ -25,3 +25,5 @@ An API is available under the `api` packages for the following purposes:
 ### Common
 
 - `NestedItemStackSearcher.EVENT` - Testing against sub-items, such as for backpacks or other containers.
+- `criteria.Criterion` - Class to extend if making new criteria; create a new `Criterion.Type<T>` to go along with it
+  and register using `Criterion#register`.

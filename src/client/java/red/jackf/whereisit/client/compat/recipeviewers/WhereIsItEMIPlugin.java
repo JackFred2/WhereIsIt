@@ -59,8 +59,8 @@ public class WhereIsItEMIPlugin implements EmiPlugin {
         }
         if (ingredient.isEmpty()) return;
 
-        TagEmiIngredient tag = getEmiItemTagIngredient(ingredient);
-        if (tag != null) {
+        if (ingredient instanceof EmiFavorite favorite) ingredient = favorite.getStack();
+        if (ingredient instanceof TagEmiIngredient tag && tag.key.registry() == Registries.ITEM) {
             //noinspection unchecked
             request.accept(new ItemTagCriterion((TagKey<Item>) tag.key));
         } else {
@@ -70,12 +70,6 @@ public class WhereIsItEMIPlugin implements EmiPlugin {
             if (!criterion.isEmpty())
                 request.accept(new AnyOfCriterion(criterion).compact());
         }
-    }
-
-    private static TagEmiIngredient getEmiItemTagIngredient(EmiIngredient ingredient) {
-        if (ingredient instanceof EmiFavorite favorite) ingredient = favorite.getStack();
-        if (ingredient instanceof TagEmiIngredient tag && tag.key.registry() == Registries.ITEM) return tag;
-        return null;
     }
 
     private static void getCriterion(Consumer<Criterion> consumer, EmiStack emiStack, SearchRequestPopulator.Context context) {
