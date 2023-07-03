@@ -30,17 +30,6 @@ public interface SearchRequestPopulator {
     });
 
     /**
-     * Takes an ItemStack when selected from an Item Overlay, and adds relevant criterion to the request. This allows
-     * for custom search behavior, such as enchanted books looking for enchantments instead.
-     * This event should return true if the behavior was triggered, short-circuiting the event.
-     */
-    Event<OverlayStackBehavior> OVERLAY_STACK_BEHAVIOR = EventFactory.createArrayBacked(OverlayStackBehavior.class, listeners -> (consumer, stack) -> {
-        for (OverlayStackBehavior listener : listeners)
-            if (listener.processOverlayStackBehavior(consumer, stack)) return true;
-        return false;
-    });
-
-    /**
      * Add search criteria from a given screen. All criteria should be added to <code>request</code>.
      *
      * @param request Request to add criteria to
@@ -61,7 +50,7 @@ public interface SearchRequestPopulator {
         WhereIsItClient.LOGGER.debug("Adding {}, context: {}", stack, context);
         var criterion = new ArrayList<Criterion>();
         // checks if it's an overlay stack without custom behavior
-        if (context != Context.OVERLAY || !OVERLAY_STACK_BEHAVIOR.invoker().processOverlayStackBehavior(criterion::add, stack)) {
+        if (context != Context.OVERLAY || !OverlayStackBehavior.EVENT.invoker().processOverlayStackBehavior(criterion::add, stack)) {
             criterion.add(new ItemCriterion(stack.getItem()));
             if (context == Context.INVENTORY_PRECISE || context == Context.OVERLAY_ALTERNATE) {
                 criterion.add(new NbtCriterion(stack.getTag(), true));
@@ -73,10 +62,6 @@ public interface SearchRequestPopulator {
         }
 
         consumer.accept(new AllOfCriterion(criterion).compact());
-    }
-
-    interface OverlayStackBehavior {
-        boolean processOverlayStackBehavior(Consumer<Criterion> consumer, ItemStack stack);
     }
 
     enum Context {

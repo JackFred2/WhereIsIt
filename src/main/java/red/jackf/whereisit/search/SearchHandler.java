@@ -41,6 +41,8 @@ public class SearchHandler {
             return;
         }
 
+        var startTime = System.nanoTime();
+
         var startPos = player.blockPosition();
         var level = player.level();
         var pos = new BlockPos.MutableBlockPos();
@@ -59,6 +61,7 @@ public class SearchHandler {
             }
         }
         WhereIsIt.LOGGER.debug("Server search results id %d: %s".formatted(packet.id(), results.toString()));
+        WhereIsIt.LOGGER.debug("Search time: {}ns ({}ms)", System.nanoTime() - startTime, (System.nanoTime() - startTime) / 1_000_000);
         if (results.size() > 0)
             response.sendPacket(new ClientboundResultsPacket(packet.id(), results));
     }

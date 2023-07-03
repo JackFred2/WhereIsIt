@@ -1,4 +1,4 @@
-package red.jackf.whereisit.client;
+package red.jackf.whereisit.client.defaults;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 /**
  * If WhereIsIt is installed on the server, asks it for nearby items.
  */
-public class DefaultSearchInvoker {
+public class SearchInvokerDefaults {
     private static final AtomicLong packetCounter = new AtomicLong(0);
     private static final ConcurrentMap<Long, Consumer<Collection<SearchResult>>> consumers = new ConcurrentHashMap<>();
 

@@ -1,4 +1,4 @@
-package red.jackf.whereisit.client;
+package red.jackf.whereisit.client.defaults;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Populates a request from the vanilla GUIs/recipe book
  */
-public class DefaultRequestPopulator {
+public class SearchRequestPopulatorDefaults {
     public static void populate(SearchRequest request, Screen screen, int mouseX, int mouseY) {
         // normal item
         if (screen instanceof AbstractContainerScreen<?> containerScreen) {

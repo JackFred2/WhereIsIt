@@ -1,13 +1,13 @@
-package red.jackf.whereisit.client;
+package red.jackf.whereisit.client.defaults;
 
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import red.jackf.whereisit.api.criteria.EnchantmentCriterion;
-import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.client.api.OverlayStackBehavior;
 
-public class DefaultOverlayStackBehaviors {
+public class OverlayStackBehaviorDefaults {
     public static void setup() {
-        SearchRequestPopulator.OVERLAY_STACK_BEHAVIOR.register((consumer, stack) -> {
+        OverlayStackBehavior.EVENT.register((consumer, stack) -> {
             if (!stack.is(Items.ENCHANTED_BOOK)) return false;
             var enchantments = EnchantmentHelper.getEnchantments(stack);
             if (enchantments.isEmpty()) return false;

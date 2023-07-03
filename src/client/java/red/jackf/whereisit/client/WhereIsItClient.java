@@ -16,6 +16,11 @@ import org.slf4j.Logger;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.client.api.SearchInvoker;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.client.api.ShouldIgnoreKey;
+import red.jackf.whereisit.client.defaults.OverlayStackBehaviorDefaults;
+import red.jackf.whereisit.client.defaults.SearchRequestPopulatorDefaults;
+import red.jackf.whereisit.client.defaults.SearchInvokerDefaults;
+import red.jackf.whereisit.client.defaults.ShouldIgnoreKeyDefaults;
 import red.jackf.whereisit.client.render.ScreenRendering;
 import red.jackf.whereisit.client.render.WorldRendering;
 import red.jackf.whereisit.client.util.NotificationToast;
@@ -78,7 +83,7 @@ public class WhereIsItClient implements ClientModInitializer {
 
                 // listen for keypress
                 ScreenKeyboardEvents.afterKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
-                    if (SEARCH.matches(key, scancode)) {
+                    if (SEARCH.matches(key, scancode) && !ShouldIgnoreKey.EVENT.invoker().shouldIgnoreKey()) {
                         int mouseX = (int) (client.mouseHandler.xpos() * (double) client.getWindow()
                                 .getGuiScaledWidth() / (double) client.getWindow().getScreenWidth());
                         int mouseY = (int) (client.mouseHandler.ypos() * (double) client.getWindow()
@@ -121,9 +126,10 @@ public class WhereIsItClient implements ClientModInitializer {
         });
 
         // mod default handlers
-        SearchRequestPopulator.EVENT.register(DefaultRequestPopulator::populate);
-        DefaultOverlayStackBehaviors.setup();
-        DefaultSearchInvoker.setup();
+        SearchRequestPopulator.EVENT.register(SearchRequestPopulatorDefaults::populate);
+        OverlayStackBehaviorDefaults.setup();
+        SearchInvokerDefaults.setup();
+        ShouldIgnoreKeyDefaults.setup();
 
         WorldRendering.setup();
     }

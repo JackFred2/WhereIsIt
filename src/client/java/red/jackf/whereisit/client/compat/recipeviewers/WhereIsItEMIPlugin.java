@@ -21,6 +21,7 @@ import red.jackf.whereisit.api.criteria.FluidCriterion;
 import red.jackf.whereisit.api.criteria.ItemTagCriterion;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.client.api.ShouldIgnoreKey;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import java.util.function.Consumer;
  *
  * Internal usages: <br />
  * - filtering ingredients by tag or not, and stacks by item or fluids <br />
- * - getting the hovered item in a recipe screen
+ * - getting the hovered item in a recipe screen, and if it's the result
  */
 @SuppressWarnings("UnstableApiUsage")
 public class WhereIsItEMIPlugin implements EmiPlugin {
@@ -42,15 +43,19 @@ public class WhereIsItEMIPlugin implements EmiPlugin {
             if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.emiSupport) return;
             populate(request, screen, mouseX, mouseY);
         });
+        ShouldIgnoreKey.EVENT.register(EmiApi::isSearchFocused);
     }
 
     // TODO fix adding ingredients from both this and the vanilla handler, as #getHoveredStack() also looks in GUIs.
     //      not too important though
     // TODO support the recipe tree screen
     private static void populate(SearchRequest request, Screen screen, int mouseX, int mouseY) {
-        var ingredient = EmiApi.getHoveredStack(mouseX, mouseY, true).getStack();
-        //            we want favourites, but not the crafting history or craftables
+        // look on overlay
+        var ingredient = EmiApi.getHoveredStack(mouseX, mouseY, false).getStack();
+        //            we want favourites, but not the crafting history or craftables, so easier to just class check
         var context = ingredient.getClass() == EmiFavorite.class ? SearchRequestPopulator.Context.FAVOURITE : SearchRequestPopulator.Context.overlay();
+
+        // nothing from overlay, look for recipe screen
         if (ingredient.isEmpty() && screen instanceof RecipeScreen recipeScreen) {
             ingredient = recipeScreen.getHoveredStack();
             context = SearchRequestPopulator.Context.RECIPE;

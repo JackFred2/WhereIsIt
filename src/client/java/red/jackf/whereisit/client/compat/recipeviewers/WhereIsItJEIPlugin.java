@@ -15,6 +15,7 @@ import red.jackf.whereisit.api.criteria.FluidCriterion;
 import red.jackf.whereisit.api.criteria.ItemCriterion;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.client.api.ShouldIgnoreKey;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 public final class WhereIsItJEIPlugin implements IModPlugin {
@@ -43,6 +44,12 @@ public final class WhereIsItJEIPlugin implements IModPlugin {
 
                     getRecipeStack(request, runtime.getRecipesGui());
                 }
+            });
+            ShouldIgnoreKey.EVENT.register(() -> {
+                if (runtime != null) {
+                    return runtime.getIngredientListOverlay().hasKeyboardFocus();
+                }
+                return false;
             });
             setup = true;
         }

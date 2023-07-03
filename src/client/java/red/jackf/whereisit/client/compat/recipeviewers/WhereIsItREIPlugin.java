@@ -17,6 +17,7 @@ import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.*;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.client.api.ShouldIgnoreKey;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.function.Consumer;
@@ -39,6 +40,11 @@ public class WhereIsItREIPlugin implements REIClientPlugin {
             if (screen instanceof DisplayScreen) {
                 getFromRecipeScreen(request, screen, mouseX, mouseY);
             }
+        });
+
+        ShouldIgnoreKey.EVENT.register(() -> {
+            var textField = REIRuntime.getInstance().getSearchTextField();
+            return textField != null && textField.isFocused();
         });
     }
 
