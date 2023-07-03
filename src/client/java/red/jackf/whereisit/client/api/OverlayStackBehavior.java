@@ -13,11 +13,11 @@ public interface OverlayStackBehavior {
      * for custom search behavior, such as enchanted books looking for enchantments instead.
      * This event should return true if the behavior was triggered, short-circuiting the event.
      */
-    Event<OverlayStackBehavior> EVENT = EventFactory.createArrayBacked(OverlayStackBehavior.class, listeners -> (consumer, stack) -> {
+    Event<OverlayStackBehavior> EVENT = EventFactory.createArrayBacked(OverlayStackBehavior.class, listeners -> (consumer, stack, alternate) -> {
         for (OverlayStackBehavior listener : listeners)
-            if (listener.processOverlayStackBehavior(consumer, stack)) return true;
+            if (listener.processOverlayStackBehavior(consumer, stack, alternate)) return true;
         return false;
     });
 
-    boolean processOverlayStackBehavior(Consumer<Criterion> consumer, ItemStack stack);
+    boolean processOverlayStackBehavior(Consumer<Criterion> consumer, ItemStack stack, boolean alternate);
 }

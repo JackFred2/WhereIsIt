@@ -13,11 +13,11 @@ import java.util.Set;
 
 public class OverlayStackBehaviorDefaults {
     public static void setup() {
-        OverlayStackBehavior.EVENT.register((consumer, stack) -> {
+        OverlayStackBehavior.EVENT.register((consumer, stack, alternate) -> {
             if (!stack.is(Items.ENCHANTED_BOOK)) return false;
             var enchantments = EnchantmentHelper.getEnchantments(stack);
             if (enchantments.isEmpty()) return false;
-            enchantments.forEach((ench, level) -> consumer.accept(new EnchantmentCriterion(ench, null)));
+            enchantments.forEach((ench, level) -> consumer.accept(new EnchantmentCriterion(ench, alternate ? level : null)));
             return true;
         });
 
@@ -28,7 +28,8 @@ public class OverlayStackBehaviorDefaults {
                 Items.TIPPED_ARROW
         );
 
-        OverlayStackBehavior.EVENT.register((consumer, stack) -> {
+        OverlayStackBehavior.EVENT.register((consumer, stack, alternate) -> {
+            if (alternate) return false;
             if (!POTION_ITEMS.contains(stack.getItem())) return false;
             var potion = PotionUtils.getPotion(stack);
             if (potion == Potions.WATER) return false;

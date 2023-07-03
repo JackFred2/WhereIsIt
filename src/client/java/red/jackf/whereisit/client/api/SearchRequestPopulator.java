@@ -4,6 +4,8 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.*;
@@ -50,14 +52,19 @@ public interface SearchRequestPopulator {
         WhereIsItClient.LOGGER.debug("Adding {}, context: {}", stack, context);
         var criterion = new ArrayList<Criterion>();
         // checks if it's an overlay stack without custom behavior
-        if (context != Context.OVERLAY || !OverlayStackBehavior.EVENT.invoker().processOverlayStackBehavior(criterion::add, stack)) {
+        var triggeredOverlayBehavior = false;
+        if (context == Context.OVERLAY || context == Context.OVERLAY_ALTERNATE)
+            triggeredOverlayBehavior = OverlayStackBehavior.EVENT.invoker().processOverlayStackBehavior(criterion::add, stack, context == Context.OVERLAY_ALTERNATE);
+
+        if (!triggeredOverlayBehavior) {
             criterion.add(new ItemCriterion(stack.getItem()));
             if (context == Context.INVENTORY_PRECISE || context == Context.OVERLAY_ALTERNATE) {
                 criterion.add(new NbtCriterion(stack.getTag(), true));
             } else if (context == Context.FAVOURITE) {
-                EnchantmentHelper.getEnchantments(stack).forEach((ench, level) -> criterion.add(new EnchantmentCriterion(ench, level)));
                 if (stack.hasCustomHoverName()) criterion.add(new NameCriterion(stack.getHoverName().getString()));
-                // TODO add potions
+                EnchantmentHelper.getEnchantments(stack).forEach((ench, level) -> criterion.add(new EnchantmentCriterion(ench, level)));
+                var potion = PotionUtils.getPotion(stack);
+                if (potion != Potions.EMPTY) criterion.add(new PotionEffectCriterion(potion));
             }
         }
 
@@ -86,7 +93,7 @@ public interface SearchRequestPopulator {
         OVERLAY,
         /**
          * A mass item list, such as the overlays in recipe viewers. Alternate behaviour triggered by the user holding
-         * shift. Functions the same as INVENTORY_PRECISE.
+         * shift.
          */
         OVERLAY_ALTERNATE,
         /**
