@@ -72,7 +72,11 @@ public class AllOfCriterion extends Criterion implements Consumer<Criterion> {
 
     @Override
     public void accept(Criterion criterion) {
-        this.criteria.add(criterion);
+        if (criterion instanceof AllOfCriterion allOfCriterion) {
+            this.criteria.addAll(allOfCriterion.criteria);
+        } else {
+            this.criteria.add(criterion);
+        }
     }
 
     @Override

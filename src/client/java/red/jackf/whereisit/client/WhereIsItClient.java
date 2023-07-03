@@ -55,7 +55,7 @@ public class WhereIsItClient implements ClientModInitializer {
             ColourScheme.ARO,
     };
 
-    public static void updateScheme() {
+    public static void updateColourScheme() {
         if (WhereIsItConfig.INSTANCE.getConfig().getClient().randomScheme) {
             getter = RANDOM_CANDIDATES[(int) (Math.random() * RANDOM_CANDIDATES.length)].getGradient();
         } else {
@@ -75,7 +75,7 @@ public class WhereIsItClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         LOGGER.debug("Setup Client");
-        updateScheme();
+        updateColourScheme();
 
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
 
@@ -93,19 +93,21 @@ public class WhereIsItClient implements ClientModInitializer {
                         var request = new SearchRequest();
                         SearchRequestPopulator.EVENT.invoker().grabStack(request, screen1, mouseX, mouseY);
                         if (request.hasCriteria()) {
-                            request.compact();
                             lastRequest = request;
                             lastSearchTime = -1;
                             closedScreenThisSearch = false;
                             WorldRendering.clearResults();
-                            updateScheme();
+
+                            updateColourScheme();
                             LOGGER.debug("Starting request: %s".formatted(request));
+
                             if (WhereIsItConfig.INSTANCE.getConfig().getClient().printSearchRequestsInChat && Minecraft.getInstance().player != null) {
                                 var text = TextUtil.prettyPrint(request.pack());
                                 for (Component component : text) {
                                     Minecraft.getInstance().player.sendSystemMessage(component);
                                 }
                             }
+
                             var anySucceeded = SearchInvoker.EVENT.invoker().search(request, results -> {
                                 WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
                                 if (WhereIsItConfig.INSTANCE.getConfig().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {

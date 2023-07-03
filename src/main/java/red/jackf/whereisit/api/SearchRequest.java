@@ -20,16 +20,13 @@ public class SearchRequest implements Consumer<Criterion> {
     public static final String DATA = "Data";
     private final List<Criterion> criteria = new ArrayList<>();
 
-    public void compact() {
-        while (criteria.size() == 1 && criteria.get(0) instanceof AllOfCriterion all) {
-            criteria.clear();
-            criteria.addAll(all.criteria);
-        }
-    }
-
     public void accept(Criterion criterion) {
         if (criterion.valid()) {
-            this.criteria.add(criterion);
+            if (criterion instanceof AllOfCriterion allOfCriterion) {
+                criteria.addAll(allOfCriterion.criteria);
+            } else {
+                this.criteria.add(criterion);
+            }
         } else {
             var data = new CompoundTag();
             criterion.writeTag(data);

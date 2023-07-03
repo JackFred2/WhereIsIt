@@ -3,10 +3,7 @@ package red.jackf.whereisit.client.compat.recipeviewers;
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
-import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.stack.FluidEmiStack;
-import dev.emi.emi.api.stack.ItemEmiStack;
-import dev.emi.emi.api.stack.TagEmiIngredient;
+import dev.emi.emi.api.stack.*;
 import dev.emi.emi.runtime.EmiFavorite;
 import dev.emi.emi.screen.RecipeScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -62,9 +59,10 @@ public class WhereIsItEMIPlugin implements EmiPlugin {
         }
         if (ingredient.isEmpty()) return;
 
-        if (ingredient instanceof TagEmiIngredient tagIngredient && tagIngredient.key.registry() == Registries.ITEM) {
+        TagEmiIngredient tag = getEmiItemTagIngredient(ingredient);
+        if (tag != null) {
             //noinspection unchecked
-            request.accept(new ItemTagCriterion((TagKey<Item>) tagIngredient.key));
+            request.accept(new ItemTagCriterion((TagKey<Item>) tag.key));
         } else {
             List<Criterion> criterion = new ArrayList<>();
             for (EmiStack emiStack : ingredient.getEmiStacks())
@@ -72,6 +70,12 @@ public class WhereIsItEMIPlugin implements EmiPlugin {
             if (!criterion.isEmpty())
                 request.accept(new AnyOfCriterion(criterion).compact());
         }
+    }
+
+    private static TagEmiIngredient getEmiItemTagIngredient(EmiIngredient ingredient) {
+        if (ingredient instanceof EmiFavorite favorite) ingredient = favorite.getStack();
+        if (ingredient instanceof TagEmiIngredient tag && tag.key.registry() == Registries.ITEM) return tag;
+        return null;
     }
 
     private static void getCriterion(Consumer<Criterion> consumer, EmiStack emiStack, SearchRequestPopulator.Context context) {

@@ -50,7 +50,7 @@ public class WhereIsItConfigScreenBuilder {
                         .build())
                 .save(() -> {
                     instance.save();
-                    WhereIsItClient.updateScheme();
+                    WhereIsItClient.updateColourScheme();
                 })
                 .build()
                 .generateScreen(parent);
