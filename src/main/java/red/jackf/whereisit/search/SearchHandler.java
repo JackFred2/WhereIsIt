@@ -61,7 +61,10 @@ public class SearchHandler {
             }
         }
         WhereIsIt.LOGGER.debug("Server search results id %d: %s".formatted(packet.id(), results.toString()));
-        WhereIsIt.LOGGER.debug("Search time: {}ns ({}ms)", System.nanoTime() - startTime, (System.nanoTime() - startTime) / 1_000_000);
+        var time = System.nanoTime() - startTime;
+        var timingStr = "Search time: %.2fms (%dns)".formatted((float) time / 1_000_000, time);
+        WhereIsIt.LOGGER.debug(timingStr);
+        if (WhereIsItConfig.INSTANCE.getConfig().getCommon().printSearchTime) player.sendSystemMessage(Component.literal("[Where Is It] " + timingStr).withStyle(ChatFormatting.YELLOW));
         if (results.size() > 0)
             response.sendPacket(new ClientboundResultsPacket(packet.id(), results));
     }

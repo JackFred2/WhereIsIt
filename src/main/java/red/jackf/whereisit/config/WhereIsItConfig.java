@@ -70,6 +70,9 @@ public class WhereIsItConfig {
         @ConfigEntry
         public Color solidColour = new Color(0xFFBADA55);
 
+        @ConfigEntry
+        public boolean printSearchRequestsInChat = false;
+
         public void validate() {
             this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
             this.solidColour = new Color(this.solidColour.getRGB() | 0xFF_000000);
@@ -95,6 +98,9 @@ public class WhereIsItConfig {
 
         @ConfigEntry
         public boolean doNestedSearch = true;
+
+        @ConfigEntry
+        public boolean printSearchTime = false;
 
         public void validate() {
             this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 16);

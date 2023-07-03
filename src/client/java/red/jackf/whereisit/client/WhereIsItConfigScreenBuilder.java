@@ -7,6 +7,7 @@ import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.gui.ImageRenderer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static net.minecraft.SharedConstants.TICKS_PER_SECOND;
 import static net.minecraft.network.chat.Component.translatable;
@@ -35,6 +38,15 @@ public class WhereIsItConfigScreenBuilder {
                         .name(translatable("whereisit.config.title"))
                         .group(makeClientGroup(instance.getDefaults(), instance.getConfig()))
                         .group(makeCommonGroup(instance.getDefaults(), instance.getConfig()))
+                        .build())
+                .category(ConfigCategory.createBuilder()
+                        .name(translatable("whereisit.config.compatibility"))
+                        .group(makeClientCompatibilityGroup(instance.getDefaults(), instance.getConfig()))
+                        .build())
+                .category(ConfigCategory.createBuilder()
+                        .name(translatable("whereisit.config.debug"))
+                        .group(makeClientDebugGroup(instance.getDefaults(), instance.getConfig()))
+                        .group(makeCommonDebugGroup(instance.getDefaults(), instance.getConfig()))
                         .build())
                 .save(() -> {
                     instance.save();
@@ -92,62 +104,86 @@ public class WhereIsItConfigScreenBuilder {
                                 .onOffFormatter())
                         .build())
                 .options(makeColourOptions(defaults, config))
-                .option(LabelOption.create(translatable("whereisit.config.compatibilityPrefix")))
-                .options(makeClientCompatibilityGroup(defaults, config))
                 .build();
     }
 
-    private static Collection<? extends Option<?>> makeClientCompatibilityGroup(WhereIsItConfig defaults, WhereIsItConfig config) {
-        var jeiSupport = Option.<Boolean>createBuilder()
-                .name(translatable("whereisit.config.client.compatibility.jeiSupport"))
-                .binding(
-                        defaults.getClient().compatibility.jeiSupport,
-                        () -> config.getClient().compatibility.jeiSupport,
-                        b -> config.getClient().compatibility.jeiSupport = b
-                )
-                .description(OptionDescription.createBuilder().text(
-                                translatable("whereisit.config.client.compatibility.jeiSupport.description"),
-                                translatable("whereisit.config.client.compatibility.requiresModInstalled")
+    private static Option<Boolean> makeRecipeViewerOption(String langId, String modid, boolean def, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+        var desc = OptionDescription.createBuilder().text(
+                translatable("whereisit.config.compatibility.client.%sSupport.description".formatted(langId)),
+                translatable("whereisit.config.compatibility.requiresModInstalled")
+        );
+        if (!FabricLoader.getInstance().isModLoaded(modid))
+            desc.text(translatable("whereisit.config.compatibility.modNotInstalled").withStyle(ChatFormatting.RED));
+
+        return Option.<Boolean>createBuilder()
+                .name(translatable("whereisit.config.compatibility.client.%sSupport".formatted(langId)))
+                .binding(def, getter, setter)
+                .description(desc.build())
+                .available(FabricLoader.getInstance().isModLoaded(modid))
+                .controller(opt -> BooleanControllerBuilder.create(opt)
+                        .coloured(true)
+                        .onOffFormatter())
+                .build();
+    }
+
+    private static OptionGroup makeClientDebugGroup(WhereIsItConfig defaults, WhereIsItConfig config) {
+        return OptionGroup.createBuilder()
+                .name(translatable("whereisit.config.client"))
+                .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.debug.client.printSearchRequestsInChat"))
+                        .binding(
+                                defaults.getClient().printSearchRequestsInChat,
+                                () -> config.getClient().printSearchRequestsInChat,
+                                b -> config.getClient().printSearchRequestsInChat = b
                         )
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .yesNoFormatter())
                         .build())
-                .available(FabricLoader.getInstance().isModLoaded("jei"))
-                .controller(opt -> BooleanControllerBuilder.create(opt)
-                        .coloured(true)
-                        .onOffFormatter())
                 .build();
-        var reiSupport = Option.<Boolean>createBuilder()
-                .name(translatable("whereisit.config.client.compatibility.reiSupport"))
-                .binding(
-                        defaults.getClient().compatibility.reiSupport,
-                        () -> config.getClient().compatibility.reiSupport,
-                        b -> config.getClient().compatibility.reiSupport = b
-                )
-                .description(OptionDescription.of(
-                        translatable("whereisit.config.client.compatibility.reiSupport.description"),
-                        translatable("whereisit.config.client.compatibility.requiresModInstalled")
-                ))
-                .available(FabricLoader.getInstance().isModLoaded("roughlyenoughitems"))
-                .controller(opt -> BooleanControllerBuilder.create(opt)
-                        .coloured(true)
-                        .onOffFormatter())
+    }
+
+    private static OptionGroup makeCommonDebugGroup(WhereIsItConfig defaults, WhereIsItConfig config) {
+        return OptionGroup.createBuilder()
+                .name(translatable("whereisit.config.common"))
+                .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.debug.common.printSearchTime"))
+                        .description(OptionDescription.of(translatable("whereisit.config.debug.common.printSearchTime.description")))
+                        .binding(
+                                defaults.getCommon().printSearchTime,
+                                () -> config.getCommon().printSearchTime,
+                                b -> config.getCommon().printSearchTime = b
+                        )
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .yesNoFormatter())
+                        .build())
                 .build();
-        var emiSupport = Option.<Boolean>createBuilder()
-                .name(translatable("whereisit.config.client.compatibility.emiSupport"))
-                .binding(
-                        defaults.getClient().compatibility.emiSupport,
-                        () -> config.getClient().compatibility.emiSupport,
-                        b -> config.getClient().compatibility.emiSupport = b
-                )
-                .description(OptionDescription.of(
-                        translatable("whereisit.config.client.compatibility.emiSupport.description"),
-                        translatable("whereisit.config.client.compatibility.requiresModInstalled")
-                ))
-                .available(FabricLoader.getInstance().isModLoaded("emi"))
-                .controller(opt -> BooleanControllerBuilder.create(opt)
-                        .coloured(true)
-                        .onOffFormatter())
+    }
+
+    private static OptionGroup makeClientCompatibilityGroup(WhereIsItConfig defaults, WhereIsItConfig config) {
+        var jeiSupport = makeRecipeViewerOption("jei", "jei",
+                defaults.getClient().compatibility.jeiSupport,
+                () -> config.getClient().compatibility.jeiSupport,
+                b -> config.getClient().compatibility.jeiSupport = b
+        );
+        var reiSupport = makeRecipeViewerOption("rei", "roughlyenoughitems",
+                defaults.getClient().compatibility.reiSupport,
+                () -> config.getClient().compatibility.reiSupport,
+                b -> config.getClient().compatibility.reiSupport = b
+        );
+        var emiSupport = makeRecipeViewerOption("emi", "emi",
+                defaults.getClient().compatibility.emiSupport,
+                () -> config.getClient().compatibility.emiSupport,
+                b -> config.getClient().compatibility.emiSupport = b
+        );
+
+        return OptionGroup.createBuilder()
+                .name(translatable("whereisit.config.client"))
+                .option(jeiSupport)
+                .option(reiSupport)
+                .option(emiSupport)
                 .build();
-        return List.of(jeiSupport, reiSupport, emiSupport);
     }
 
     private static Collection<? extends Option<?>> makeColourOptions(WhereIsItConfig defaults, WhereIsItConfig config) {
