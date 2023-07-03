@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.api.criteria.AllOfCriterion;
 import red.jackf.whereisit.api.criteria.Criterion;
 
 import java.util.ArrayList;
@@ -15,9 +16,16 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class SearchRequest implements Consumer<Criterion> {
-    private static final String ID = "Id";
-    private static final String DATA = "Data";
+    public static final String ID = "Id";
+    public static final String DATA = "Data";
     private final List<Criterion> criteria = new ArrayList<>();
+
+    public void compact() {
+        while (criteria.size() == 1 && criteria.get(0) instanceof AllOfCriterion all) {
+            criteria.clear();
+            criteria.addAll(all.criteria);
+        }
+    }
 
     public void accept(Criterion criterion) {
         if (criterion.valid()) {

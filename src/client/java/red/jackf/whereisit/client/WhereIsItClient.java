@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -18,12 +19,13 @@ import red.jackf.whereisit.client.api.SearchInvoker;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.client.api.ShouldIgnoreKey;
 import red.jackf.whereisit.client.defaults.OverlayStackBehaviorDefaults;
-import red.jackf.whereisit.client.defaults.SearchRequestPopulatorDefaults;
 import red.jackf.whereisit.client.defaults.SearchInvokerDefaults;
+import red.jackf.whereisit.client.defaults.SearchRequestPopulatorDefaults;
 import red.jackf.whereisit.client.defaults.ShouldIgnoreKeyDefaults;
 import red.jackf.whereisit.client.render.ScreenRendering;
 import red.jackf.whereisit.client.render.WorldRendering;
 import red.jackf.whereisit.client.util.NotificationToast;
+import red.jackf.whereisit.client.util.TextUtil;
 import red.jackf.whereisit.config.ColourScheme;
 import red.jackf.whereisit.config.WhereIsItConfig;
 import red.jackf.whereisit.util.ColourGetter;
@@ -91,12 +93,19 @@ public class WhereIsItClient implements ClientModInitializer {
                         var request = new SearchRequest();
                         SearchRequestPopulator.EVENT.invoker().grabStack(request, screen1, mouseX, mouseY);
                         if (request.hasCriteria()) {
+                            request.compact();
                             lastRequest = request;
                             lastSearchTime = -1;
                             closedScreenThisSearch = false;
                             WorldRendering.clearResults();
                             updateScheme();
                             LOGGER.debug("Starting request: %s".formatted(request));
+                            if (WhereIsItConfig.INSTANCE.getConfig().getClient().printSearchRequestsInChat && Minecraft.getInstance().player != null) {
+                                var text = TextUtil.prettyPrint(request.pack());
+                                for (Component component : text) {
+                                    Minecraft.getInstance().player.sendSystemMessage(component);
+                                }
+                            }
                             var anySucceeded = SearchInvoker.EVENT.invoker().search(request, results -> {
                                 WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
                                 if (WhereIsItConfig.INSTANCE.getConfig().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {

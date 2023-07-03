@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class AllOfCriterion extends Criterion implements Consumer<Criterion> {
     private static final String KEY = "AllOf";
-    private final List<Criterion> criteria = new ArrayList<>();
+    public final List<Criterion> criteria = new ArrayList<>();
     public AllOfCriterion() {
         super(VanillaCriteria.ALL_OF);
     }
