@@ -6,6 +6,8 @@
   "whereisit.config.title": "Where Is It",
   "whereisit.config.compatibilityPrefix": "Mod Compatibility",
   "whereisit.config.client": "Client Options",
+  "whereisit.config.client.closeGuiOnFoundResults": "Close GUI On Found Results",
+  "whereisit.config.client.closeGuiOnFoundResults.description": "Whether the GUI will close if results were found. Will only happen once per search.",
   "whereisit.config.client.fadeoutTime": "Fade Out Time",
   "whereisit.config.client.fadeoutTime.description": "How long it takes world and slot highlights to fade out.",
   "whereisit.config.client.fadeoutTime.slider": "%s seconds",

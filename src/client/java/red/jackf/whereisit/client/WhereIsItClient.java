@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ public class WhereIsItClient implements ClientModInitializer {
     @Nullable
     public static SearchRequest lastRequest = null;
     public static long lastSearchTime = 0;
+    public static boolean closedScreenThisSearch = false;
 
     private static ColourGetter getter = f -> 0; // replaced in mod init
 
@@ -86,11 +88,16 @@ public class WhereIsItClient implements ClientModInitializer {
                         if (request.hasCriteria()) {
                             lastRequest = request;
                             lastSearchTime = -1;
+                            closedScreenThisSearch = false;
                             WorldRendering.clearResults();
                             updateScheme();
                             LOGGER.debug("Starting request: %s".formatted(request));
                             var anySucceeded = SearchInvoker.EVENT.invoker().search(request, results -> {
                                 WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
+                                if (WhereIsItConfig.INSTANCE.getConfig().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {
+                                    closedScreenThisSearch = true;
+                                    Minecraft.getInstance().setScreen(null);
+                                }
                                 WorldRendering.addResults(results);
                             });
                             if (!anySucceeded) NotificationToast.sendNotInstalledOnServer();

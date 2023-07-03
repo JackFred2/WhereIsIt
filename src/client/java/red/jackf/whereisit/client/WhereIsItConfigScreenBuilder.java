@@ -47,6 +47,21 @@ public class WhereIsItConfigScreenBuilder {
     private static OptionGroup makeClientGroup(WhereIsItConfig defaults, WhereIsItConfig config) {
         return OptionGroup.createBuilder()
                 .name(translatable("whereisit.config.client"))
+                .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.client.closeGuiOnFoundResults"))
+                        .binding(
+                                defaults.getClient().closeGuiOnFoundResults,
+                                () -> config.getClient().closeGuiOnFoundResults,
+                                b -> config.getClient().closeGuiOnFoundResults = b
+                        )
+                        .description(b -> OptionDescription.createBuilder()
+                                .text(translatable("whereisit.config.client.closeGuiOnFoundResults.description"))
+                                .build()
+                        )
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .yesNoFormatter())
+                        .build())
                 .option(Option.<Integer>createBuilder()
                         .name(translatable("whereisit.config.client.fadeoutTime"))
                         .binding(

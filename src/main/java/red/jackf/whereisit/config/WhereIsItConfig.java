@@ -53,6 +53,9 @@ public class WhereIsItConfig {
 
     public static class Client {
         @ConfigEntry
+        public boolean closeGuiOnFoundResults = true;
+
+        @ConfigEntry
         public int fadeoutTimeTicks = 10 * TICKS_PER_SECOND;
 
         @ConfigEntry

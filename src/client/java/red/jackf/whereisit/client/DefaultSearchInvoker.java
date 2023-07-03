@@ -53,7 +53,9 @@ public class DefaultSearchInvoker {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> { // on server connect
             ClientPlayNetworking.registerGlobalReceiver(ClientboundResultsPacket.TYPE, (packet, player, responseSender) -> {
                 var consumer = consumers.remove(packet.id());
-                if (consumer != null) consumer.accept(packet.results());
+                if (consumer != null) {
+                    client.execute(() -> consumer.accept(packet.results()));
+                }
             });
         });
     }
