@@ -60,6 +60,17 @@ public class WhereIsItConfigScreenBuilder {
         return OptionGroup.createBuilder()
                 .name(translatable("whereisit.config.client"))
                 .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.client.playSoundOnRequest"))
+                        .binding(
+                                defaults.getClient().playSoundOnRequest,
+                                () -> config.getClient().playSoundOnRequest,
+                                b -> config.getClient().playSoundOnRequest = b
+                        )
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .yesNoFormatter())
+                        .build())
+                .option(Option.<Boolean>createBuilder()
                         .name(translatable("whereisit.config.client.closeGuiOnFoundResults"))
                         .binding(
                                 defaults.getClient().closeGuiOnFoundResults,
@@ -180,6 +191,21 @@ public class WhereIsItConfigScreenBuilder {
 
         return OptionGroup.createBuilder()
                 .name(translatable("whereisit.config.client"))
+                .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.compatibility.client.recipeBookSupport"))
+                        .description(OptionDescription.createBuilder()
+                                .text(translatable("whereisit.config.compatibility.client.recipeBookSupport.description"))
+                                .image(WhereIsIt.id("textures/gui/config/recipe_book_example.png"), 152, 66)
+                                .build())
+                        .binding(
+                                defaults.getClient().compatibility.recipeBookSupport,
+                                () -> config.getClient().compatibility.recipeBookSupport,
+                                b -> config.getClient().compatibility.recipeBookSupport = b
+                        )
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .onOffFormatter())
+                        .build())
                 .option(jeiSupport)
                 .option(reiSupport)
                 .option(emiSupport)

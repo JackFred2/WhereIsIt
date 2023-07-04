@@ -53,6 +53,9 @@ public class WhereIsItConfig {
 
     public static class Client {
         @ConfigEntry
+        public boolean playSoundOnRequest = false;
+
+        @ConfigEntry
         public boolean closeGuiOnFoundResults = true;
 
         @ConfigEntry
@@ -82,7 +85,8 @@ public class WhereIsItConfig {
         public Compatibility compatibility = new Compatibility();
 
         public static class Compatibility {
-
+            @ConfigEntry
+            public boolean recipeBookSupport = true;
             @ConfigEntry
             public boolean jeiSupport = true;
             @ConfigEntry

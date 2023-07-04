@@ -10,7 +10,9 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -117,6 +119,7 @@ public class WhereIsItClient implements ClientModInitializer {
                                 WorldRendering.addResults(results);
                             });
                             if (!anySucceeded) NotificationToast.sendNotInstalledOnServer();
+                            else if (WhereIsItConfig.INSTANCE.getConfig().getClient().playSoundOnRequest) playRequestSound();
                         }
                     }
                 });
@@ -143,5 +146,9 @@ public class WhereIsItClient implements ClientModInitializer {
         ShouldIgnoreKeyDefaults.setup();
 
         WorldRendering.setup();
+    }
+
+    private void playRequestSound() {
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_CHIME.value(), 2f, 0.5f));
     }
 }

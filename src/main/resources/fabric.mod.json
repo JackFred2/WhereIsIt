@@ -46,6 +46,7 @@
 	},
 	"suggests": {
 		"emi": "*",
-		"roughlyenoughitems": "*"
+		"roughlyenoughitems": "*",
+		"jei": "*"
 	}
 }

@@ -9,6 +9,7 @@ import red.jackf.whereisit.api.criteria.AnyOfCriterion;
 import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.ItemTagCriterion;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.ArrayList;
 
@@ -28,7 +29,7 @@ public class SearchRequestPopulatorDefaults {
             }
 
             // grab from recipe book highlights
-            if (containerScreen instanceof RecipeUpdateListener recipeBookHolder) {
+            if (WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.recipeBookSupport && containerScreen instanceof RecipeUpdateListener recipeBookHolder) {
                 var book = recipeBookHolder.getRecipeBookComponent();
                 if (book.ghostRecipe.getRecipe() != null) {
                     for (var i = 0; i < book.ghostRecipe.size(); i++) {
