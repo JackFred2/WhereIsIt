@@ -32,8 +32,8 @@ jobs:
       - name: Build and publish with Gradle
         run: ./gradlew build publish
         env:
-          MAVEN_USERNAME: ${{ secrets.GITHUB_ACTOR }}
-          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload GitHub release
         uses: AButler/upload-release-assets@v2.0
