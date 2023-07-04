@@ -1,4 +1,4 @@
-import java.net.URI;
+import java.net.URI
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
@@ -6,11 +6,11 @@ plugins {
 	id("fabric-loom") version "1.2-SNAPSHOT"
 }
 
-val version = findProperty("mod_version")
-val group = findProperty("maven_group")
+group = findProperty("maven_group") !!
+version = findProperty("mod_version") !!
 
 base {
-	archivesName.set("${findProperty("archives_base_name")}-${findProperty("minecraft_version")}-$version")
+	archivesName.set("${findProperty("archives_base_name")}-${findProperty("minecraft_version")}")
 }
 
 repositories {
@@ -76,7 +76,7 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${findProperty("minecraft_version")}")
-	mappings(loom.layered() {
+	mappings(loom.layered {
 		officialMojangMappings()
 		parchment("org.parchmentmc.data:parchment-${findProperty("parchment_version")}@zip")
 	})
@@ -139,6 +139,8 @@ tasks.jar {
 publishing {
 	publications {
 		create<MavenPublication>("mavenJava") {
+			setVersion(rootProject.version)
+			groupId = group as String
 			from(components["java"])
 		}
 	}
