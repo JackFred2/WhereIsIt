@@ -35,8 +35,18 @@ jobs:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload GitHub release
+      - name: Upload GitHub Package
         uses: AButler/upload-release-assets@v2.0
         with:
           files: 'build/libs/*.jar;!build/libs/*-sources.jar;!build/libs/*-dev.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to GitHub
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          loaders: |
+            fabric
+            quilt
+
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-generate-changelog: true
