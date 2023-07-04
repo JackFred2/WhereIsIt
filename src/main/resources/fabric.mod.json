@@ -1,77 +1,52 @@
 {
-  "schemaVersion": 1,
-  "id": "whereisit",
-  "version": "${version}",
-  "name": "Where Is It",
-  "description": "Find an item in nearby inventories.",
-  "authors": [
-    {
-      "name": "JackFred",
-      "contact": {
-        "homepage": "https://github.com/JackFred2",
-        "email": "jack@jackf.red"
-      }
-    }
-  ],
-  "contributors": [
-    "zml2008 - OptiFine Compatibility Code",
-    "Abbie5 - EMI Compatibility",
-    "cnlimiter - 1.20.x update",
-    "Huajimur - Simplified Chinese Translation",
-    "Jerry Li - Simplified Chinese Translation",
-    "Furije - Croatian Translation",
-    "Jonathan - French Translation",
-    "Lucas Sarazin - French Translation",
-    "ibdib - German Translation",
-    "Sainer - German Translation",
-    "Emafire003 - Italian Translation",
-    "othunt - Korean Translation",
-    "K0RR - Polish Translation",
-    "Alexey2gor - Russian Translation",
-    "kyrtion - Russian Translation",
-    "Night - Russian Translation",
-    "Reviksedy - Russian Translation",
-    "Vanya - Russian Translation",
-    "noroj - Spanish Translation",
-    "SmallPepperZ - Spanish Translation",
-    "Eric1337 - Swedish Translation",
-    "Ege_e - Turkish Translation",
-    "...and any other translators I have missed"
-  ],
-  "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/where-is-it",
-    "sources": "https://github.com/JackFred2/WhereIsIt",
-    "issues": "https://github.com/JackFred2/WhereIsIt/issues"
-  },
-  "license": [
-    "MIT",
-    "EPL-1.0"
-  ],
-  "icon": "assets/whereisit/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "red.jackf.whereisit.WhereIsIt"
-    ],
-    "client": [
-      "red.jackf.whereisit.WhereIsItClient"
-    ],
-    "modmenu": [
-      "red.jackf.whereisit.compat.ModMenuHandler"
-    ]
-  },
-  "mixins": [
-    "whereisit.mixins.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.8.3",
-    "fabric-api": "*",
-    "minecraft": "1.20.x",
-    "cloth-config2": ">=5.0.0"
-  },
-  "suggests": {
-    "roughlyenoughitems": ">=6.0.0",
-    "modmenu": "*",
-    "emi": ">=0.6.0"
-  }
+	"schemaVersion": 1,
+	"id": "whereisit",
+	"version": "${version}",
+	"name": "WhereIsIt",
+	"description": "Find items in nearby inventories.",
+	"authors": [
+		"JackFred"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/where-is-it",
+		"sources": "https://github.com/JackFred2/WhereIsIt",
+		"issues": "https://github.com/JackFred2/WhereIsIt/issues"
+	},
+	"license": "LGPL-3.0-or-later",
+	"icon": "assets/whereisit/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"red.jackf.whereisit.WhereIsIt"
+		],
+		"client": [
+			"red.jackf.whereisit.client.WhereIsItClient"
+		],
+		"modmenu": [
+			"red.jackf.whereisit.client.compat.WhereIsItModMenu"
+		],
+		"jei_mod_plugin": [
+			"red.jackf.whereisit.client.compat.recipeviewers.WhereIsItJEIPlugin"
+		],
+		"rei_client": [
+			"red.jackf.whereisit.client.compat.recipeviewers.WhereIsItREIPlugin"
+		],
+		"emi": [
+			"red.jackf.whereisit.client.compat.recipeviewers.WhereIsItEMIPlugin"
+		]
+	},
+	"mixins": [],
+	"accessWidener": "whereisit.accesswidener",
+	"depends": {
+		"fabricloader": ">=0.14.21",
+		"minecraft": "~1.20",
+		"java": ">=17",
+		"fabric-api": "*",
+		"yet_another_config_lib_v3": "*"
+	},
+	"suggests": {
+		"emi": "*",
+		"roughlyenoughitems": "*",
+		"jei": "*"
+	}
 }

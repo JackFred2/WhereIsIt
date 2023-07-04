@@ -1,97 +1,40 @@
 package red.jackf.whereisit;
 
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
-import net.fabricmc.api.EnvType;
+import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import red.jackf.whereisit.network.FoundS2C;
-import red.jackf.whereisit.network.SearchC2S;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import net.minecraft.resources.ResourceLocation;
+import org.slf4j.Logger;
+import red.jackf.whereisit.config.WhereIsItConfig;
+import red.jackf.whereisit.criteria.VanillaCriteria;
+import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
+import red.jackf.whereisit.search.DefaultNestedItemStackSearchers;
+import red.jackf.whereisit.search.SearchHandler;
+import red.jackf.whereisit.util.RateLimiter;
 
 public class WhereIsIt implements ModInitializer {
-    public static final String MODID = "whereisit";
-    private static final Logger LOGGER = LogManager.getLogger();
-    private static final Map<UUID, Long> rateLimitMap = new HashMap<>();
-    public static WhereIsItConfig CONFIG = AutoConfig.register(WhereIsItConfig.class, GsonConfigSerializer::new).getConfig();
-    public static boolean REILoaded = false;
-    public static boolean EMILoaded = false;
+    public static final Logger LOGGER = LogUtils.getLogger();
+	public static final String MODID = "whereisit";
+	public static ResourceLocation id(String path) {
+		return new ResourceLocation(MODID, path);
+	}
 
-    public static Identifier id(String path) {
-        return new Identifier(MODID, path);
-    }
+	@Override
+	public void onInitialize() {
+		try {
+			WhereIsItConfig.INSTANCE.load();
+			WhereIsItConfig.INSTANCE.getConfig().validate();
+		} catch (Exception ex) {
+			LOGGER.error("Error loading WhereIsIt config, restoring default", ex);
+		}
+		WhereIsItConfig.INSTANCE.save();
+		LOGGER.debug("Setup Common");
+		VanillaCriteria.setup();
+		DefaultNestedItemStackSearchers.setup();
 
-    public static void log(String str) {
-        LOGGER.info(str);
-    }
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> RateLimiter.disconnected(handler.player));
 
-    public static void error(String str) {
-        LOGGER.error(str);
-    }
-
-    public static void error(Exception ex) {
-        LOGGER.error(ex);
-    }
-
-    @Override
-    public void onInitialize() {
-        AutoConfig.getConfigHolder(WhereIsItConfig.class).registerSaveListener((configHolder, whereIsItConfig) -> {
-            whereIsItConfig.validatePostLoad();
-            return ActionResult.PASS;
-        });
-
-        if (FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
-            REILoaded = true;
-            log("REI Found");
-        }
-
-        if (FabricLoader.getInstance().isModLoaded("emi")) {
-            EMILoaded = true;
-            log("EMI Found");
-        }
-
-        ServerPlayNetworking.registerGlobalReceiver(SearchC2S.ID, ((server, player, handler, buf, responseSender) -> {
-            var searchContext = SearchC2S.read(buf);
-            var itemToFind = searchContext.item();
-            if (itemToFind != Items.AIR) {
-                server.execute(() -> {
-
-                    var basePos = player.getBlockPos();
-                    var world = player.getServerWorld();
-
-                    long beforeTime = System.nanoTime();
-
-                    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT || world.getTime() >= rateLimitMap.getOrDefault(player.getUuid(), 0L) + WhereIsIt.CONFIG.getCooldown()) {
-                        var positions = Searcher.searchWorld(basePos, world, itemToFind, searchContext.tag(), searchContext.maximum());
-                        if (positions.size() > 0) {
-                            var packet = new FoundS2C(positions);
-                            ServerPlayNetworking.send(player, FoundS2C.ID, packet);
-                            player.closeHandledScreen();
-                        }
-                        rateLimitMap.put(player.getUuid(), world.getTime());
-                    } else {
-                        player.sendMessage(Text.translatable("whereisit.slowDown").formatted(Formatting.YELLOW), false);
-                    }
-
-                    if (WhereIsIt.CONFIG.printSearchTime()) {
-                        long time = (System.nanoTime() - beforeTime);
-                        player.sendMessage(Text.literal("Lookup Time: " + time + "ns"), false);
-                        WhereIsIt.LOGGER.info("Lookup Time: " + time + "ns");
-                    }
-                });
-            }
-        }));
-    }
+		ServerPlayNetworking.registerGlobalReceiver(ServerboundSearchForItemPacket.TYPE, SearchHandler::handle);
+	}
 }
