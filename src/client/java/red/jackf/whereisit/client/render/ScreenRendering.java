@@ -9,15 +9,18 @@ import red.jackf.whereisit.api.search.NestedItemStackSearcher;
 import red.jackf.whereisit.client.WhereIsItClient;
 
 public class ScreenRendering {
-    public static void render(Screen screen, GuiGraphics graphics, int mouseX, int mouseY) {
+    public static void render(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float tickDelta) {
         if (screen instanceof AbstractContainerScreen<?> containerScreen) {
-            var time = Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0;
+            var time = Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() + tickDelta : 0;
             for (Slot slot : containerScreen.getMenu().slots) {
                 if (slot.isActive() && slot.hasItem() && WhereIsItClient.lastRequest != null &&
                         NestedItemStackSearcher.check(slot.getItem(), WhereIsItClient.lastRequest)) {
                     var x = slot.x + containerScreen.leftPos;
                     var y = slot.y + containerScreen.topPos;
-                    var progress = (float) ((slot.x + (mouseX / 8) + (mouseY / 8) + (2 * time)) % 256) / 256;
+                    var progress = 2 * time // shift over time
+                            + slot.x // offset by slot X
+                            - (mouseX + mouseY)/8; // parallax with maths
+                    progress /= 256; // slow down
                     var colour = WhereIsItClient.getColour(progress);
                     graphics.fill(x, y, x + 16, y + 16, colour);
                 }

@@ -10,9 +10,11 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -79,42 +81,31 @@ public class WhereIsItClient implements ClientModInitializer {
         LOGGER.debug("Setup Client");
         updateColourScheme();
 
-        ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+        ScreenEvents.BEFORE_INIT.register((client, _screen, scaledWidth, scaledHeight) -> {
 
 			if (inGame) {
                 if (WhereIsItConfig.INSTANCE.getConfig().getClient().showSlotHighlights)
-                    ScreenEvents.afterRender(screen).register((screen2, graphics, mouseX1, mouseY1, tickDelta) -> ScreenRendering.render(screen2, graphics, mouseX1, mouseY1));
+                    ScreenEvents.afterRender(_screen).register(ScreenRendering::render);
 
                 // listen for keypress
-                ScreenKeyboardEvents.afterKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
+                ScreenKeyboardEvents.afterKeyPress(_screen).register((screen, key, scancode, modifiers) -> {
                     if (SEARCH.matches(key, scancode) && !ShouldIgnoreKey.EVENT.invoker().shouldIgnoreKey()) {
-                        int mouseX = (int) (client.mouseHandler.xpos() * (double) client.getWindow()
-                                .getGuiScaledWidth() / (double) client.getWindow().getScreenWidth());
-                        int mouseY = (int) (client.mouseHandler.ypos() * (double) client.getWindow()
-                                .getGuiScaledHeight() / (double) client.getWindow().getScreenHeight());
-                        var request = new SearchRequest();
-                        SearchRequestPopulator.EVENT.invoker().grabStack(request, screen1, mouseX, mouseY);
+                        SearchRequest request = createRequest(client, screen);
                         if (request.hasCriteria()) {
-                            lastRequest = request;
-                            lastSearchTime = -1;
-                            closedScreenThisSearch = false;
-                            WorldRendering.clearResults();
-
-                            updateColourScheme();
+                            onNewRequest(request);
                             LOGGER.debug("Starting request: %s".formatted(request));
 
                             if (WhereIsItConfig.INSTANCE.getConfig().getClient().printSearchRequestsInChat && Minecraft.getInstance().player != null) {
                                 var text = TextUtil.prettyPrint(request.pack());
-                                for (Component component : text) {
+                                for (Component component : text)
                                     Minecraft.getInstance().player.sendSystemMessage(component);
-                                }
                             }
 
                             var anySucceeded = SearchInvoker.EVENT.invoker().search(request, results -> {
                                 WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
                                 if (WhereIsItConfig.INSTANCE.getConfig().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {
                                     closedScreenThisSearch = true;
-                                    Minecraft.getInstance().setScreen(null);
+                                    screen.onClose();
                                 }
                                 WorldRendering.addResults(results);
                             });
@@ -146,6 +137,27 @@ public class WhereIsItClient implements ClientModInitializer {
         ShouldIgnoreKeyDefaults.setup();
 
         WorldRendering.setup();
+    }
+
+    // clear previous state for rendering
+    private static void onNewRequest(SearchRequest request) {
+        lastRequest = request;
+        lastSearchTime = -1;
+        closedScreenThisSearch = false;
+        WorldRendering.clearResults();
+
+        updateColourScheme();
+    }
+
+    @NotNull
+    private static SearchRequest createRequest(Minecraft client, Screen screen1) {
+        int mouseX = (int) (client.mouseHandler.xpos() * (double) client.getWindow()
+                .getGuiScaledWidth() / (double) client.getWindow().getScreenWidth());
+        int mouseY = (int) (client.mouseHandler.ypos() * (double) client.getWindow()
+                .getGuiScaledHeight() / (double) client.getWindow().getScreenHeight());
+        var request = new SearchRequest();
+        SearchRequestPopulator.EVENT.invoker().grabStack(request, screen1, mouseX, mouseY);
+        return request;
     }
 
     private void playRequestSound() {
