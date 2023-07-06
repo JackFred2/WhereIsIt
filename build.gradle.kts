@@ -186,6 +186,8 @@ curseforge {
 		options(closureOf<Options> {
 			forgeGradleIntegration = false
 		})
+	} else {
+		println("No CURSEFORGE_TOKEN set, skipping...")
 	}
 }
 
@@ -209,6 +211,8 @@ modrinth {
 			optional.project("u6dRKJwZ") // JEI
 			optional.project("mOgUt4GM") // Mod Menu
 		}
+	} else {
+		println("No MODRINTH_TOKEN set, skipping...")
 	}
 }
 

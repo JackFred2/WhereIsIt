@@ -53,4 +53,4 @@ jobs:
       - name: Publish to CurseForge
         run: ./gradlew build curseforge
         env:
-          MODRINTH_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
