@@ -4,11 +4,11 @@ Minecraft mod to locate items in nearby inventories. Press Y over an item to sea
 
 ## Features
 
-- Support for recipe viewers, including JEI, REI, EMI and the vanilla Recipe Book.
-- Ability to search for fluids and tags for recipes.
-- Custom searches using recipe viewers (search for enchantments using enchanted books, and potion effects using potions).
-- Smart favourite handling -  add a named Shulker Box in your favourites, and search for it regardless of the contents.
 - Not required - vanilla clients can join without restricting mod users.
+- Support for recipe viewers, including the vanilla Recipe Book, and for JEI, REI, EMI:
+  - Ability to search for items containing specific fluids, and tags for recipes.
+  - Custom searches (search for enchantments using enchanted books, and potion effects using potions).
+  - Smart favourite handling - add a named Shulker Box in your favourites, and search for it regardless of the contents.
 
 ## Usage
 

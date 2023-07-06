@@ -1,16 +1,31 @@
+@file:Suppress("UnstableApiUsage")
+
+import com.matthewprenger.cursegradle.CurseArtifact
+import com.matthewprenger.cursegradle.CurseProject
+import com.matthewprenger.cursegradle.CurseRelation
+import com.matthewprenger.cursegradle.Options
 import java.net.URI
-import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
 	id("maven-publish")
 	id("fabric-loom") version "1.2-SNAPSHOT"
+	id("com.modrinth.minotaur") version "2.+"
+	id("com.matthewprenger.cursegradle") version "1.4.0"
 }
 
+fun Project.findPropertyStr(name: String) = findProperty(name) as String
+
 group = findProperty("maven_group") !!
-version = findProperty("mod_version") !!
+version = findPropertyStr("mod_version")
 
 base {
 	archivesName.set("${findProperty("archives_base_name")}-${findProperty("minecraft_version")}")
+}
+
+val modReleaseType = when {
+	(version as String).endsWith("beta") -> "beta"
+	(version as String).endsWith("alpha") -> "alpha"
+	else -> "release"
 }
 
 repositories {
@@ -132,6 +147,68 @@ java {
 tasks.jar {
 	from("LICENSE") {
 		rename { "${it}_${findProperty("archivesBaseName")}"}
+	}
+}
+
+curseforge {
+	if (System.getenv("CURSEFORGE_TOKEN") != null && version != "UNKNOWN") {
+		apiKey = System.getenv("CURSEFORGE_TOKEN")
+		project(closureOf<CurseProject> {
+			id = "378036"
+			changelog = "Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt/releases"
+			releaseType = "release"
+
+			releaseType = modReleaseType
+
+			addGameVersion("Fabric")
+			addGameVersion("Java 17")
+
+			project.findPropertyStr("game_versions").split(",").forEach { addGameVersion(it) }
+
+			mainArtifact(tasks.remapJar.get().archiveFile, closureOf<CurseArtifact> {
+				relations(closureOf<CurseRelation> {
+					requiredDependency("fabric-api")
+					requiredDependency("yacl")
+					optionalDependency("emi")
+					optionalDependency("jei")
+					optionalDependency("roughly-enough-items")
+					optionalDependency("modmenu")
+				})
+				displayName = if (project.hasProperty("prefix")) {
+					"${findPropertyStr("prefix")} ${base.archivesName.get()}-$version.jar"
+				} else {
+					"${base.archivesName.get()}-$version.jar"
+				}
+			})
+
+		})
+
+		options(closureOf<Options> {
+			forgeGradleIntegration = false
+		})
+	}
+}
+
+modrinth {
+	if (System.getenv("MODRINTH_TOKEN") != null && version != "UNKNOWN") {
+		token.set(System.getenv("MODRINTH_TOKEN"))
+		projectId.set("FCTyEqkn")
+		versionNumber.set(version as String)
+		versionName.set("Where Is It $version")
+		versionType.set(modReleaseType)
+		uploadFile.set(tasks.remapJar)
+		changelog.set("Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt/releases")
+		gameVersions.set(project.findPropertyStr("game_versions").split(","))
+		loaders.set(listOf("fabric", "quilt"))
+		dependencies {
+			required.project("1eAoo2KR") // YACL
+			required.project("P7dR8mSH") // fabric api
+
+			optional.project("fRiHVvU7") // EMI
+			optional.project("nfn13YXA") // REI
+			optional.project("u6dRKJwZ") // JEI
+			optional.project("mOgUt4GM") // Mod Menu
+		}
 	}
 }
 

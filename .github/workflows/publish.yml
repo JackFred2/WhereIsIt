@@ -29,19 +29,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build and publish with Gradle
+      - name: Create GitHub Release
         run: ./gradlew build publish
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload GitHub Package
-        uses: AButler/upload-release-assets@v2.0
-        with:
-          files: 'build/libs/*.jar;!build/libs/*-sources.jar;!build/libs/*-dev.jar'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish to GitHub
+      - name: Add artifacts to GitHub Release
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           loaders: |
@@ -50,3 +44,19 @@ jobs:
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-generate-changelog: true
+
+      - name: Add artifacts to GitHub Package Registry
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: 'build/libs/*.jar;!build/libs/*-sources.jar;!build/libs/*-dev.jar'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to Modrinth
+        run: ./gradlew build modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+
+      - name: Publish to CurseForge
+        run: ./gradlew build curseforge
+        env:
+          MODRINTH_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
