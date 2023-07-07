@@ -110,7 +110,7 @@ dependencies {
 	// https://github.com/mezz/JustEnoughItems/issues/2891
 	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
 	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
-	modCompileOnlyApi("maven.modrinth:jei:${findProperty("jei_modrinth_id")}")
+	modCompileOnly("maven.modrinth:jei:${findProperty("jei_modrinth_id")}")
 
 	// modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version")
 	// modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version")
