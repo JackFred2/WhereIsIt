@@ -13,19 +13,15 @@ plugins {
 	id("com.matthewprenger.cursegradle") version "1.4.0"
 }
 
-fun Project.findPropertyStr(name: String) = findProperty(name) as String
+fun Project.findPropertyStr(name: String) = findProperty(name) as String?
 
 group = findProperty("maven_group") !!
-version = findPropertyStr("mod_version")
+version = findPropertyStr("mod_version") ?: "dev"
+
+val modReleaseType = findPropertyStr("type") ?: "release"
 
 base {
 	archivesName.set("${findProperty("archives_base_name")}-${findProperty("minecraft_version")}")
-}
-
-val modReleaseType = when {
-	(version as String).endsWith("beta") -> "beta"
-	(version as String).endsWith("alpha") -> "alpha"
-	else -> "release"
 }
 
 repositories {
@@ -125,8 +121,11 @@ dependencies {
 }
 
 tasks.withType<ProcessResources>().configureEach {
+	inputs.property("version", version)
+
 	filesMatching("fabric.mod.json") {
-		expand(mapOf("version" to version))
+		print("match")
+		expand(inputs.properties)
 	}
 }
 
@@ -163,7 +162,7 @@ curseforge {
 			addGameVersion("Fabric")
 			addGameVersion("Java 17")
 
-			project.findPropertyStr("game_versions").split(",").forEach { addGameVersion(it) }
+			project.findPropertyStr("game_versions")?.split(",")?.forEach { addGameVersion(it) }
 
 			mainArtifact(tasks.remapJar.get().archiveFile, closureOf<CurseArtifact> {
 				relations(closureOf<CurseRelation> {
@@ -200,7 +199,9 @@ modrinth {
 		versionType.set(modReleaseType)
 		uploadFile.set(tasks.remapJar)
 		changelog.set("Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt/releases")
-		gameVersions.set(project.findPropertyStr("game_versions").split(","))
+		project.findPropertyStr("game_versions")?.let {
+			gameVersions.set(it.split(","))
+		}
 		loaders.set(listOf("fabric", "quilt"))
 		dependencies {
 			required.project("1eAoo2KR") // YACL
