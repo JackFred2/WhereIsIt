@@ -2,6 +2,11 @@
 
 Minecraft mod to locate items in nearby inventories. Press Y over an item to search.
 
+## Requirements
+
+- [Fabric API](https://modrinth.com/mod/fabric-api)
+- [YACL](https://modrinth.com/mod/yacl)
+
 ## Features
 
 - Not required - vanilla clients can join without restricting mod users.
