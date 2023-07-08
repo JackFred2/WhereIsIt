@@ -25,49 +25,47 @@ base {
 }
 
 repositories {
-	repositories {
-		maven {
-			name = "ParchmentMC"
-			url = URI("https://maven.parchmentmc.org")
-			content {
-				includeGroup("org.parchmentmc.data")
-			}
+	maven {
+		name = "ParchmentMC"
+		url = URI("https://maven.parchmentmc.org")
+		content {
+			includeGroup("org.parchmentmc.data")
 		}
-		maven {
-			name = "TerraformersMC"
-			url = URI("https://maven.terraformersmc.com/releases/")
-			content {
-				includeGroup("com.terraformersmc")
-				includeGroup("dev.emi")
-			}
+	}
+	maven {
+		name = "TerraformersMC"
+		url = URI("https://maven.terraformersmc.com/releases/")
+		content {
+			includeGroup("com.terraformersmc")
+			includeGroup("dev.emi")
 		}
-		maven {
-			// JEI
-			name = "Jared"
-			url = URI("https://maven.blamejared.com/")
-			content {
-				includeGroup("mezz.jei")
-			}
+	}
+	maven {
+		// JEI
+		name = "Jared"
+		url = URI("https://maven.blamejared.com/")
+		content {
+			includeGroup("mezz.jei")
 		}
-		maven {
-			name = "Shedaniel"
-			url = URI("https://maven.shedaniel.me")
-			content {
-				includeGroupByRegex("me.shedaniel.*")
-				includeGroup("dev.architectury")
-			}
+	}
+	maven {
+		name = "Shedaniel"
+		url = URI("https://maven.shedaniel.me")
+		content {
+			includeGroupByRegex("me.shedaniel.*")
+			includeGroup("dev.architectury")
 		}
-		maven {
-			name = "Xander Maven"
-			url = URI("https://maven.isxander.dev/releases")
-			content {
-				includeGroup("dev.isxander.yacl")
-			}
+	}
+	maven {
+		name = "Xander Maven"
+		url = URI("https://maven.isxander.dev/releases")
+		content {
+			includeGroup("dev.isxander.yacl")
 		}
-		maven {
-			name = "Modrinth"
-			url = URI("https://api.modrinth.com/maven")
-		}
+	}
+	maven {
+		name = "Modrinth"
+		url = URI("https://api.modrinth.com/maven")
 	}
 }
 
