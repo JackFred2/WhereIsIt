@@ -4,6 +4,7 @@ import com.matthewprenger.cursegradle.CurseArtifact
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseRelation
 import com.matthewprenger.cursegradle.Options
+import net.fabricmc.loom.task.RemapSourcesJarTask
 import java.net.URI
 
 plugins {
@@ -132,13 +133,16 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.named<Jar>("sourcesJar") {
+	dependsOn(tasks.classes)
+	archiveClassifier.set("sources")
+	from(sourceSets.main.get().allSource)
 }
 
 tasks.jar {
@@ -222,6 +226,7 @@ publishing {
 			setVersion(rootProject.version)
 			groupId = group as String
 			from(components["java"])
+			artifact(tasks.named("sourcesJar"))
 		}
 	}
 
