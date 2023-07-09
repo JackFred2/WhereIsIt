@@ -26,8 +26,12 @@ import java.util.function.Consumer;
 public interface SearchRequestPopulator {
     Event<SearchRequestPopulator> EVENT = EventFactory.createArrayBacked(SearchRequestPopulator.class, listeners -> (request, screen, mouseX, mouseY) -> {
         for (SearchRequestPopulator listener : listeners) {
-            listener.grabStack(request, screen, mouseX, mouseY);
-            if (request.hasCriteria()) break;
+            try {
+                listener.grabStack(request, screen, mouseX, mouseY);
+                if (request.hasCriteria()) break;
+            } catch (Exception ex) {
+                WhereIsItClient.LOGGER.error("Error populating from stack, class %s".formatted(listener.getClass().getName()), ex);
+            }
         }
     });
 
