@@ -4,7 +4,6 @@ import com.matthewprenger.cursegradle.CurseArtifact
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseRelation
 import com.matthewprenger.cursegradle.Options
-import net.fabricmc.loom.task.RemapSourcesJarTask
 import java.net.URI
 
 plugins {
