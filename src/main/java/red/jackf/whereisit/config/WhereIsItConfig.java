@@ -53,6 +53,9 @@ public class WhereIsItConfig {
 
     public static class Client {
         @ConfigEntry
+        public boolean searchUsingItemInHand = false;
+
+        @ConfigEntry
         public boolean playSoundOnRequest = false;
 
         @ConfigEntry

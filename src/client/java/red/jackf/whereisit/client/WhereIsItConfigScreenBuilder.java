@@ -60,6 +60,18 @@ public class WhereIsItConfigScreenBuilder {
         return OptionGroup.createBuilder()
                 .name(translatable("whereisit.config.client"))
                 .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.client.searchUsingItemInHand"))
+                        .binding(
+                                defaults.getClient().searchUsingItemInHand,
+                                () -> config.getClient().searchUsingItemInHand,
+                                b -> config.getClient().searchUsingItemInHand = b
+                        )
+                        .description(OptionDescription.of(translatable("whereisit.config.client.searchUsingItemInHand.description")))
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .yesNoFormatter())
+                        .build())
+                .option(Option.<Boolean>createBuilder()
                         .name(translatable("whereisit.config.client.playSoundOnRequest"))
                         .binding(
                                 defaults.getClient().playSoundOnRequest,
