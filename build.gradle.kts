@@ -79,6 +79,13 @@ loom {
 		}
 	}
 
+	runConfigs {
+		configureEach {
+			val path = buildscript.sourceFile?.parentFile?.resolve("log4j2.xml")
+			path?.let { property("log4j2.configurationFile", path.path) }
+		}
+	}
+
 	accessWidenerPath.set(file("src/main/resources/whereisit.accesswidener"))
 }
 
