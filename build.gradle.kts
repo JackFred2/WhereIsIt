@@ -229,10 +229,12 @@ modrinth {
 publishing {
 	publications {
 		create<MavenPublication>("mavenJava") {
-			setVersion(rootProject.version)
-			groupId = group as String
-			from(components["java"])
-			artifact(tasks.named("sourcesJar"))
+			artifact(tasks.named("sourcesJar")) {
+				builtBy(tasks.named("remapSourcesJar"))
+			}
+			afterEvaluate {
+				artifact(tasks.named("remapJar"))
+			}
 		}
 	}
 
