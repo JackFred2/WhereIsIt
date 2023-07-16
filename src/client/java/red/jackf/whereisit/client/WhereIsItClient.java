@@ -122,7 +122,7 @@ public class WhereIsItClient implements ClientModInitializer {
                 if (item.isEmpty()) return;
                 var request = new SearchRequest();
                 SearchRequestPopulator.addItemStack(request, item, SearchRequestPopulator.Context.inventory());
-                if (request.hasCriteria()) doSearch(request);
+                if (request.hasCriteria()) SearchInvoker.doSearch(request);
             }
         });
 
@@ -135,7 +135,7 @@ public class WhereIsItClient implements ClientModInitializer {
         WorldRendering.setup();
     }
 
-    private void doSearch(SearchRequest request) {
+    public static boolean doSearch(SearchRequest request) {
         updateRendering(request);
         LOGGER.debug("Starting request: %s".formatted(request));
 
@@ -155,6 +155,8 @@ public class WhereIsItClient implements ClientModInitializer {
         });
         if (!anySucceeded) NotificationToast.sendNotInstalledOnServer();
         else if (WhereIsItConfig.INSTANCE.getConfig().getClient().playSoundOnRequest) playRequestSound();
+
+        return anySucceeded;
     }
 
     // clear previous state for rendering
@@ -178,7 +180,7 @@ public class WhereIsItClient implements ClientModInitializer {
         return request;
     }
 
-    private void playRequestSound() {
+    private static void playRequestSound() {
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_CHIME.value(), 2f, 0.5f));
     }
 }
