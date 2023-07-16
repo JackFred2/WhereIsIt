@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import org.lwjgl.opengl.GL11;
@@ -15,9 +16,7 @@ import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("resource") // i really don't want to call ClientLevel#close() thanks
 public class WorldRendering {
@@ -37,7 +36,7 @@ public class WorldRendering {
                     .setWriteMaskState(RenderStateShard.COLOR_WRITE)
                     .createCompositeState(false));
 
-    private static final List<SearchResult> results = new ArrayList<>();
+    private static final Map<BlockPos, SearchResult> results = new HashMap<>();
 
     private static float progress = 1f;
 
@@ -80,7 +79,7 @@ public class WorldRendering {
                 (int) (alpha * 255)
         );
 
-        results.forEach(result -> renderIndividual(
+        results.values().forEach(result -> renderIndividual(
                 result,
                 builder,
                 pose,
@@ -154,7 +153,10 @@ public class WorldRendering {
     }
 
     public static void addResults(Collection<SearchResult> newResults) {
-        results.addAll(newResults);
+        for (SearchResult result : newResults) {
+            // TODO: when names are added, prioritise the one with a name
+            results.put(result.pos(), result);
+        }
     }
 
     public static void clearResults() {
