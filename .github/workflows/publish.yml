@@ -43,6 +43,7 @@ jobs:
             quilt
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-generate-changelog: true
 
       - name: Publish to Modrinth
         run: ./gradlew build modrinth
