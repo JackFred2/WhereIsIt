@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jetbrains.annotations.Nullable;
@@ -54,7 +55,9 @@ public class EnchantmentCriterion extends Criterion {
 
     @Override
     public boolean test(ItemStack stack) {
-        var level = EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack);
+        var level = stack.is(Items.ENCHANTED_BOOK) ?
+                EnchantmentHelper.getEnchantments(stack).getOrDefault(enchantment, 0) :
+                EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack);
         if (targetLevel != null) return targetLevel == level;
         return level > 0;
     }
