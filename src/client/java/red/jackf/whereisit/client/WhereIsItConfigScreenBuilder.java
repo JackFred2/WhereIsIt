@@ -1,13 +1,11 @@
 package red.jackf.whereisit.client;
 
 import dev.isxander.yacl3.api.*;
-import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
-import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
-import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
-import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
+import dev.isxander.yacl3.api.controller.*;
 import dev.isxander.yacl3.gui.ImageRenderer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
@@ -126,8 +124,92 @@ public class WhereIsItConfigScreenBuilder {
                                 .coloured(true)
                                 .onOffFormatter())
                         .build())
+                .options(makeLabelOptions(defaults, config))
                 .options(makeColourOptions(defaults, config))
                 .build();
+    }
+
+    private static Collection<? extends Option<?>> makeLabelOptions(WhereIsItConfig defaults, WhereIsItConfig config) {
+        var nameSizeOption = Option.<Float>createBuilder()
+                .name(translatable("whereisit.config.client.containerNameLabelScale"))
+                .description(f -> OptionDescription.createBuilder()
+                        .customImage(CompletableFuture.supplyAsync(() -> getLabelImage(() -> f)))
+                        .build())
+                .binding(
+                        defaults.getClient().containerNameLabelScale,
+                        () -> config.getClient().containerNameLabelScale,
+                        f -> config.getClient().containerNameLabelScale = f
+                )
+                .controller(opt -> FloatSliderControllerBuilder.create(opt)
+                        .valueFormatter(f -> translatable("mco.download.percent", (int) (f * 100)))
+                        .range(0.25f, 2f)
+                        .step(0.01f))
+                .build();
+        var showNameToggle = Option.<Boolean>createBuilder()
+                .name(translatable("whereisit.config.client.showContainerNamesInResults"))
+                .description(b -> OptionDescription.createBuilder()
+                        .customImage(CompletableFuture.supplyAsync(() -> getLabelImage(() -> b ? nameSizeOption.pendingValue() : 0)))
+                        .build()
+                )
+                .binding(
+                        defaults.getClient().showContainerNamesInResults,
+                        () -> config.getClient().showContainerNamesInResults,
+                        b -> config.getClient().showContainerNamesInResults = b
+                )
+                .controller(opt -> BooleanControllerBuilder.create(opt)
+                        .coloured(true)
+                        .yesNoFormatter())
+                .build();
+        return List.of(showNameToggle, nameSizeOption);
+    }
+
+    private static Optional<ImageRenderer> getLabelImage(Supplier<Float> scaleGetter) {
+        return Optional.of(new ImageRenderer() {
+            private static final int imageWidth = 700;
+            private static final int imageHeight = 536;
+            private static final int labelMidX = 340;
+            private static final int labelMidY = 146;
+            private static final int labelRefWidth = 136;
+            private static final int labelRefHeight = 54;
+            @Override
+            public int render(GuiGraphics graphics, int x, int y, int renderWidth) {
+                float ratio = (float) renderWidth / imageWidth;
+                int height = (int) (imageHeight * ratio);
+
+                graphics.pose().pushPose();
+                graphics.pose().translate(x, y, 0);
+                graphics.pose().scale(ratio, ratio, 1);
+                graphics.blit(WhereIsIt.id("textures/gui/config/show_container_names_example.png"),
+                        0, 0, 0, 0,
+                        imageWidth, imageHeight, imageWidth, imageHeight);
+
+                float f = scaleGetter.get();
+
+                if (f == 0f) {
+                    graphics.pose().popPose();
+                    return height;
+                }
+
+                int halfWidth = (int) ((labelRefWidth / 2f) * f);
+                int halfHeight = (int) ((labelRefHeight / 2f) * f);
+                var bgColour = ((int) (Minecraft.getInstance().options.getBackgroundOpacity(0.25F) * 255F)) << 24;
+                graphics.fill(labelMidX - halfWidth, labelMidY - halfHeight, labelMidX + halfWidth, labelMidY + halfHeight, bgColour);
+
+                graphics.pose().translate(labelMidX, labelMidY, 0);
+                graphics.pose().scale(f * 5, f * 5, f * 5);
+                var font = Minecraft.getInstance().font;
+                var textWidth = font.width("Tools");
+                graphics.drawString(font, "Tools", -textWidth / 2, -font.lineHeight / 2, 0xFF_FFFFFF, false);
+                graphics.pose().popPose();
+
+                return height;
+            }
+
+            @Override
+            public void close() {
+
+            }
+        });
     }
 
     private static Option<Boolean> makeRecipeViewerOption(String langId, String modid, boolean def, Supplier<Boolean> getter, Consumer<Boolean> setter) {
@@ -235,7 +317,7 @@ public class WhereIsItConfigScreenBuilder {
                 .controller(opt -> ColorControllerBuilder.create(opt)
                         .allowAlpha(false))
                 .description(color -> OptionDescription.createBuilder()
-                        .customImage(CompletableFuture.supplyAsync(() -> getPreviewImage(ColourScheme.SOLID, color)))
+                        .customImage(CompletableFuture.supplyAsync(() -> getGradientPreview(ColourScheme.SOLID, color)))
                         .build())
                 .build();
 
@@ -247,7 +329,7 @@ public class WhereIsItConfigScreenBuilder {
                         c -> config.getClient().colourScheme = c
                 )
                 .description(colourScheme -> OptionDescription.createBuilder()
-                        .customImage(CompletableFuture.supplyAsync(() -> getPreviewImage(colourScheme, solidColourOption.pendingValue())))
+                        .customImage(CompletableFuture.supplyAsync(() -> getGradientPreview(colourScheme, solidColourOption.pendingValue())))
                         .build())
                 .controller(opt -> EnumControllerBuilder.create(opt)
                         .enumClass(ColourScheme.class))
@@ -273,7 +355,7 @@ public class WhereIsItConfigScreenBuilder {
         return List.of(randomSchemeOption, colourSchemeOption, solidColourOption);
     }
 
-    private static Optional<ImageRenderer> getPreviewImage(ColourScheme scheme, Color solid) {
+    private static Optional<ImageRenderer> getGradientPreview(ColourScheme scheme, Color solid) {
         var renderer = new ImageRenderer() {
             private static void blit(GuiGraphics graphics, int x, int y, int width, int height, int u, int v, int regionWidth, int regionHeight) {
                 graphics.blit(COLOUR_PREVIEW_BORDER, x, y, width, height, u, v, regionWidth, regionHeight, 24, 64);

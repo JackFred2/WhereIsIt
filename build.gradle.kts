@@ -105,6 +105,9 @@ dependencies {
 	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${findProperty("yacl_version")}")
 	implementation("blue.endless:jankson:${findProperty("jankson_version")}")
 
+	// Dev Util
+	modLocalRuntime("maven.modrinth:jsst:B39piMwB")
+
 	// COMPATIBILITY
 
 	// ItemStack Grabbers

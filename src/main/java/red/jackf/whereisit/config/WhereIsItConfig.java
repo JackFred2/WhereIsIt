@@ -68,6 +68,12 @@ public class WhereIsItConfig {
         public boolean showSlotHighlights = true;
 
         @ConfigEntry
+        public boolean showContainerNamesInResults = true;
+
+        @ConfigEntry
+        public float containerNameLabelScale = 1f;
+
+        @ConfigEntry
         public boolean randomScheme = true;
 
         @ConfigEntry
@@ -82,6 +88,7 @@ public class WhereIsItConfig {
         public void validate() {
             this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
             this.solidColour = new Color(this.solidColour.getRGB() | 0xFF_000000);
+            this.containerNameLabelScale = Mth.clamp(this.containerNameLabelScale, 0.25f, 2f);
         }
 
         @ConfigEntry

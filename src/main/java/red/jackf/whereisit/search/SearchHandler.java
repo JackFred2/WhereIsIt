@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Nameable;
 import net.minecraft.world.level.Level;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
@@ -27,6 +28,8 @@ public class SearchHandler {
 
     public static void handle(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender response) {
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER && WhereIsItConfig.INSTANCE.getConfig().getServer().rateLimit) {
+            //don't close the level
+            //noinspection resource
             var time = player.level().getGameTime();
             if (RateLimiter.rateLimited(player, time)) {
                 player.sendSystemMessage(Component.literal("[WhereIsIt] Slow down!").withStyle(ChatFormatting.RED));
@@ -60,12 +63,14 @@ public class SearchHandler {
                 }
             }
         }
+
         WhereIsIt.LOGGER.debug("Server search results id %d: %s".formatted(packet.id(), results.toString()));
         var time = System.nanoTime() - startTime;
         var timingStr = "Search time: %.2fms (%dns)".formatted((float) time / 1_000_000, time);
         WhereIsIt.LOGGER.debug(timingStr);
         if (WhereIsItConfig.INSTANCE.getConfig().getCommon().printSearchTime) player.sendSystemMessage(Component.literal("[Where Is It] " + timingStr).withStyle(ChatFormatting.YELLOW));
-        if (results.size() > 0)
+
+        if (!results.isEmpty())
             response.sendPacket(new ClientboundResultsPacket(packet.id(), results));
     }
 
@@ -81,7 +86,8 @@ public class SearchHandler {
                     if (view.isResourceBlank()) continue;
                     var resource = view.getResource().toStack((int) view.getAmount());
                     if (NestedItemStackSearcher.check(resource, request)) {
-                        results.add(new SearchResult(pos.immutable(), resource));
+                        var name = level.getBlockEntity(pos) instanceof Nameable nameable ? nameable.getCustomName() : null;
+                        results.add(new SearchResult(pos.immutable(), resource, name));
                         return;
                     }
                 }
