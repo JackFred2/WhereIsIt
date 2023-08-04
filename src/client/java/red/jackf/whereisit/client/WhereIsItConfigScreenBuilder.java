@@ -345,7 +345,8 @@ public class WhereIsItConfigScreenBuilder {
                 )
                 .description(OptionDescription.of(translatable("whereisit.config.client.randomScheme.description")))
                 .controller(opt -> BooleanControllerBuilder.create(opt)
-                        .onOffFormatter())
+                        .onOffFormatter()
+                        .coloured(true))
                 .listener((opt, enabled) -> {
                     solidColourOption.setAvailable(!enabled && colourSchemeOption.pendingValue() == ColourScheme.SOLID);
                     colourSchemeOption.setAvailable(!enabled);

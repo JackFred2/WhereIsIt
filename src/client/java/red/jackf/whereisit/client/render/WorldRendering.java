@@ -89,12 +89,12 @@ public class WorldRendering {
 
     @SuppressWarnings("DataFlowIssue")
     private static void renderLabels(WorldRenderContext context) {
-        scheduledLabels.stream().sorted(Comparator.<Pair<Vec3, Component>>comparingDouble(pair ->
+        scheduledLabels.stream().sorted(Comparator.comparingDouble(pair ->
                 // sort by furthest to camera inwards
-                context.camera().rotation().transformInverse(pair.getFirst()
-                        .subtract(context.camera().getPosition())
+                -context.camera().rotation().transformInverse(pair.getFirst()
+                        //.subtract(context.camera().getPosition())
                         .toVector3f()).z
-        ).reversed()).forEach(pair ->
+        )).forEach(pair ->
                 renderLabel(
                         pair.getFirst(),
                         pair.getSecond(),
