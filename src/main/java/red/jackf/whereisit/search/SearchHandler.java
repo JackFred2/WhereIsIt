@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
@@ -87,7 +88,7 @@ public class SearchHandler {
                     var resource = view.getResource().toStack((int) view.getAmount());
                     if (NestedItemStackSearcher.check(resource, request)) {
                         var name = level.getBlockEntity(pos) instanceof Nameable nameable ? nameable.getCustomName() : null;
-                        results.add(new SearchResult(pos.immutable(), resource, name));
+                        results.add(new SearchResult(pos.immutable(), resource, name, new Vec3(0, 1, 0)));
                         return;
                     }
                 }

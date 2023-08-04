@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchResult;
 
@@ -18,6 +19,7 @@ import java.util.Set;
  * <li>if (hasItemDetails) item: ItemStack</li>
  * <li>hasCustomName: boolean</li>
  * <li>if (hasCustomName) name: Component</li>
+ * <li>if (hasCustomName) nameOffset: 3 * double</li>
  */
 public record ClientboundResultsPacket(long id, Set<SearchResult> results) implements FabricPacket {
     public static final PacketType<ClientboundResultsPacket> TYPE = PacketType.create(WhereIsIt.id("c2s_searchforitem"), ClientboundResultsPacket::new);
@@ -31,9 +33,13 @@ public record ClientboundResultsPacket(long id, Set<SearchResult> results) imple
             var pos = bbuf.readBlockPos();
             ItemStack item = null;
             Component name = null;
+            Vec3 nameOffset = null;
             if (bbuf.readBoolean()) item = bbuf.readItem();
-            if (bbuf.readBoolean()) name = bbuf.readComponent();
-            return new SearchResult(pos, item, name);
+            if (bbuf.readBoolean()) {
+                name = bbuf.readComponent();
+                nameOffset = new Vec3(bbuf.readDouble(), bbuf.readDouble(), bbuf.readDouble());
+            }
+            return new SearchResult(pos, item, name, nameOffset);
         });
     }
 
@@ -44,8 +50,13 @@ public record ClientboundResultsPacket(long id, Set<SearchResult> results) imple
             bbuf.writeBlockPos(result.pos());
             bbuf.writeBoolean(result.item() != null);
             if (result.item() != null) bbuf.writeItem(result.item());
-            bbuf.writeBoolean(result.name() != null);
-            if (result.name() != null) bbuf.writeComponent(result.name());
+            bbuf.writeBoolean(result.name() != null && result.nameOffset() != null);
+            if (result.name() != null && result.nameOffset() != null) {
+                bbuf.writeComponent(result.name());
+                bbuf.writeDouble(result.nameOffset().x);
+                bbuf.writeDouble(result.nameOffset().y);
+                bbuf.writeDouble(result.nameOffset().z);
+            }
         });
     }
 

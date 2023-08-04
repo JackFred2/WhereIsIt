@@ -13,14 +13,17 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.lwjgl.opengl.GL11;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,55 +74,45 @@ public class WorldRendering {
 
     @SuppressWarnings("DataFlowIssue")
     private static void renderLabels(WorldRenderContext context) {
-        for (SearchResult result : namedResults.values())
-            renderLabelBackground(result, context.matrixStack(), context.camera(), context.consumers());
-        for (SearchResult result : namedResults.values())
-            renderLabel(result, context.matrixStack(), context.camera(), context.consumers());
+        namedResults.values().stream().sorted(Comparator.<SearchResult>comparingDouble(res ->
+            context.camera().rotation().transformInverse(res.pos().getCenter()
+                    .add(res.nameOffset())
+                    .subtract(context.camera().getPosition())
+                    .toVector3f()).z
+        ).reversed()).forEach(res ->
+            renderLabel(
+                    res.pos().getCenter().add(res.nameOffset()),
+                    res.name(),
+                    context.matrixStack(),
+                    context.camera(),
+                    context.consumers()));
     }
 
-    private static void renderLabelBackground(SearchResult result, PoseStack pose, Camera camera, MultiBufferSource consumers) {
-        var pos = result.pos().above().getCenter().subtract(camera.getPosition());
-
+    public static void renderLabel(Vec3 pos, Component name, PoseStack pose, Camera camera, MultiBufferSource consumers) {
         pose.pushPose();
+
+        pos = pos.subtract(camera.getPosition());
 
         pose.translate(pos.x, pos.y, pos.z);
         pose.mulPose(camera.rotation());
         var factor = 0.025f * WhereIsItConfig.INSTANCE.getConfig().getClient().containerNameLabelScale;
         pose.scale(-factor, -factor, factor);
         var matrix4f = pose.last().pose();
-        var width = Minecraft.getInstance().font.width(result.name());
+        var width = Minecraft.getInstance().font.width(name);
         float x = (float) -width/2;
 
-        var bgColour = ((int) (Minecraft.getInstance().options.getBackgroundOpacity(0.25F) * 255F)) << 24;
         var bgBuffer = consumers.getBuffer(RenderType.textBackgroundSeeThrough());
-        RenderSystem.disableDepthTest();
+        var bgColour = ((int) (Minecraft.getInstance().options.getBackgroundOpacity(0.25F) * 255F)) << 24;
         bgBuffer.vertex(matrix4f, x - 1, -1f, 0).color(bgColour).uv2(LightTexture.FULL_BRIGHT).endVertex();
         bgBuffer.vertex(matrix4f, x - 1, 10f, 0).color(bgColour).uv2(LightTexture.FULL_BRIGHT).endVertex();
         bgBuffer.vertex(matrix4f, x + width, 10f, 0).color(bgColour).uv2(LightTexture.FULL_BRIGHT).endVertex();
         bgBuffer.vertex(matrix4f, x + width, -1f, 0).color(bgColour).uv2(LightTexture.FULL_BRIGHT).endVertex();
-        RenderSystem.enableDepthTest();
-
-        pose.popPose();
-    }
-
-    private static void renderLabel(SearchResult result, PoseStack pose, Camera camera, MultiBufferSource consumers) {
-        var pos = result.pos().above().getCenter().subtract(camera.getPosition());
-
-        pose.pushPose();
-
-        pose.translate(pos.x, pos.y, pos.z);
-        pose.mulPose(camera.rotation());
-        var factor = 0.025f * WhereIsItConfig.INSTANCE.getConfig().getClient().containerNameLabelScale;
-        pose.scale(-factor, -factor, factor);
-        var matrix4f = pose.last().pose();
-        var width = Minecraft.getInstance().font.width(result.name());
-        float x = (float) -width/2;
 
         RenderSystem.disableDepthTest();
         RenderSystem.depthFunc(GL11.GL_ALWAYS);
-        Minecraft.getInstance().font.drawInBatch(result.name(), x, 0, 0x20_FFFFFF, false,
+        Minecraft.getInstance().font.drawInBatch(name, x, 0, 0x20_FFFFFF, false,
                 matrix4f, consumers, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
-        Minecraft.getInstance().font.drawInBatch(result.name(), x, 0, 0xFF_FFFFFF, false,
+        Minecraft.getInstance().font.drawInBatch(name, x, 0, 0xFF_FFFFFF, false,
                 matrix4f, consumers, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
         RenderSystem.enableDepthTest();
@@ -238,5 +231,13 @@ public class WorldRendering {
     public static void clearResults() {
         results.clear();
         namedResults.clear();
+    }
+
+    public static Map<BlockPos, SearchResult> getResults() {
+        return results;
+    }
+
+    public static Map<BlockPos, SearchResult> getNamedResults() {
+        return namedResults;
     }
 }
