@@ -2,6 +2,7 @@ package red.jackf.whereisit.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -22,10 +23,7 @@ import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("resource") // i really don't want to call ClientLevel#close() thanks
 public class WorldRendering {
@@ -48,21 +46,34 @@ public class WorldRendering {
     private static final Map<BlockPos, SearchResult> results = new HashMap<>();
     private static final Map<BlockPos, SearchResult> namedResults = new HashMap<>();
 
+    private static final List<Pair<Vec3, Component>> scheduledLabels = new ArrayList<>();
+
     private static float progress = 1f;
 
     public static void setup() {
+        // schedule highlight label renders
+        WorldRenderEvents.START.register(context -> {
+            if (!WhereIsItConfig.INSTANCE.getConfig().getClient().showContainerNamesInResults) return;
+            for (SearchResult value : namedResults.values())
+                scheduleLabel(value.pos().getCenter().add(value.nameOffset()), value.name());
+        });
+
+        // render scheduled labels
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((context, hit) -> {
-            if (!WhereIsItConfig.INSTANCE.getConfig().getClient().showContainerNamesInResults) return true;
-            if (namedResults.isEmpty()) return true;
+            if (scheduledLabels.isEmpty()) return true;
 
             renderLabels(context);
+            scheduledLabels.clear();
             return true;
         });
 
+        // label boxes
         WorldRenderEvents.END.register(context -> {
             if (results.isEmpty()) return;
 
-            progress = Mth.clamp((context.world().getGameTime() + context.tickDelta() - WhereIsItClient.lastSearchTime) / WhereIsItConfig.INSTANCE.getConfig().getClient().fadeoutTimeTicks, 0f, 1f);
+            progress = Mth.clamp((context.world()
+                    .getGameTime() + context.tickDelta() - WhereIsItClient.lastSearchTime) / WhereIsItConfig.INSTANCE.getConfig()
+                    .getClient().fadeoutTimeTicks, 0f, 1f);
 
             if (context.world() == null || progress > 1f) {
                 return;
@@ -72,20 +83,24 @@ public class WorldRendering {
         });
     }
 
+    public static void scheduleLabel(Vec3 pos, Component name) {
+        scheduledLabels.add(Pair.of(pos, name));
+    }
+
     @SuppressWarnings("DataFlowIssue")
     private static void renderLabels(WorldRenderContext context) {
-        namedResults.values().stream().sorted(Comparator.<SearchResult>comparingDouble(res ->
-            context.camera().rotation().transformInverse(res.pos().getCenter()
-                    .add(res.nameOffset())
-                    .subtract(context.camera().getPosition())
-                    .toVector3f()).z
-        ).reversed()).forEach(res ->
-            renderLabel(
-                    res.pos().getCenter().add(res.nameOffset()),
-                    res.name(),
-                    context.matrixStack(),
-                    context.camera(),
-                    context.consumers()));
+        scheduledLabels.stream().sorted(Comparator.<Pair<Vec3, Component>>comparingDouble(pair ->
+                // sort by furthest to camera inwards
+                context.camera().rotation().transformInverse(pair.getFirst()
+                        .subtract(context.camera().getPosition())
+                        .toVector3f()).z
+        ).reversed()).forEach(pair ->
+                renderLabel(
+                        pair.getFirst(),
+                        pair.getSecond(),
+                        context.matrixStack(),
+                        context.camera(),
+                        context.consumers()));
     }
 
     public static void renderLabel(Vec3 pos, Component name, PoseStack pose, Camera camera, MultiBufferSource consumers) {
@@ -99,7 +114,7 @@ public class WorldRendering {
         pose.scale(-factor, -factor, factor);
         var matrix4f = pose.last().pose();
         var width = Minecraft.getInstance().font.width(name);
-        float x = (float) -width/2;
+        float x = (float) -width / 2;
 
         var bgBuffer = consumers.getBuffer(RenderType.textBackgroundSeeThrough());
         var bgColour = ((int) (Minecraft.getInstance().options.getBackgroundOpacity(0.25F) * 255F)) << 24;
