@@ -16,12 +16,13 @@ import net.minecraft.world.level.Level;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
+import red.jackf.whereisit.api.search.ConnectedBlocksGrabber;
 import red.jackf.whereisit.config.WhereIsItConfig;
 import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 import red.jackf.whereisit.util.RateLimiter;
 
-import java.util.HashSet;
+import java.util.*;
 
 public class SearchHandler {
 
@@ -43,26 +44,36 @@ public class SearchHandler {
             return;
         }
 
+        WhereIsIt.LOGGER.debug("Server search id %d: %s".formatted(packet.id(), packet.request().toString()));
+
         var startTime = System.nanoTime();
 
         var startPos = player.blockPosition();
         var level = player.level();
         var pos = new BlockPos.MutableBlockPos();
-        var results = new HashSet<SearchResult>();
+        var results = new HashMap<BlockPos, SearchResult>();
         var range = WhereIsItConfig.INSTANCE.getConfig().getCommon().searchRangeBlocks;
-        WhereIsIt.LOGGER.debug("Server search id %d: %s".formatted(packet.id(), packet.request().toString()));
+        var maxRange = range * range;
         for (int x = startPos.getX() - range; x <= startPos.getX() + range; x++) {
             pos.setX(x);
             for (int y = startPos.getY() - range; y <= startPos.getY() + range; y++) {
                 pos.setY(y);
                 for (int z = startPos.getZ() - range; z <= startPos.getZ() + range; z++) {
                     pos.setZ(z);
-                    if (pos.distSqr(startPos) > range * range) continue;
-                    checkPosition(packet.request(), level, pos, results);
+                    if (pos.distSqr(startPos) > maxRange) continue;
+
+                    var connected = ConnectedBlocksGrabber.getConnected(level, pos);
+                    var adjustedRoot = connected.get(0);
+
+                    if (results.containsKey(adjustedRoot)) continue;
+
+                    var result = checkPosition(packet.request(), level, adjustedRoot);
+                    if (result != null) results.put(adjustedRoot, result);
                 }
             }
         }
 
+        WhereIsIt.LOGGER.debug(results.values().toString());
         WhereIsIt.LOGGER.debug("Server search results id %d: %s".formatted(packet.id(), results.toString()));
         var time = System.nanoTime() - startTime;
         var timingStr = "Search time: %.2fms (%dns)".formatted((float) time / 1_000_000, time);
@@ -70,12 +81,18 @@ public class SearchHandler {
         if (WhereIsItConfig.INSTANCE.getConfig().getCommon().printSearchTime) player.sendSystemMessage(Component.literal("[Where Is It] " + timingStr).withStyle(ChatFormatting.YELLOW));
 
         if (!results.isEmpty())
-            response.sendPacket(new ClientboundResultsPacket(packet.id(), results));
+            response.sendPacket(new ClientboundResultsPacket(packet.id(), results.values()));
     }
 
-    // check all items from a given world position, and returns if any match
+    /**
+     * Checks a single position to see if it matches a search request
+     * @param request Request to test against
+     * @param level Level the test is in
+     * @param pos Position the test is at
+     * @return A search result if there is a positive match, or null if not matching.
+     */
     @SuppressWarnings("UnstableApiUsage")
-    private static void checkPosition(SearchRequest request, Level level, BlockPos.MutableBlockPos pos, HashSet<SearchResult> results) {
+    private static SearchResult checkPosition(SearchRequest request, Level level, BlockPos pos) {
         var checked = new HashSet<Storage<ItemVariant>>();
         for (var direction : Direction.values()) { // each side
             var storage = ItemStorage.SIDED.find(level, pos, direction);
@@ -90,11 +107,12 @@ public class SearchHandler {
                         result.item(resource);
                         if (level.getBlockEntity(pos) instanceof Nameable nameable)
                             result.name(nameable.getCustomName(), null);
-                        results.add(result.build());
-                        return;
+                        return result.build();
                     }
                 }
             }
         }
+
+        return null;
     }
 }

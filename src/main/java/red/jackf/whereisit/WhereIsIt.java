@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import red.jackf.whereisit.config.WhereIsItConfig;
 import red.jackf.whereisit.criteria.VanillaCriteria;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
+import red.jackf.whereisit.search.DefaultConnectedBlocksGrabbers;
 import red.jackf.whereisit.search.DefaultNestedItemStackSearchers;
 import red.jackf.whereisit.search.SearchHandler;
 import red.jackf.whereisit.util.RateLimiter;
@@ -32,6 +33,7 @@ public class WhereIsIt implements ModInitializer {
 		LOGGER.debug("Setup Common");
 		VanillaCriteria.setup();
 		DefaultNestedItemStackSearchers.setup();
+		DefaultConnectedBlocksGrabbers.setup();
 
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> RateLimiter.disconnected(handler.player));
 

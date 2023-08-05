@@ -7,6 +7,7 @@ import net.minecraft.world.phys.Vec3;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchResult;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ import java.util.Set;
  * <li>if (hasCustomName) hasCustomNameOffset: boolean</li>
  * <li>if (hasCustomName && hasCustomNameOffset) nameOffset: 3 * double</li>
  */
-public record ClientboundResultsPacket(long id, Set<SearchResult> results) implements FabricPacket {
+public record ClientboundResultsPacket(long id, Collection<SearchResult> results) implements FabricPacket {
     public static final PacketType<ClientboundResultsPacket> TYPE = PacketType.create(WhereIsIt.id("c2s_searchforitem"), ClientboundResultsPacket::new);
 
     public ClientboundResultsPacket(FriendlyByteBuf buf) {

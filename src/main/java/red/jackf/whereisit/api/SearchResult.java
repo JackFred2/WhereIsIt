@@ -6,6 +6,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public final class SearchResult {
@@ -13,6 +15,7 @@ public final class SearchResult {
     private final @Nullable ItemStack item;
     private final @Nullable Component name;
     private final @Nullable Vec3 nameOffset;
+    private final List<BlockPos> otherPositions = new ArrayList<>();
     private static final Vec3 DEFAULT_OFFSET = new Vec3(0, 1, 0);
 
     private SearchResult(BlockPos pos, @Nullable ItemStack item, @Nullable Component name, @Nullable Vec3 nameOffset) {
