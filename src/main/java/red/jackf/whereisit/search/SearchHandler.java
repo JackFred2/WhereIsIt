@@ -68,7 +68,9 @@ public class SearchHandler {
                     if (results.containsKey(adjustedRoot)) continue;
 
                     var result = checkPosition(packet.request(), level, adjustedRoot);
-                    if (result != null) results.put(adjustedRoot, result);
+                    if (result != null) {
+                        results.put(adjustedRoot, result.withOtherPositions(connected));
+                    }
                 }
             }
         }

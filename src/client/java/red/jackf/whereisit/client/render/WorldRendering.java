@@ -161,13 +161,23 @@ public class WorldRendering {
                 (int) (alpha * 255)
         );
 
-        for (SearchResult result : results.values())
+        for (SearchResult result : results.values()) {
             renderBox(
-                    result,
+                    result.pos(),
                     builder,
                     pose,
                     scale
             );
+
+            for (BlockPos otherPos : result.otherPositions()) {
+                renderBox(
+                        otherPos,
+                        builder,
+                        pose,
+                        scale
+                );
+            }
+        }
 
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
@@ -184,10 +194,9 @@ public class WorldRendering {
 
     }
 
-    private static void renderBox(SearchResult searchResult, VertexConsumer consumer, PoseStack pose, float scale) {
+    private static void renderBox(BlockPos pos, VertexConsumer consumer, PoseStack pose, float scale) {
         pose.pushPose();
-        pose.translate(searchResult.pos().getX() + 0.5f, searchResult.pos().getY() + 0.5f, searchResult.pos()
-                .getZ() + 0.5f);
+        pose.translate(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
         pose.scale(scale * 0.5f, scale * 0.5f, scale * 0.5f);
         var resultMatrix = pose.last().pose();
 
