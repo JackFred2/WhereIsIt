@@ -5,10 +5,13 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.criteria.AllOfCriterion;
 import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.search.NestedItemStackSearcher;
+import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +26,20 @@ public class SearchRequest implements Consumer<Criterion> {
     public static final String DATA = "Data";
     private final List<Criterion> criteria = new ArrayList<>();
 
+    /**
+     * Perform a check on an ItemStack with the given request. Use this method to correctly handle nested items.
+     * @param stack ItemStack to test against
+     * @param request Search Request to test with
+     * @return Whether this ItemStack or any sub-items if applicable matches the request
+     */
+    public static boolean check(ItemStack stack, SearchRequest request) {
+        return request.test(stack) || (WhereIsItConfig.INSTANCE.getConfig().getCommon().doNestedSearch && NestedItemStackSearcher.EVENT.invoker().check(stack, request::test));
+    }
+
+    /**
+     * Adds a new criterion to this request. The criterion is checked for validity before being added.
+     * @param criterion The criterion to add to this request
+     */
     public void accept(Criterion criterion) {
         if (criterion.valid()) {
             if (criterion instanceof AllOfCriterion allOfCriterion) {
@@ -37,12 +54,17 @@ public class SearchRequest implements Consumer<Criterion> {
         }
     }
 
+    /**
+     * @return Whether this request has any criteria.
+     */
     public boolean hasCriteria() {
         return !criteria.isEmpty();
     }
 
     /**
-     * Serializes a criterion into a compound tag. Null if invalid.
+     * Serializes an individual criterion into a compound tag. Null if not registered to {@link Criterion.Type#REGISTRY}.
+     * @param criterion Criterion to serialize
+     * @return Serialized criterion, or null if not registered.
      */
     @Nullable
     public static CompoundTag toTag(Criterion criterion) {
@@ -56,6 +78,10 @@ public class SearchRequest implements Consumer<Criterion> {
         return tag;
     }
 
+    /**
+     * Serailizes this request into a Compound Tag.
+     * @return Serialized search request
+     */
     public CompoundTag pack() {
         var list = new ListTag();
         for (Criterion criterion : this.criteria) {
@@ -69,7 +95,9 @@ public class SearchRequest implements Consumer<Criterion> {
     }
 
     /**
-     * Load a criterion from a compound tag. Null if invalid or unknown.
+     * Load an individual criterion from a compound tag. Null if invalid or unknown.
+     * @param criterionTag Compound tag to read the criterion's data from
+     * @return Deserialized criterion, or null if unknown or an error occured.
      */
     @Nullable
     public static Criterion fromTag(CompoundTag criterionTag) {
@@ -90,6 +118,11 @@ public class SearchRequest implements Consumer<Criterion> {
         return null;
     }
 
+    /**
+     * Load a search request from a Compound Tag.
+     * @param root Compound tag to read from
+     * @return Constructed search request. If an error occcurs, an empty request is returned which is not checked.
+     */
     public static SearchRequest load(CompoundTag root) {
         try {
             var request = new SearchRequest();
@@ -116,6 +149,13 @@ public class SearchRequest implements Consumer<Criterion> {
         }
     }
 
+    /**
+     * Test all of this request's criterion against a given ItemStack. Returns false if any criterion fail. If no criterion,
+     * return true as default.
+     * @param stack Stack to test against
+     * @return If no criterion fail against the itemstack.
+     */
+    @ApiStatus.Internal
     public boolean test(ItemStack stack) {
         for (Criterion criterion : criteria)
             if (!criterion.test(stack)) return false;

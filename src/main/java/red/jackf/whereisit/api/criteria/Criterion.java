@@ -51,6 +51,13 @@ public abstract class Criterion {
      */
     public abstract boolean test(ItemStack stack);
 
+    /**
+     * Register a new criteria to the registry. Criterion that aren't known to the server will be ignored.
+     * @param id ID of the criterion in the registry.
+     * @param type Type object of the criteria.
+     * @return Type object of the criteria registered; equal to <code>type</code>.
+     * @param <T> Extended Criterion class
+     */
     public static <T extends Criterion> Type<T> register(ResourceLocation id, Type<T> type) {
         return Registry.register(Type.REGISTRY, id, type);
     }

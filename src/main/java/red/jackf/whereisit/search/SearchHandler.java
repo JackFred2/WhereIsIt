@@ -16,7 +16,6 @@ import net.minecraft.world.level.Level;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
-import red.jackf.whereisit.api.search.NestedItemStackSearcher;
 import red.jackf.whereisit.config.WhereIsItConfig;
 import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
@@ -86,7 +85,7 @@ public class SearchHandler {
                     if (view.isResourceBlank()) continue;
                     var resource = view.getResource().toStack((int) view.getAmount()); // get stack
 
-                    if (NestedItemStackSearcher.check(resource, request)) {
+                    if (SearchRequest.check(resource, request)) {
                         var result = SearchResult.builder(pos);
                         result.item(resource);
                         if (level.getBlockEntity(pos) instanceof Nameable nameable)

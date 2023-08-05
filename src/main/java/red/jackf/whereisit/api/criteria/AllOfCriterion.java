@@ -62,7 +62,7 @@ public class AllOfCriterion extends Criterion implements Consumer<Criterion> {
 
     @Override
     public boolean valid() {
-        return criteria.size() > 0 && criteria.stream().allMatch(Criterion::valid);
+        return !criteria.isEmpty() && criteria.stream().allMatch(Criterion::valid);
     }
 
     @Override

@@ -3,8 +3,6 @@ package red.jackf.whereisit.api.search;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.world.item.ItemStack;
-import red.jackf.whereisit.api.SearchRequest;
-import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.function.Predicate;
 
@@ -20,9 +18,4 @@ public interface NestedItemStackSearcher {
     });
 
     boolean check(ItemStack source, Predicate<ItemStack> predicate);
-
-    // check an item or any possible sub-items
-    static boolean check(ItemStack source, SearchRequest request) {
-        return request.test(source) || (WhereIsItConfig.INSTANCE.getConfig().getCommon().doNestedSearch && EVENT.invoker().check(source, request::test));
-    }
 }
