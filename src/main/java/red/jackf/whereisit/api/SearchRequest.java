@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a request to search for an item.
+ */
 public class SearchRequest implements Consumer<Criterion> {
     public static final String ID = "Id";
     public static final String DATA = "Data";

@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
@@ -79,16 +78,20 @@ public class SearchHandler {
     @SuppressWarnings("UnstableApiUsage")
     private static void checkPosition(SearchRequest request, Level level, BlockPos.MutableBlockPos pos, HashSet<SearchResult> results) {
         var checked = new HashSet<Storage<ItemVariant>>();
-        for (var direction : Direction.values()) {
+        for (var direction : Direction.values()) { // each side
             var storage = ItemStorage.SIDED.find(level, pos, direction);
-            if (storage != null && !checked.contains(storage)) {
+            if (storage != null && !checked.contains(storage)) { // side valid and we haven't already tried this inv
                 checked.add(storage);
-                for (var view : storage) {
+                for (var view : storage) { // for each view in this side
                     if (view.isResourceBlank()) continue;
-                    var resource = view.getResource().toStack((int) view.getAmount());
+                    var resource = view.getResource().toStack((int) view.getAmount()); // get stack
+
                     if (NestedItemStackSearcher.check(resource, request)) {
-                        var name = level.getBlockEntity(pos) instanceof Nameable nameable ? nameable.getCustomName() : null;
-                        results.add(new SearchResult(pos.immutable(), resource, name, new Vec3(0, 1, 0)));
+                        var result = SearchResult.builder(pos);
+                        result.item(resource);
+                        if (level.getBlockEntity(pos) instanceof Nameable nameable)
+                            result.name(nameable.getCustomName(), null);
+                        results.add(result.build());
                         return;
                     }
                 }
