@@ -116,7 +116,8 @@ public class WhereIsItClient implements ClientModInitializer {
             WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
             if (WhereIsItConfig.INSTANCE.getConfig().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {
                 closedScreenThisSearch = true;
-                if (Minecraft.getInstance().screen != null) Minecraft.getInstance().screen.onClose();
+                if (Minecraft.getInstance().screen != null && Minecraft.getInstance().player != null)
+                    Minecraft.getInstance().player.closeContainer();
             }
             WorldRendering.addResults(results);
         });
