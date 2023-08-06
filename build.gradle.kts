@@ -13,15 +13,13 @@ plugins {
 	id("com.matthewprenger.cursegradle") version "1.4.0"
 }
 
-fun Project.findPropertyStr(name: String) = findProperty(name) as String?
+group = properties["maven_group"]!!
+version = properties["mod_version"] ?: "dev"
 
-group = findProperty("maven_group") !!
-version = findPropertyStr("mod_version") ?: "dev"
-
-val modReleaseType = findPropertyStr("type") ?: "release"
+val modReleaseType = properties["type"]?.toString() ?: "release"
 
 base {
-	archivesName.set("${findProperty("archives_base_name")}-${findProperty("minecraft_version")}")
+	archivesName.set("${properties["archives_base_name"]}-${properties["minecraft_version"]}")
 }
 
 repositories {
@@ -67,6 +65,17 @@ repositories {
 		name = "Modrinth"
 		url = URI("https://api.modrinth.com/maven")
 	}
+	maven {
+		name = "GitHubPackages"
+		url = URI("https://maven.pkg.github.com/JackFred2/JackFredLib")
+		content {
+			includeGroup("red.jackf")
+		}
+		credentials {
+			username = properties["gpr.user"]?.toString() ?: System.getenv("GPR_USER")
+			password = properties["gpr.key"]?.toString() ?: System.getenv("GPR_TOKEN")
+		}
+	}
 }
 
 loom {
@@ -91,41 +100,42 @@ loom {
 
 dependencies {
 	// To change the versions see the gradle.properties file
-	minecraft("com.mojang:minecraft:${findProperty("minecraft_version")}")
+	minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
 	mappings(loom.layered {
 		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-${findProperty("parchment_version")}@zip")
+		parchment("org.parchmentmc.data:parchment-${properties["parchment_version"]}@zip")
 	})
-	modImplementation("net.fabricmc:fabric-loader:${findProperty("loader_version")}")
+	modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
-	modImplementation("net.fabricmc.fabric-api:fabric-api:${findProperty("fabric_version")}")
-	modImplementation("com.terraformersmc:modmenu:${findProperty("modmenu_version")}")
+	modImplementation("red.jackf:jackfredlib:${properties["jackfredlib_version"]!!}")
+	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
 
 	// Config
-	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${findProperty("yacl_version")}")
-	implementation("blue.endless:jankson:${findProperty("jankson_version")}")
+	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${properties["yacl_version"]}")
+	implementation("blue.endless:jankson:${properties["jankson_version"]}")
 
 	// Dev Util
 	modLocalRuntime("maven.modrinth:jsst:B39piMwB")
 
 	// COMPATIBILITY
+	modImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
 
 	// ItemStack Grabbers
 	// https://github.com/mezz/JustEnoughItems/issues/2891
 	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
 	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
-	modCompileOnly("maven.modrinth:jei:${findProperty("jei_modrinth_id")}")
+	modCompileOnly("maven.modrinth:jei:${properties["jei_modrinth_id"]}")
 
 	// modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version")
 	// modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version")
-	modCompileOnly("me.shedaniel:RoughlyEnoughItems-fabric:${findProperty("rei_version")}")
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}")
 
 	//modCompileOnly("dev.emi:emi-fabric:${emi_version}:api")
-	modCompileOnly("dev.emi:emi-fabric:${findProperty("emi_version")}")
+	modCompileOnly("dev.emi:emi-fabric:${properties["emi_version"]}")
 
 	//modRuntimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
 	//modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}")
-	modLocalRuntime("dev.emi:emi-fabric:${findProperty("emi_version")}")
+	modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
 }
 
 tasks.withType<ProcessResources>().configureEach {
@@ -156,7 +166,7 @@ tasks.named<Jar>("sourcesJar") {
 
 tasks.jar {
 	from("LICENSE") {
-		rename { "${it}_${findProperty("archivesBaseName")}"}
+		rename { "${it}_${properties["archivesBaseName"]}"}
 	}
 }
 
@@ -173,7 +183,7 @@ curseforge {
 			addGameVersion("Fabric")
 			addGameVersion("Java 17")
 
-			project.findPropertyStr("game_versions")?.split(",")?.forEach { addGameVersion(it) }
+			properties["game_versions"]?.toString()?.split(",")?.forEach { addGameVersion(it) }
 
 			mainArtifact(tasks.remapJar.get().archiveFile, closureOf<CurseArtifact> {
 				relations(closureOf<CurseRelation> {
@@ -185,7 +195,7 @@ curseforge {
 					optionalDependency("modmenu")
 				})
 				displayName = if (project.hasProperty("prefix")) {
-					"${findPropertyStr("prefix")} ${base.archivesName.get()}-$version.jar"
+					"${properties["prefix"]} ${base.archivesName.get()}-$version.jar"
 				} else {
 					"${base.archivesName.get()}-$version.jar"
 				}
@@ -210,7 +220,7 @@ modrinth {
 		versionType.set(modReleaseType)
 		uploadFile.set(tasks.remapJar)
 		changelog.set("Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt/releases")
-		project.findPropertyStr("game_versions")?.let {
+		properties["game_versions"]!!.toString().let {
 			gameVersions.set(it.split(","))
 		}
 		loaders.set(listOf("fabric", "quilt"))
@@ -246,8 +256,8 @@ publishing {
 			name = "GitHubPackages"
 			url = URI("https://maven.pkg.github.com/JackFred2/WhereIsIt")
 			credentials {
-				username = System.getenv("GITHUB_ACTOR")
-				password = System.getenv("GITHUB_TOKEN")
+				username = properties["gpr.user"]?.toString() ?: System.getenv("GPR_USER")
+				password = properties["gpr.key"]?.toString() ?: System.getenv("GPR_TOKEN")
 			}
 		}
 	}

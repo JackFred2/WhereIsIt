@@ -38,10 +38,10 @@ public interface ConnectedBlocksGrabber {
      * @return List of all blocks linked to this position. Always includes <code>pos</code>. This list is stable, such
      * that the order of positions are the same each times it is called.
      */
-    static List<BlockPos> getConnected(Level level, BlockPos pos) {
+    static List<BlockPos> getConnected(Level level, BlockState state, BlockPos pos) {
         var set = new HashSet<BlockPos>();
         set.add(pos.immutable());
-        EVENT.invoker().getConnected(set, pos, level, level.getBlockState(pos));
+        EVENT.invoker().getConnected(set, pos, level, state);
         if (set.size() == 1) return List.of(pos.immutable());
         return set.stream().sorted(Comparator.comparingLong(BlockPos::asLong)).toList();
     }

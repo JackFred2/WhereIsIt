@@ -6,6 +6,14 @@ on:
       - published
   workflow_dispatch:
 
+permissions:
+  packages: write
+  contents: write
+
+env:
+  GPR_USER: ${{ secrets.GITHUB_ACTOR }}
+  GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,9 +39,6 @@ jobs:
 
       - name: Publish to GitHub Package Registry
         run: ./gradlew build publish
-        env:
-          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create and add artifacts to GitHub Release
         uses: Kir-Antipov/mc-publish@v3.3

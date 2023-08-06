@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
@@ -27,6 +28,7 @@ import java.util.*;
 public class SearchHandler {
 
     public static void handle(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender response) {
+        // check rate limit for players
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER && WhereIsItConfig.INSTANCE.getConfig().getServer().rateLimit) {
             //don't close the level
             //noinspection resource
@@ -39,6 +41,7 @@ public class SearchHandler {
             RateLimiter.add(player, time);
         }
 
+        // empty requests
         if (!packet.request().hasCriteria()) {
             WhereIsIt.LOGGER.warn("Empty request from {}", player.getGameProfile().getName());
             return;
@@ -48,6 +51,7 @@ public class SearchHandler {
 
         var startTime = System.nanoTime();
 
+        // do the search
         var startPos = player.blockPosition();
         var level = player.level();
         var pos = new BlockPos.MutableBlockPos();
@@ -62,12 +66,14 @@ public class SearchHandler {
                     pos.setZ(z);
                     if (pos.distSqr(startPos) > maxRange) continue;
 
-                    var connected = ConnectedBlocksGrabber.getConnected(level, pos);
+                    var state = level.getBlockState(pos);
+
+                    var connected = ConnectedBlocksGrabber.getConnected(level, state, pos);
                     var adjustedRoot = connected.get(0);
 
                     if (results.containsKey(adjustedRoot)) continue;
 
-                    var result = checkPosition(packet.request(), level, adjustedRoot);
+                    var result = checkPosition(packet.request(), level, state, adjustedRoot);
                     if (result != null) {
                         results.put(adjustedRoot, result.withOtherPositions(connected));
                     }
@@ -75,13 +81,15 @@ public class SearchHandler {
             }
         }
 
-        WhereIsIt.LOGGER.debug(results.values().toString());
         WhereIsIt.LOGGER.debug("Server search results id %d: %s".formatted(packet.id(), results.toString()));
+
+        // timing
         var time = System.nanoTime() - startTime;
         var timingStr = "Search time: %.2fms (%dns)".formatted((float) time / 1_000_000, time);
         WhereIsIt.LOGGER.debug(timingStr);
         if (WhereIsItConfig.INSTANCE.getConfig().getCommon().printSearchTime) player.sendSystemMessage(Component.literal("[Where Is It] " + timingStr).withStyle(ChatFormatting.YELLOW));
 
+        // send to player
         if (!results.isEmpty())
             response.sendPacket(new ClientboundResultsPacket(packet.id(), results.values()));
     }
@@ -90,11 +98,12 @@ public class SearchHandler {
      * Checks a single position to see if it matches a search request
      * @param request Request to test against
      * @param level Level the test is in
+     * @param state Block state at the given position
      * @param pos Position the test is at
      * @return A search result if there is a positive match, or null if not matching.
      */
     @SuppressWarnings("UnstableApiUsage")
-    private static SearchResult checkPosition(SearchRequest request, Level level, BlockPos pos) {
+    private static SearchResult checkPosition(SearchRequest request, Level level, BlockState state, BlockPos pos) {
         var checked = new HashSet<Storage<ItemVariant>>();
         for (var direction : Direction.values()) { // each side
             var storage = ItemStorage.SIDED.find(level, pos, direction);
