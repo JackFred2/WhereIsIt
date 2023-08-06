@@ -6,6 +6,10 @@
 name: build
 on: [pull_request, push]
 
+env:
+  GPR_USER: ${{ secrets.GITHUB_ACTOR }}
+  GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build:
     strategy:
