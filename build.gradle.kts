@@ -172,7 +172,7 @@ tasks.jar {
 }
 
 curseforge {
-	if (System.getenv("CURSEFORGE_TOKEN") != null && version != "UNKNOWN") {
+	if (System.getenv("CURSEFORGE_TOKEN") != null && version != "dev") {
 		apiKey = System.getenv("CURSEFORGE_TOKEN")
 		project(closureOf<CurseProject> {
 			id = "378036"
@@ -213,7 +213,7 @@ curseforge {
 }
 
 modrinth {
-	if (System.getenv("MODRINTH_TOKEN") != null && version != "UNKNOWN") {
+	if (System.getenv("MODRINTH_TOKEN") != null && version != "dev") {
 		token.set(System.getenv("MODRINTH_TOKEN"))
 		projectId.set("FCTyEqkn")
 		versionNumber.set(version as String)
