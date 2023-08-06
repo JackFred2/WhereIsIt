@@ -28,13 +28,12 @@ import red.jackf.whereisit.client.defaults.OverlayStackBehaviorDefaults;
 import red.jackf.whereisit.client.defaults.SearchInvokerDefaults;
 import red.jackf.whereisit.client.defaults.SearchRequestPopulatorDefaults;
 import red.jackf.whereisit.client.defaults.ShouldIgnoreKeyDefaults;
+import red.jackf.whereisit.client.render.CurrentGradientHolder;
 import red.jackf.whereisit.client.render.ScreenRendering;
 import red.jackf.whereisit.client.render.WorldRendering;
 import red.jackf.whereisit.client.util.NotificationToast;
 import red.jackf.whereisit.client.util.TextUtil;
-import red.jackf.whereisit.config.ColourScheme;
 import red.jackf.whereisit.config.WhereIsItConfig;
-import red.jackf.whereisit.util.ColourGetter;
 
 public class WhereIsItClient implements ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -46,42 +45,10 @@ public class WhereIsItClient implements ClientModInitializer {
     public static long lastSearchTime = 0;
     public static boolean closedScreenThisSearch = false;
 
-    private static ColourGetter getter = f -> 0; // replaced in mod init
-
-    private static final ColourScheme[] RANDOM_CANDIDATES = new ColourScheme[] {
-            ColourScheme.PRIDE,
-            ColourScheme.GAY,
-            ColourScheme.LESBIAN,
-            ColourScheme.BISEXUAL,
-            ColourScheme.PANSEXUAL,
-            ColourScheme.NONBINARY,
-            ColourScheme.INTERSEX,
-            ColourScheme.TRANS,
-            ColourScheme.ACE,
-            ColourScheme.ARO,
-    };
-
-    public static void updateColourScheme() {
-        if (WhereIsItConfig.INSTANCE.getConfig().getClient().randomScheme) {
-            getter = RANDOM_CANDIDATES[(int) (Math.random() * RANDOM_CANDIDATES.length)].getGradient();
-        } else {
-            var scheme = WhereIsItConfig.INSTANCE.getConfig().getClient().colourScheme;
-            if (scheme == ColourScheme.SOLID) {
-                getter = f -> WhereIsItConfig.INSTANCE.getConfig().getClient().solidColour.getRGB();
-            } else {
-                getter = scheme.getGradient();
-            }
-        }
-    }
-
-    public static int getColour(float factor) {
-        return getter.eval(factor);
-    }
-
     @Override
     public void onInitializeClient() {
         LOGGER.debug("Setup Client");
-        updateColourScheme();
+        CurrentGradientHolder.refreshColourScheme();
 
         ScreenEvents.BEFORE_INIT.register((client, _screen, scaledWidth, scaledHeight) -> {
 
@@ -166,7 +133,7 @@ public class WhereIsItClient implements ClientModInitializer {
         closedScreenThisSearch = false;
         WorldRendering.clearResults();
 
-        updateColourScheme();
+        CurrentGradientHolder.refreshColourScheme();
     }
 
     @NotNull

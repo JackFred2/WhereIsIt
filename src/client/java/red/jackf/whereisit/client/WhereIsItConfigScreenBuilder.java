@@ -9,7 +9,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
+import red.jackf.jackfredlib.api.colour.Colour;
+import red.jackf.jackfredlib.client.api.GradientUtils;
 import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.client.render.CurrentGradientHolder;
 import red.jackf.whereisit.config.ColourScheme;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
@@ -48,7 +51,7 @@ public class WhereIsItConfigScreenBuilder {
                         .build())
                 .save(() -> {
                     instance.save();
-                    WhereIsItClient.updateColourScheme();
+                    CurrentGradientHolder.refreshColourScheme();
                 })
                 .build()
                 .generateScreen(parent);
@@ -365,23 +368,22 @@ public class WhereIsItConfigScreenBuilder {
             @Override
             public int render(GuiGraphics graphics, int x, int y, int renderWidth) {
                 int borderThickness = 8;
-                int height = 64;
+                int renderHeight = 64;
 
-                var width = renderWidth - (2 * borderThickness);
+                int width = renderWidth - 2 * borderThickness;
+                int height = renderHeight - 2 * borderThickness;
 
                 graphics.pose().pushPose();
                 graphics.pose().translate(x, y, 0);
-                blit(graphics, 0, 0, borderThickness, height, 0, 0, borderThickness, height); // left
-                blit(graphics, renderWidth - borderThickness, 0, borderThickness, height, 2 * borderThickness, 0, borderThickness, height); // right
+                blit(graphics, 0, 0, borderThickness, renderHeight, 0, 0, borderThickness, renderHeight); // left
+                blit(graphics, renderWidth - borderThickness, 0, borderThickness, renderHeight, 2 * borderThickness, 0, borderThickness, renderHeight); // right
                 blit(graphics, borderThickness, 0, width, borderThickness, borderThickness, 0, borderThickness, borderThickness); // top
-                blit(graphics, borderThickness, height - borderThickness, width, borderThickness, borderThickness, height - borderThickness, borderThickness, borderThickness); // bottom
-                for (int i = 0; i < width; i += 1) {
-                    graphics.fill(i + borderThickness, borderThickness, i + borderThickness + 1, 56, scheme == ColourScheme.SOLID ? solid.getRGB() : scheme.getGradient()
-                            .eval(((float) i) / width));
-                }
+                blit(graphics, borderThickness, renderHeight - borderThickness, width, borderThickness, borderThickness, renderHeight - borderThickness, borderThickness, borderThickness); // bottom
+                GradientUtils.drawHorizontalGradient(graphics, borderThickness, borderThickness, width, height,
+                        scheme == ColourScheme.SOLID ? Colour.fromInt(solid.getRGB()) : scheme.getGradient(), 0, 1);
                 graphics.pose().popPose();
 
-                return height;
+                return renderHeight;
             }
 
             @Override

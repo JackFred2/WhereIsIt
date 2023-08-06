@@ -21,7 +21,7 @@ public class ScreenRendering {
                             + slot.x // offset by slot X
                             - (mouseX + mouseY) / 6; // parallax with maths
                     progress /= 256; // slow down
-                    var colour = WhereIsItClient.getColour(progress);
+                    var colour = CurrentGradientHolder.getColour(progress);
                     graphics.fill(x, y, x + 16, y + 16, colour);
                 }
             }

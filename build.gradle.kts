@@ -78,6 +78,13 @@ repositories {
 	}
 }
 
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
 loom {
     splitEnvironmentSourceSets()
 
@@ -107,7 +114,8 @@ dependencies {
 	})
 	modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
-	modImplementation("red.jackf:jackfredlib:${properties["jackfredlib_version"]!!}")
+	include("red.jackf:jackfredlib:${properties["jackfredlib_version"]}")
+	modImplementation("red.jackf:jackfredlib:${properties["jackfredlib_version"]}")
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
 
 	// Config
@@ -149,13 +157,6 @@ tasks.withType<ProcessResources>().configureEach {
 
 tasks.withType<JavaCompile>().configureEach {
 	options.release.set(17)
-}
-
-java {
-	withSourcesJar()
-
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.named<Jar>("sourcesJar") {
@@ -242,12 +243,7 @@ modrinth {
 publishing {
 	publications {
 		create<MavenPublication>("mavenJava") {
-			artifact(tasks.named("sourcesJar")) {
-				builtBy(tasks.named("remapSourcesJar"))
-			}
-			afterEvaluate {
-				artifact(tasks.named("remapJar"))
-			}
+			from(components["java"]!!)
 		}
 	}
 

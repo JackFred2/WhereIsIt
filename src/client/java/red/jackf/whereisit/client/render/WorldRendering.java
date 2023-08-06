@@ -147,7 +147,7 @@ public class WorldRendering {
 
         // from 100% to 50%
         var alpha = 1 - (progress / 2f);
-        var colour = WhereIsItClient.getColour(((context.world().getGameTime() + context.tickDelta()) % 80) / 80);
+        var colour = CurrentGradientHolder.getColour(((context.world().getGameTime() + context.tickDelta()) % 80) / 80);
         var scale = easingFunc(progress);
 
         var tesselator = Tesselator.getInstance();
