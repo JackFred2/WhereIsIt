@@ -5,6 +5,8 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Nameable;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import red.jackf.jackfredlib.api.ResultHolder;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
@@ -15,6 +17,7 @@ import java.util.HashSet;
 public class DefaultBlockSearchers {
     public static void setup() {
         setupTransferApi();
+        setupEnderChest();
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -41,6 +44,19 @@ public class DefaultBlockSearchers {
             }
 
             return ResultHolder.pass();
+        });
+    }
+
+    private static void setupEnderChest() {
+        BlockSearcher.EVENT.register(BlockSearcher.DEFAULT, (request, player, level, state, pos) -> {
+            if (!state.is(Blocks.ENDER_CHEST)) return ResultHolder.pass();
+            for (ItemStack enderItem : player.getEnderChestInventory().items)
+                if (SearchRequest.check(enderItem, request))
+                    return ResultHolder.value(SearchResult.builder(pos)
+                            .item(enderItem)
+                            .build());
+            // there's very likely no other inventory directly at the ender chest so cancel here
+            return ResultHolder.empty();
         });
     }
 }
