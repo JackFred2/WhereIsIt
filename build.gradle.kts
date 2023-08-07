@@ -64,6 +64,9 @@ repositories {
 	maven {
 		name = "Modrinth"
 		url = URI("https://api.modrinth.com/maven")
+		content {
+			includeGroup("maven.modrinth")
+		}
 	}
 	maven {
 		name = "GitHubPackages"
@@ -74,6 +77,13 @@ repositories {
 		credentials {
 			username = properties["gpr.user"]?.toString() ?: System.getenv("GPR_USER")
 			password = properties["gpr.key"]?.toString() ?: System.getenv("GPR_TOKEN")
+		}
+	}
+	maven {
+		name = "Sonatype"
+		url = URI("https://oss.sonatype.org/content/repositories/snapshots")
+		content {
+			includeGroupByRegex("com.twelvemonkeys.*")
 		}
 	}
 }
