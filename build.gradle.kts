@@ -138,22 +138,25 @@ dependencies {
 	// COMPATIBILITY
 	modImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
 
-	// ItemStack Grabbers
+	// Recipe Viewer APIs
 	// https://github.com/mezz/JustEnoughItems/issues/2891
-	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-	// modCompileOnlyApi("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
+	// modCompileOnlyApi("mezz.jei:jei-${properties["minecraft_version"]}-common-api:${properties["jei_version"]}")
+	// modCompileOnlyApi("mezz.jei:jei-${properties["minecraft_version"]}-fabric-api:${properties["jei_version"]}")
 	modCompileOnly("maven.modrinth:jei:${properties["jei_modrinth_id"]}")
 
-	// modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version")
-	// modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version")
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${properties["rei_version"]}")
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${properties["rei_version"]}")
 	modCompileOnly("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}")
 
-	//modCompileOnly("dev.emi:emi-fabric:${emi_version}:api")
+	//modCompileOnly("dev.emi:emi-fabric:${properties["emi_version"]}:api")
 	modCompileOnly("dev.emi:emi-fabric:${properties["emi_version"]}")
 
-	//modRuntimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
-	//modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}")
-	modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
+	// Recipe Viewer Runtimes
+	//modRuntimeOnly("mezz.jei:jei-${properties["minecraft_version"]}-fabric:${properties["jei_version"]}")
+	modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}") {
+		exclude("net.fabricmc.fabric-api")
+	}
+	//modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
 }
 
 tasks.withType<ProcessResources>().configureEach {

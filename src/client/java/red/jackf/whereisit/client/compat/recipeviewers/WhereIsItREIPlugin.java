@@ -18,6 +18,7 @@ import red.jackf.whereisit.api.criteria.*;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.client.api.ShouldIgnoreKey;
+import red.jackf.whereisit.client.compat.CompatUtils;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.function.Consumer;
@@ -27,18 +28,25 @@ import java.util.function.Consumer;
  * - getting a tag ID from a recipe slot
  */
 public class WhereIsItREIPlugin implements REIClientPlugin {
+    private boolean hasErrored = false;
     public WhereIsItREIPlugin() {
         super();
         WhereIsItClient.LOGGER.info("Hooking into REI");
 
         SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
             if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.reiSupport) return;
-            if (REIRuntime.getInstance().isOverlayVisible()) {
-                if (getFromOverlay(request)) return;
-            }
+            if (hasErrored) return;
+            try {
+                if (REIRuntime.getInstance().isOverlayVisible()) {
+                    if (getFromOverlay(request)) return;
+                }
 
-            if (screen instanceof DisplayScreen) {
-                getFromRecipeScreen(request, screen, mouseX, mouseY);
+                if (screen instanceof DisplayScreen) {
+                    getFromRecipeScreen(request, screen, mouseX, mouseY);
+                }
+            } catch (Exception ex) {
+                CompatUtils.LOGGER.error("Error in REI handler, disabling", ex);
+                hasErrored = true;
             }
         });
 

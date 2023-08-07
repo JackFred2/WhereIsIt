@@ -19,6 +19,7 @@ import red.jackf.whereisit.api.criteria.ItemTagCriterion;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.client.api.ShouldIgnoreKey;
+import red.jackf.whereisit.client.compat.CompatUtils;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.ArrayList;
@@ -34,11 +35,19 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("UnstableApiUsage")
 public class WhereIsItEMIPlugin implements EmiPlugin {
+    private static boolean hasErrored = false;
+
     static {
         WhereIsItClient.LOGGER.info("Hooking into EMI");
         SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
             if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.emiSupport) return;
-            populate(request, screen, mouseX, mouseY);
+            if (hasErrored) return;
+            try {
+                populate(request, screen, mouseX, mouseY);
+            } catch (Exception ex) {
+                CompatUtils.LOGGER.error("Error in REI handler, disabling", ex);
+                hasErrored = true;
+            }
         });
         ShouldIgnoreKey.EVENT.register(EmiApi::isSearchFocused);
     }

@@ -16,9 +16,11 @@ import red.jackf.whereisit.api.criteria.ItemCriterion;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.client.api.ShouldIgnoreKey;
+import red.jackf.whereisit.client.compat.CompatUtils;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 public final class WhereIsItJEIPlugin implements IModPlugin {
+    private boolean hasErrored = false;
     private boolean setup = false;
     private IJeiRuntime runtime = null;
 
@@ -35,14 +37,20 @@ public final class WhereIsItJEIPlugin implements IModPlugin {
             WhereIsItClient.LOGGER.info("Hooking into JEI");
             SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
                 if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.jeiSupport) return;
-                if (runtime != null) {
-                    var ingredientsStack = parseIngredient(request, runtime.getIngredientListOverlay()::getIngredientUnderMouse, SearchRequestPopulator.Context.overlay());
-                    if (ingredientsStack) return;
+                if (hasErrored) return;
+                try {
+                    if (runtime != null) {
+                        var ingredientsStack = parseIngredient(request, runtime.getIngredientListOverlay()::getIngredientUnderMouse, SearchRequestPopulator.Context.overlay());
+                        if (ingredientsStack) return;
 
-                    var bookmarkStack = parseIngredient(request, runtime.getBookmarkOverlay()::getIngredientUnderMouse, SearchRequestPopulator.Context.FAVOURITE);
-                    if (bookmarkStack) return;
+                        var bookmarkStack = parseIngredient(request, runtime.getBookmarkOverlay()::getIngredientUnderMouse, SearchRequestPopulator.Context.FAVOURITE);
+                        if (bookmarkStack) return;
 
-                    getRecipeStack(request, runtime.getRecipesGui());
+                        getRecipeStack(request, runtime.getRecipesGui());
+                    }
+                } catch (Exception ex) {
+                    CompatUtils.LOGGER.error("Error in JEI handler, disabling", ex);
+                    hasErrored = true;
                 }
             });
             ShouldIgnoreKey.EVENT.register(() -> {
