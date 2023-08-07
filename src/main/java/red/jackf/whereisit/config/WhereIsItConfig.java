@@ -114,6 +114,9 @@ public class WhereIsItConfig {
         public boolean doNestedSearch = true;
 
         @ConfigEntry
+        public boolean enableDefaultSearchers = true;
+
+        @ConfigEntry
         public boolean printSearchTime = false;
 
         public void validate() {

@@ -28,6 +28,8 @@
   "whereisit.config.common.searchRange.slider": "%s blocks",
   "whereisit.config.common.nestedSearching": "Nested Searching",
   "whereisit.config.common.nestedSearching.description": "Whether to search within certain items that contain other items, such as Shulker Boxes or Bundles.",
+  "whereisit.config.common.enableDefaultSearchers": "Enable Default Searchers",
+  "whereisit.config.common.enableDefaultSearchers.description": "Whether to enable the mod's block searchers for ender chests, and the fallback using Fabric's Transfer API.",
   "whereisit.config.compatibility": "Compatibility",
   "whereisit.config.compatibility.modNotInstalled": "Mod is not installed.",
   "whereisit.config.compatibility.requiresModInstalled": "Requires the mod to be installed to function.",

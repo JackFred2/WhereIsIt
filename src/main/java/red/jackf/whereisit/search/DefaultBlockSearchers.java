@@ -11,6 +11,7 @@ import red.jackf.jackfredlib.api.ResultHolder;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.api.search.BlockSearcher;
+import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.HashSet;
 
@@ -23,6 +24,7 @@ public class DefaultBlockSearchers {
     @SuppressWarnings("UnstableApiUsage")
     private static void setupTransferApi() {
         BlockSearcher.EVENT.register(BlockSearcher.FALLBACK, (request, player, level, state, pos) -> {
+            if (!WhereIsItConfig.INSTANCE.getConfig().getCommon().enableDefaultSearchers) return ResultHolder.pass();
             var checked = new HashSet<Storage<ItemVariant>>();
             for (var direction : Direction.values()) { // each side
                 var storage = ItemStorage.SIDED.find(level, pos, direction);
@@ -49,6 +51,7 @@ public class DefaultBlockSearchers {
 
     private static void setupEnderChest() {
         BlockSearcher.EVENT.register(BlockSearcher.DEFAULT, (request, player, level, state, pos) -> {
+            if (!WhereIsItConfig.INSTANCE.getConfig().getCommon().enableDefaultSearchers) return ResultHolder.pass();
             if (!state.is(Blocks.ENDER_CHEST)) return ResultHolder.pass();
             for (ItemStack enderItem : player.getEnderChestInventory().items)
                 if (SearchRequest.check(enderItem, request))

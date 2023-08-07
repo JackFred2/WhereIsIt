@@ -266,6 +266,18 @@ public class WhereIsItConfigScreenBuilder {
                                 .coloured(true)
                                 .yesNoFormatter())
                         .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.common.enableDefaultSearchers"))
+                        .binding(
+                                defaults.getCommon().enableDefaultSearchers,
+                                () -> config.getCommon().enableDefaultSearchers,
+                                b -> config.getCommon().enableDefaultSearchers = b
+                        )
+                        .description(OptionDescription.of(translatable("whereisit.config.common.enableDefaultSearchers.description")))
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .yesNoFormatter())
+                        .build())
                 .build();
     }
 
