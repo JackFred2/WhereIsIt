@@ -8,6 +8,8 @@ import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.minecraft.SharedConstants.TICKS_PER_SECOND;
 
@@ -118,6 +120,12 @@ public class WhereIsItConfig {
 
         @ConfigEntry
         public boolean printSearchTime = false;
+
+        @ConfigEntry
+        public List<String> commandAliases = new ArrayList<>(commandAliasesDefault);
+        private static final List<String> commandAliasesDefault = List.of(
+                "whereis"
+        );
 
         public void validate() {
             this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 16);

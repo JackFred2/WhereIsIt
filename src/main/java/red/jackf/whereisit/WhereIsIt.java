@@ -2,6 +2,7 @@ package red.jackf.whereisit;
 
 import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.resources.ResourceLocation;
@@ -13,6 +14,7 @@ import red.jackf.whereisit.search.DefaultBlockSearchers;
 import red.jackf.whereisit.search.DefaultConnectedBlocksGrabbers;
 import red.jackf.whereisit.search.DefaultNestedItemStackSearchers;
 import red.jackf.whereisit.search.SearchHandler;
+import red.jackf.whereisit.serverside.WhereIsCommand;
 import red.jackf.whereisit.util.RateLimiter;
 
 public class WhereIsIt implements ModInitializer {
@@ -37,6 +39,7 @@ public class WhereIsIt implements ModInitializer {
 		DefaultNestedItemStackSearchers.setup();
 		DefaultConnectedBlocksGrabbers.setup();
 
+		CommandRegistrationCallback.EVENT.register(WhereIsCommand::register);
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> RateLimiter.disconnected(handler.player));
 
 		ServerPlayNetworking.registerGlobalReceiver(ServerboundSearchForItemPacket.TYPE, SearchHandler::handle);
