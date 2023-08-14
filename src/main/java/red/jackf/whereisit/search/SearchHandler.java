@@ -30,6 +30,8 @@ public class SearchHandler {
     }
 
     public static void handle(SearchRequest request, ServerPlayer player, Consumer<Collection<SearchResult>> resultConsumer) {
+        ServerSideRenderer.fadeServerSide(player);
+
         // check rate limit for players
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER && WhereIsItConfig.INSTANCE.getConfig().getServer().rateLimit) {
             //don't close the level
@@ -42,6 +44,8 @@ public class SearchHandler {
 
             RateLimiter.add(player, time);
         }
+
+        // clear last server side results
 
         // empty requests
         if (!request.hasCriteria()) {
