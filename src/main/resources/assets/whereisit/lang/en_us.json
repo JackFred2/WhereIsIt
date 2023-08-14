@@ -31,7 +31,7 @@
   "whereisit.config.common.enableDefaultSearchers": "Enable Default Searchers",
   "whereisit.config.common.enableDefaultSearchers.description": "Whether to enable the mod's block searchers for ender chests, and the fallback using Fabric's Transfer API.",
   "whereisit.config.common.serverSideHighlightFadeTime": "Server Side highlight fade time",
-  "whereisit.config.common.serverSideHighlightFadeTime.description": "How long it takes server side highlights to fade away. Can be faded early by punching or right-clicking.",
+  "whereisit.config.common.serverSideHighlightFadeTime.description": "How long it takes server side highlights to fade away.",
   "whereisit.config.common.commandAliases": "Search command aliases",
   "whereisit.config.common.commandAliases.description": "A list of aliases for the search command. Disable by removing all options.",
   "whereisit.config.common.commandAliases.requiresDataReload": "Requires a run of the /reload command to update properly.",

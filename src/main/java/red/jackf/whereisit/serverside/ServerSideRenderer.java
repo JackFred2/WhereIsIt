@@ -5,6 +5,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 import red.jackf.jackfredlib.api.colour.Colour;
 import red.jackf.jackfredlib.api.lying.Debris;
 import red.jackf.jackfredlib.api.lying.Lies;
@@ -32,16 +34,13 @@ public class ServerSideRenderer {
         }
     }
 
-    private static EntityLie makeBlockDisplay(ServerLevel level, BlockPos pos, Colour colour) {
+    private static EntityLie makeAlternateBlockDisplay(ServerLevel level, BlockPos pos, Colour colour) {
         return EntityLie.builder(EntityBuilders.blockDisplay(level)
                         .positionCentered(pos)
-                        .state(Blocks.STRUCTURE_BLOCK.defaultBlockState())
-                        .scaleAndCenter(0.5f)
+                        .state(Blocks.JIGSAW.defaultBlockState())
+                        .scaleAndCenter(0.7f)
                         .glowing(true, colour)
-                        .build())
-                .onLeftClick((activeLie, shiftDown, relativeToEntity) -> activeLie.fade())
-                .onRightClick((activeLie, shiftDown, hand, relativeToEntity) -> activeLie.fade())
-                .build();
+                        .build()).build();
     }
 
     private static int randomFadeTime() {
@@ -56,12 +55,27 @@ public class ServerSideRenderer {
 
         for (SearchResult result : results) {
             var colour = Colour.fromHSV((float) Math.random(), 1, 1);
-            var mainLie = makeBlockDisplay(level, result.pos(), colour);
 
-            Debris.INSTANCE.schedule(Lies.INSTANCE.addEntity(player, mainLie), randomFadeTime());
+            var timeout = randomFadeTime();
+
+            var mainEntity = EntityBuilders.blockDisplay(level)
+                    .position(Vec3.atBottomCenterOf(result.pos().above()).add(result.nameOffset().subtract(0, 1, 0)))
+                    .state(Blocks.STRUCTURE_BLOCK.defaultBlockState())
+                    .scaleAndCenter(0.7f)
+                    .addTranslation(new Vector3f(0, -0.5f, 0))
+                    .glowing(true, colour);
+
+            if (result.name() != null) {
+                mainEntity.customName(result.name()).alwaysRenderName(true);
+                mainEntity.addTranslation(result.nameOffset().subtract(0, 1, 0).reverse().toVector3f());
+            }
+
+            var mainLie = EntityLie.builder(mainEntity.build()).build();
+
+            Debris.INSTANCE.schedule(Lies.INSTANCE.addEntity(player, mainLie), timeout);
 
             for (BlockPos otherPos : result.otherPositions()) {
-                Debris.INSTANCE.schedule(Lies.INSTANCE.addEntity(player, makeBlockDisplay(level, otherPos, colour)), randomFadeTime());
+                Debris.INSTANCE.schedule(Lies.INSTANCE.addEntity(player, makeAlternateBlockDisplay(level, otherPos, colour)), timeout);
             }
         }
     }
