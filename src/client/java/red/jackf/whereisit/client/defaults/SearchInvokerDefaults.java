@@ -54,6 +54,7 @@ public class SearchInvokerDefaults {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> { // on server connect
             ClientPlayNetworking.registerGlobalReceiver(ClientboundResultsPacket.TYPE, (packet, player, responseSender) -> {
                 if (packet.id() == ClientboundResultsPacket.WHEREIS_COMMAND_ID) {
+                    WhereIsItClient.lastSearchTime = -1;
                     WhereIsItClient.recieveResults(packet.results());
                 } else {
                     var consumer = consumers.remove(packet.id());

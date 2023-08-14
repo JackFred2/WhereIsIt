@@ -245,7 +245,6 @@ public class WorldRendering {
     }
 
     public static void addResults(Collection<SearchResult> newResults) {
-        WhereIsItClient.lastSearchTime = -1;
         for (SearchResult result : newResults) {
             // TODO: when names are added, prioritise the one with a name
             results.put(result.pos(), result);

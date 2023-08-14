@@ -59,7 +59,7 @@ public class ServerSideRenderer {
             var timeout = randomFadeTime();
 
             var mainEntity = EntityBuilders.blockDisplay(level)
-                    .position(Vec3.atBottomCenterOf(result.pos().above()).add(result.nameOffset().subtract(0, 1, 0)))
+                    .position(Vec3.atBottomCenterOf(result.pos().above()).add(result.name() != null ? result.nameOffset().subtract(0, 1, 0) : Vec3.ZERO))
                     .state(Blocks.STRUCTURE_BLOCK.defaultBlockState())
                     .scaleAndCenter(0.7f)
                     .addTranslation(new Vector3f(0, -0.5f, 0))

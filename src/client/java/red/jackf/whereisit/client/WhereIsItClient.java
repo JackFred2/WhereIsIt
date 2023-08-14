@@ -64,7 +64,7 @@ public class WhereIsItClient implements ClientModInitializer {
                     if (SEARCH.matches(key, scancode) && !ShouldIgnoreKey.EVENT.invoker().shouldIgnoreKey()) {
                         SearchRequest request = createRequest(client, screen);
                         if (request.hasCriteria()) {
-                            doSearch(request);
+                            SearchInvoker.doSearch(request);
                         }
                     }
                 });
@@ -106,6 +106,7 @@ public class WhereIsItClient implements ClientModInitializer {
     }
 
     public static boolean doSearch(SearchRequest request) {
+        WhereIsItClient.lastSearchTime = -1;
         updateRendering(request);
         LOGGER.debug("Starting request: %s".formatted(request));
 
