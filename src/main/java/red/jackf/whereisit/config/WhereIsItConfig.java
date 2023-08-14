@@ -135,6 +135,7 @@ public class WhereIsItConfig {
 
         public void validate() {
             this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 16);
+            this.serverSideHighlightFadeTime = Mth.clamp(this.serverSideHighlightFadeTime, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
         }
     }
 

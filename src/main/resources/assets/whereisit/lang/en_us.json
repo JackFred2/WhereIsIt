@@ -30,6 +30,11 @@
   "whereisit.config.common.nestedSearching.description": "Whether to search within certain items that contain other items, such as Shulker Boxes or Bundles.",
   "whereisit.config.common.enableDefaultSearchers": "Enable Default Searchers",
   "whereisit.config.common.enableDefaultSearchers.description": "Whether to enable the mod's block searchers for ender chests, and the fallback using Fabric's Transfer API.",
+  "whereisit.config.common.serverSideHighlightFadeTime": "Server Side highlight fade time",
+  "whereisit.config.common.serverSideHighlightFadeTime.description": "How long it takes server side highlights to fade away. Can be faded early by punching or right-clicking.",
+  "whereisit.config.common.commandAliases": "Search command aliases",
+  "whereisit.config.common.commandAliases.description": "A list of aliases for the search command. Disable by removing all options.",
+  "whereisit.config.common.commandAliases.requiresDataReload": "Requires a run of the /reload command to update properly.",
   "whereisit.config.compatibility": "Compatibility",
   "whereisit.config.compatibility.modNotInstalled": "Mod is not installed.",
   "whereisit.config.compatibility.requiresModInstalled": "Requires the mod to be installed to function.",
@@ -42,7 +47,9 @@
   "whereisit.config.compatibility.client.emiSupport": "EMI Support",
   "whereisit.config.compatibility.client.emiSupport.description": "Allows Where Is It to obtain the item from EMI's overlays and recipe screens.",
   "whereisit.config.debug": "Debug Options",
+  "whereisit.config.debug.client.printSearchRequestsInChat": "Print Search Requests in Chat",
   "whereisit.config.debug.common.printSearchTime": "Print Search Times",
   "whereisit.config.debug.common.printSearchTime.description": "Whether to print search times in chat. Applies to all online players if on a server.",
-  "whereisit.config.debug.client.printSearchRequestsInChat": "Print Search Requests in Chat"
+  "whereisit.config.debug.common.forceServerSideHighlightsOnly": "Force Server-side Highlighting",
+  "whereisit.config.debug.common.forceServerSideHighlightsOnly.description": "Whether to force all requests to use server-side highlighting, instead of just clients without Where Is It. This may disable features of other mods that can ask for search results, but may have better rendering compatibility."
 }

@@ -25,10 +25,10 @@ import static net.minecraft.SharedConstants.TICKS_PER_SECOND;
 public class ServerSideRenderer {
     public static void send(ServerPlayer player, Collection<SearchResult> results) {
         if (WhereIsItConfig.INSTANCE.getConfig().getCommon().forceServerSideHighlightsOnly
-                || ServerPlayNetworking.canSend(player, ClientboundResultsPacket.TYPE)) {
-            ServerPlayNetworking.send(player, new ClientboundResultsPacket(ClientboundResultsPacket.WHEREIS_COMMAND_ID, results));
-        } else {
+                || !ServerPlayNetworking.canSend(player, ClientboundResultsPacket.TYPE)) {
             doServersideRendering(player, results);
+        } else {
+            ServerPlayNetworking.send(player, new ClientboundResultsPacket(ClientboundResultsPacket.WHEREIS_COMMAND_ID, results));
         }
     }
 

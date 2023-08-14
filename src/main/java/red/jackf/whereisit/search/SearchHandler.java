@@ -16,6 +16,7 @@ import red.jackf.whereisit.api.search.ConnectedBlocksGrabber;
 import red.jackf.whereisit.config.WhereIsItConfig;
 import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
+import red.jackf.whereisit.serverside.ServerSideRenderer;
 import red.jackf.whereisit.util.RateLimiter;
 
 import java.util.Collection;
@@ -92,7 +93,11 @@ public class SearchHandler {
 
         // send to player
         if (!results.isEmpty()) {
-            resultConsumer.accept(results.values());
+            if (WhereIsItConfig.INSTANCE.getConfig().getCommon().forceServerSideHighlightsOnly) {
+                ServerSideRenderer.send(player, results.values());
+            } else {
+                resultConsumer.accept(results.values());
+            }
         }
     }
 }

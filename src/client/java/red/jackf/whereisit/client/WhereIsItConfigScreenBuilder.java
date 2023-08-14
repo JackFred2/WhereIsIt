@@ -39,6 +39,20 @@ public class WhereIsItConfigScreenBuilder {
                         .name(translatable("whereisit.config.title"))
                         .group(makeClientGroup(instance.getDefaults(), instance.getConfig()))
                         .group(makeCommonGroup(instance.getDefaults(), instance.getConfig()))
+                        .group(ListOption.<String>createBuilder()
+                                .name(translatable("whereisit.config.common.commandAliases"))
+                                .description(OptionDescription.of(
+                                        translatable("whereisit.config.common.commandAliases.description"),
+                                        translatable("whereisit.config.common.commandAliases.requiresDataReload").withStyle(ChatFormatting.RED)
+                                ))
+                                .controller(StringControllerBuilder::create)
+                                .binding(
+                                        instance.getDefaults().getCommon().commandAliases,
+                                        () -> instance.getConfig().getCommon().commandAliases,
+                                        l -> instance.getConfig().getCommon().commandAliases = l
+                                ).initial("find")
+                                .insertEntriesAtEnd(true)
+                                .build())
                         .build())
                 .category(ConfigCategory.createBuilder()
                         .name(translatable("whereisit.config.compatibility"))
@@ -278,6 +292,18 @@ public class WhereIsItConfigScreenBuilder {
                                 .coloured(true)
                                 .yesNoFormatter())
                         .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.debug.common.forceServerSideHighlightsOnly"))
+                        .binding(
+                                defaults.getCommon().forceServerSideHighlightsOnly,
+                                () -> config.getCommon().forceServerSideHighlightsOnly,
+                                b -> config.getCommon().forceServerSideHighlightsOnly = b
+                        )
+                        .description(OptionDescription.of(translatable("whereisit.config.debug.common.forceServerSideHighlightsOnly.description")))
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .yesNoFormatter())
+                        .build())
                 .build();
     }
 
@@ -437,6 +463,19 @@ public class WhereIsItConfigScreenBuilder {
                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                 .coloured(true)
                                 .onOffFormatter())
+                        .build())
+                .option(Option.<Integer>createBuilder()
+                        .name(translatable("whereisit.config.common.serverSideHighlightFadeTime"))
+                        .binding(
+                                defaults.getCommon().serverSideHighlightFadeTime,
+                                () -> config.getCommon().serverSideHighlightFadeTime,
+                                i -> config.getCommon().serverSideHighlightFadeTime = i
+                        )
+                        .description(OptionDescription.of(translatable("whereisit.config.common.serverSideHighlightFadeTime.description")))
+                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                .range(5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND)
+                                .step(1)
+                                .valueFormatter(i -> translatable("whereisit.config.client.fadeoutTime.slider", "%.2f".formatted(i.floatValue() / 20))))
                         .build())
                 .build();
     }

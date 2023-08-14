@@ -136,7 +136,6 @@ public class WhereIsItClient implements ClientModInitializer {
     // clear previous state for rendering
     private static void updateRendering(SearchRequest request) {
         lastRequest = request;
-        lastSearchTime = -1;
         closedScreenThisSearch = false;
         WorldRendering.clearResults();
 
