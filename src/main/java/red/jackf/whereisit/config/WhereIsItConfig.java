@@ -64,7 +64,7 @@ public class WhereIsItConfig {
         public boolean closeGuiOnFoundResults = true;
 
         @ConfigEntry
-        public int fadeoutTimeTicks = 10 * TICKS_PER_SECOND;
+        public int fadeoutTimeTicks = 15 * TICKS_PER_SECOND;
 
         @ConfigEntry
         public boolean showSlotHighlights = true;
@@ -126,6 +126,12 @@ public class WhereIsItConfig {
         private static final List<String> commandAliasesDefault = List.of(
                 "whereis"
         );
+
+        @ConfigEntry
+        public int serverSideHighlightFadeTime = 15 * TICKS_PER_SECOND;
+
+        @ConfigEntry
+        public boolean forceServerSideHighlightsOnly = false;
 
         public void validate() {
             this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 16);

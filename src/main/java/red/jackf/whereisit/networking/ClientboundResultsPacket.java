@@ -24,6 +24,7 @@ import java.util.Set;
  */
 public record ClientboundResultsPacket(long id, Collection<SearchResult> results) implements FabricPacket {
     public static final PacketType<ClientboundResultsPacket> TYPE = PacketType.create(WhereIsIt.id("c2s_searchforitem"), ClientboundResultsPacket::new);
+    public static final long WHEREIS_COMMAND_ID = -1L;
 
     public ClientboundResultsPacket(FriendlyByteBuf buf) {
         this(buf.readLong(), parse(buf));

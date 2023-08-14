@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.api.search.BlockSearcher;
 import red.jackf.whereisit.api.search.ConnectedBlocksGrabber;
@@ -17,11 +18,17 @@ import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 import red.jackf.whereisit.util.RateLimiter;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 public class SearchHandler {
 
-    public static void handle(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender response) {
+    public static void handleFromPacket(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender responder) {
+        handle(packet.request(), player, results -> responder.sendPacket(new ClientboundResultsPacket(packet.id(), results)));
+    }
+
+    public static void handle(SearchRequest request, ServerPlayer player, Consumer<Collection<SearchResult>> resultConsumer) {
         // check rate limit for players
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER && WhereIsItConfig.INSTANCE.getConfig().getServer().rateLimit) {
             //don't close the level
@@ -36,12 +43,12 @@ public class SearchHandler {
         }
 
         // empty requests
-        if (!packet.request().hasCriteria()) {
+        if (!request.hasCriteria()) {
             WhereIsIt.LOGGER.warn("Empty request from {}", player.getGameProfile().getName());
             return;
         }
 
-        WhereIsIt.LOGGER.debug("Server search id %d: %s".formatted(packet.id(), packet.request().toString()));
+        WhereIsIt.LOGGER.debug("Server search for {}: {}", player.getScoreboardName(), request);
 
         var startTime = System.nanoTime();
 
@@ -67,7 +74,7 @@ public class SearchHandler {
 
                     if (results.containsKey(adjustedRoot)) continue;
 
-                    var result = BlockSearcher.EVENT.invoker().searchPosition(packet.request(), player, level, state, adjustedRoot);
+                    var result = BlockSearcher.EVENT.invoker().searchPosition(request, player, level, state, adjustedRoot);
                     if (result.hasValue()) {
                         results.put(adjustedRoot, result.get().withOtherPositions(connected));
                     }
@@ -75,7 +82,7 @@ public class SearchHandler {
             }
         }
 
-        WhereIsIt.LOGGER.debug("Server search results id %d: %s".formatted(packet.id(), results.toString()));
+        WhereIsIt.LOGGER.debug("Server search results for {}: {}", player.getScoreboardName(), results);
 
         // timing
         var time = System.nanoTime() - startTime;
@@ -84,7 +91,8 @@ public class SearchHandler {
         if (WhereIsItConfig.INSTANCE.getConfig().getCommon().printSearchTime) player.sendSystemMessage(Component.literal("[Where Is It] " + timingStr).withStyle(ChatFormatting.YELLOW));
 
         // send to player
-        if (!results.isEmpty())
-            response.sendPacket(new ClientboundResultsPacket(packet.id(), results.values()));
+        if (!results.isEmpty()) {
+            resultConsumer.accept(results.values());
+        }
     }
 }

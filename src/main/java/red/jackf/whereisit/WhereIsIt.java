@@ -42,6 +42,6 @@ public class WhereIsIt implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(WhereIsCommand::register);
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> RateLimiter.disconnected(handler.player));
 
-		ServerPlayNetworking.registerGlobalReceiver(ServerboundSearchForItemPacket.TYPE, SearchHandler::handle);
+		ServerPlayNetworking.registerGlobalReceiver(ServerboundSearchForItemPacket.TYPE, SearchHandler::handleFromPacket);
 	}
 }

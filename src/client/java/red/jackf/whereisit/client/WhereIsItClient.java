@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import red.jackf.whereisit.api.SearchRequest;
+import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.api.SearchInvoker;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.client.api.ShouldIgnoreKey;
@@ -34,6 +35,8 @@ import red.jackf.whereisit.client.render.WorldRendering;
 import red.jackf.whereisit.client.util.NotificationToast;
 import red.jackf.whereisit.client.util.TextUtil;
 import red.jackf.whereisit.config.WhereIsItConfig;
+
+import java.util.Collection;
 
 public class WhereIsItClient implements ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -112,19 +115,22 @@ public class WhereIsItClient implements ClientModInitializer {
                 Minecraft.getInstance().player.sendSystemMessage(component);
         }
 
-        var anySucceeded = SearchInvoker.EVENT.invoker().search(request, results -> {
-            WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
-            if (WhereIsItConfig.INSTANCE.getConfig().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {
-                closedScreenThisSearch = true;
-                if (Minecraft.getInstance().screen != null && Minecraft.getInstance().player != null)
-                    Minecraft.getInstance().player.closeContainer();
-            }
-            WorldRendering.addResults(results);
-        });
+        var anySucceeded = SearchInvoker.EVENT.invoker().search(request, WhereIsItClient::recieveResults);
+
         if (!anySucceeded) NotificationToast.sendNotInstalledOnServer();
         else if (WhereIsItConfig.INSTANCE.getConfig().getClient().playSoundOnRequest) playRequestSound();
 
         return anySucceeded;
+    }
+
+    public static void recieveResults(Collection<SearchResult> results) {
+        WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
+        if (WhereIsItConfig.INSTANCE.getConfig().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {
+            closedScreenThisSearch = true;
+            if (Minecraft.getInstance().screen != null && Minecraft.getInstance().player != null)
+                Minecraft.getInstance().player.closeContainer();
+        }
+        WorldRendering.addResults(results);
     }
 
     // clear previous state for rendering

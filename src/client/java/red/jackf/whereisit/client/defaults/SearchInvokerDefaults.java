@@ -3,6 +3,7 @@ package red.jackf.whereisit.client.defaults;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import red.jackf.whereisit.api.SearchResult;
+import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchInvoker;
 import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
@@ -52,9 +53,13 @@ public class SearchInvokerDefaults {
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> { // on server connect
             ClientPlayNetworking.registerGlobalReceiver(ClientboundResultsPacket.TYPE, (packet, player, responseSender) -> {
-                var consumer = consumers.remove(packet.id());
-                if (consumer != null) {
-                    client.execute(() -> consumer.accept(packet.results()));
+                if (packet.id() == ClientboundResultsPacket.WHEREIS_COMMAND_ID) {
+                    WhereIsItClient.recieveResults(packet.results());
+                } else {
+                    var consumer = consumers.remove(packet.id());
+                    if (consumer != null) {
+                        client.execute(() -> consumer.accept(packet.results()));
+                    }
                 }
             });
         });

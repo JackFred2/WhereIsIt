@@ -19,6 +19,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.enchantment.Enchantment;
 import red.jackf.whereisit.api.SearchRequest;
@@ -26,6 +27,7 @@ import red.jackf.whereisit.api.criteria.EnchantmentCriterion;
 import red.jackf.whereisit.api.criteria.ItemCriterion;
 import red.jackf.whereisit.api.criteria.ItemTagCriterion;
 import red.jackf.whereisit.config.WhereIsItConfig;
+import red.jackf.whereisit.search.SearchHandler;
 
 import java.util.stream.IntStream;
 
@@ -64,6 +66,7 @@ public class WhereIsCommand {
             .then(literal("enchantment").then(
                     argument("enchantment_id", ResourceArgument.resource(buildContext, Registries.ENCHANTMENT))
                         .executes(ctx -> WhereIsCommand.searchEnchantment(
+                            ctx.getSource().getPlayerOrException(),
                             ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT),
                             null))
                         .then(
@@ -73,8 +76,9 @@ public class WhereIsCommand {
                                     return SharedSuggestionProvider.suggest(IntStream.rangeClosed(0, enchantment.getMaxLevel()).mapToObj(Integer::toString), builder);
                                 })
                                 .executes(ctx -> WhereIsCommand.searchEnchantment(
-                                        ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT),
-                                        IntegerArgumentType.getInteger(ctx, "enchantment_level")
+                                    ctx.getSource().getPlayerOrException(),
+                                    ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT),
+                                    IntegerArgumentType.getInteger(ctx, "enchantment_level")
                                 )))
             )));
 
@@ -84,26 +88,28 @@ public class WhereIsCommand {
     }
 
     private static int searchItem(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        var player = ctx.getSource().getPlayerOrException();
         var request = new SearchRequest();
         request.accept(new ItemCriterion(ResourceArgument.getResource(ctx, "item_id", Registries.ITEM).value()));
-        System.out.println(request);
+        SearchHandler.handle(request, player, results -> ServerSideRenderer.send(player, results));
         return 0;
     }
 
     private static int searchItemTag(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        var player = ctx.getSource().getPlayerOrException();
         var request = new SearchRequest();
         var tagId = ResourceLocationArgument.getId(ctx, "item_tag");
         var tag = BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, tagId));
         if (tag.isEmpty()) throw UNKNOWN_ITEM_TAG.create(tagId);
         request.accept(new ItemTagCriterion(tag.get().key()));
-        System.out.println(request);
+        SearchHandler.handle(request, player, results -> ServerSideRenderer.send(player, results));
         return 0;
     }
 
-    private static int searchEnchantment(Holder.Reference<Enchantment> enchantment, Integer level) {
+    private static int searchEnchantment(ServerPlayer player, Holder.Reference<Enchantment> enchantment, Integer level) {
         var request = new SearchRequest();
         request.accept(new EnchantmentCriterion(enchantment.value(), level));
-        System.out.println(request);
+        SearchHandler.handle(request, player, results -> ServerSideRenderer.send(player, results));
         return 0;
     }
 }
