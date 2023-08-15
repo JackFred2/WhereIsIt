@@ -1,16 +1,17 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.matthewprenger.cursegradle.CurseArtifact
-import com.matthewprenger.cursegradle.CurseProject
-import com.matthewprenger.cursegradle.CurseRelation
-import com.matthewprenger.cursegradle.Options
+import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
+import me.modmuss50.mpp.ReleaseType
+import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
 import java.net.URI
 
 plugins {
 	id("maven-publish")
-	id("fabric-loom") version "1.2-SNAPSHOT"
-	id("com.modrinth.minotaur") version "2.+"
-	id("com.matthewprenger.cursegradle") version "1.4.0"
+	id("fabric-loom") version "1.3-SNAPSHOT"
+	id("com.github.breadmoirai.github-release") version "2.4.1"
+	id("org.ajoberstar.grgit") version "5.0.+"
+	id("me.modmuss50.mod-publish-plugin") version "0.3.3"
 }
 
 group = properties["maven_group"]!!
@@ -19,10 +20,11 @@ version = properties["mod_version"] ?: "dev"
 val modReleaseType = properties["type"]?.toString() ?: "release"
 
 base {
-	archivesName.set("${properties["archives_base_name"]}-${properties["minecraft_version"]}")
+	archivesName.set("${properties["archives_base_name"]}")
 }
 
 repositories {
+	// Parchment Mappings
 	maven {
 		name = "ParchmentMC"
 		url = URI("https://maven.parchmentmc.org")
@@ -30,6 +32,8 @@ repositories {
 			includeGroup("org.parchmentmc.data")
 		}
 	}
+
+	// Mod Menu, EMI
 	maven {
 		name = "TerraformersMC"
 		url = URI("https://maven.terraformersmc.com/releases/")
@@ -38,14 +42,17 @@ repositories {
 			includeGroup("dev.emi")
 		}
 	}
+
+	// JEI
 	maven {
-		// JEI
 		name = "Jared"
 		url = URI("https://maven.blamejared.com/")
 		content {
 			includeGroup("mezz.jei")
 		}
 	}
+
+	// REI
 	maven {
 		name = "Shedaniel"
 		url = URI("https://maven.shedaniel.me")
@@ -54,6 +61,8 @@ repositories {
 			includeGroup("dev.architectury")
 		}
 	}
+
+	// YACL
 	maven {
 		name = "Xander Maven"
 		url = URI("https://maven.isxander.dev/releases")
@@ -61,6 +70,17 @@ repositories {
 			includeGroup("dev.isxander.yacl")
 		}
 	}
+
+	// YACL Dependencies
+	maven {
+		name = "Sonatype"
+		url = URI("https://oss.sonatype.org/content/repositories/snapshots")
+		content {
+			includeGroupByRegex("com.twelvemonkeys.*")
+		}
+	}
+
+	// JEI, JSST
 	maven {
 		name = "Modrinth"
 		url = URI("https://api.modrinth.com/maven")
@@ -68,6 +88,8 @@ repositories {
 			includeGroup("maven.modrinth")
 		}
 	}
+
+	// JackFredLib
 	maven {
 		name = "GitHubPackages"
 		url = URI("https://maven.pkg.github.com/JackFred2/JackFredLib")
@@ -77,13 +99,6 @@ repositories {
 		credentials {
 			username = properties["gpr.user"]?.toString() ?: System.getenv("GPR_USER")
 			password = properties["gpr.key"]?.toString() ?: System.getenv("GPR_TOKEN")
-		}
-	}
-	maven {
-		name = "Sonatype"
-		url = URI("https://oss.sonatype.org/content/repositories/snapshots")
-		content {
-			includeGroupByRegex("com.twelvemonkeys.*")
 		}
 	}
 }
@@ -184,71 +199,115 @@ tasks.jar {
 	}
 }
 
-curseforge {
-	if (System.getenv("CURSEFORGE_TOKEN") != null && version != "dev") {
-		apiKey = System.getenv("CURSEFORGE_TOKEN")
-		project(closureOf<CurseProject> {
-			id = "378036"
-			changelog = "Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt/releases"
-			releaseType = "release"
+val lastTag = properties["lastTag"]?.toString()
+val newTag = properties["newTag"]?.toString()
+if (lastTag != null && newTag != null) {
+	val changelogPath = layout.buildDirectory.file("changelogs/$lastTag..$newTag.md")
 
-			releaseType = modReleaseType
+	val changelogTask = task("generateChangelog") {
+		val prefixList = properties["changelog_filter"]?.toString()?.split(",") ?: emptyList()
+		println("Writing changelog to ${changelogPath.get()}")
+		outputs.file(changelogPath)
 
-			addGameVersion("Fabric")
-			addGameVersion("Java 17")
-
-			properties["game_versions"]?.toString()?.split(",")?.forEach { addGameVersion(it) }
-
-			mainArtifact(tasks.remapJar.get().archiveFile, closureOf<CurseArtifact> {
-				relations(closureOf<CurseRelation> {
-					requiredDependency("fabric-api")
-					requiredDependency("yacl")
-					optionalDependency("emi")
-					optionalDependency("jei")
-					optionalDependency("roughly-enough-items")
-					optionalDependency("modmenu")
-				})
-				displayName = if (project.hasProperty("prefix")) {
-					"${properties["prefix"]} ${base.archivesName.get()}-$version.jar"
-				} else {
-					"${base.archivesName.get()}-$version.jar"
-				}
-			})
-
-		})
-
-		options(closureOf<Options> {
-			forgeGradleIntegration = false
-		})
-	} else {
-		println("No CURSEFORGE_TOKEN set, skipping...")
+		doLast {
+			val command = "git log --max-count=100 --pretty=format:\"%s\" $lastTag...$newTag"
+			val proc = Runtime.getRuntime().exec(command)
+			// println(command)
+			proc.errorStream.bufferedReader().forEachLine { println(it) }
+			val lines = mutableListOf(
+				// "# ${properties["mod_name"]} $newTag",
+				"Previous: $lastTag",
+				""
+			)
+			properties["github_url"]?.toString()?.also {
+				lines.add("Full changelog: ${it}/compare/$lastTag...$newTag")
+				lines.add("")
+			}
+			proc.inputStream.bufferedReader().forEachLine {
+				var str = it
+				// it starts with quotes in github actions i guess https://www.youtube.com/watch?v=-O3ogWBfWI0
+				if (str.startsWith("\"")) str = str.substring(1)
+				if (str.endsWith("\"")) str = str.substring(0, str.length - 1)
+				if (prefixList.any { prefix -> str.startsWith(prefix) })
+					lines.add("  - $str")
+			}
+			proc.waitFor()
+			val changelog = lines.joinToString("\n")
+			changelogPath.get().asFile.writeText(changelog)
+		}
 	}
-}
 
-modrinth {
-	if (System.getenv("MODRINTH_TOKEN") != null && version != "dev") {
-		token.set(System.getenv("MODRINTH_TOKEN"))
-		projectId.set("FCTyEqkn")
-		versionNumber.set(version as String)
-		versionName.set("Where Is It $version")
-		versionType.set(modReleaseType)
-		uploadFile.set(tasks.remapJar)
-		changelog.set("Check the GitHub for changes: https://github.com/JackFred2/WhereIsIt/releases")
-		properties["game_versions"]!!.toString().let {
-			gameVersions.set(it.split(","))
-		}
-		loaders.set(listOf("fabric", "quilt"))
-		dependencies {
-			required.project("1eAoo2KR") // YACL
-			required.project("P7dR8mSH") // fabric api
+	if (System.getenv().containsKey("GITHUB_TOKEN")) {
+		tasks.named<GithubReleaseTask>("githubRelease") {
+			dependsOn(changelogTask)
+			mustRunAfter(changelogTask)
+			inputs.file(changelogPath)
 
-			optional.project("fRiHVvU7") // EMI
-			optional.project("nfn13YXA") // REI
-			optional.project("u6dRKJwZ") // JEI
-			optional.project("mOgUt4GM") // Mod Menu
+			authorization.set(System.getenv("GITHUB_TOKEN")?.let { "Bearer $it" })
+			owner.set(properties["github_owner"]!!.toString())
+			repo.set(properties["github_repo"]!!.toString())
+			tagName.set(newTag)
+			releaseName.set("${properties["mod_name"]} $newTag")
+			targetCommitish.set(grgit.branch.current().name)
+			releaseAssets.from(
+				tasks["remapJar"].outputs.files,
+				tasks["remapSourcesJar"].outputs.files,
+			)
+
+			body.set(provider {
+				return@provider changelogPath.get().asFile.readText()
+			})
 		}
-	} else {
-		println("No MODRINTH_TOKEN set, skipping...")
+	}
+
+	tasks.named<DefaultTask>("publishMods") {
+		dependsOn(changelogTask)
+		mustRunAfter(changelogTask)
+	}
+
+	publishMods {
+		changelog.set(provider {
+			return@provider changelogPath.get().asFile.readText()
+		})
+		type.set(ReleaseType.STABLE)
+		modLoaders.add("fabric")
+		modLoaders.add("quilt")
+		file.set(tasks.named<RemapJarTask>("remapJar").get().archiveFile)
+		additionalFiles.from(tasks.named<RemapSourcesJarTask>("remapSourcesJar").get().archiveFile)
+
+		if (System.getenv().containsKey("CURSEFORGE_TOKEN") || dryRun.get()) {
+			curseforge {
+				projectId.set("378036")
+				accessToken.set(System.getenv("CURSEFORGE_TOKEN"))
+				properties["game_versions"]!!.toString().split(",").forEach {
+					minecraftVersions.add(it)
+				}
+				displayName.set("${properties["prefix"]!!} ${base.archivesName.get()}")
+				listOf("fabric-api", "yacl").forEach { requires {
+					slug.set(it)
+				}}
+				listOf("emi", "jei", "roughly-enough-items", "modmenu").forEach { optional {
+					slug.set(it)
+				}}
+			}
+		}
+
+		if (System.getenv().containsKey("MODRINTH_TOKEN") || dryRun.get()) {
+			modrinth {
+				accessToken.set(System.getenv("MODRINTH_TOKEN"))
+				projectId.set("FCTyEqkn")
+				properties["game_versions"]!!.toString().split(",").forEach {
+					minecraftVersions.add(it)
+				}
+				displayName.set("${properties["mod_name"]!!} $version")
+				listOf("fabric-api", "yacl").forEach { requires {
+					slug.set(it)
+				}}
+				listOf("emi", "jei", "rei", "modmenu").forEach { optional {
+					slug.set(it)
+				}}
+			}
+		}
 	}
 }
 
