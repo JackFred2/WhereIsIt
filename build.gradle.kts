@@ -97,8 +97,8 @@ repositories {
 			includeGroup("red.jackf")
 		}
 		credentials {
-			username = properties["gpr.user"]?.toString() ?: System.getenv("GPR_USER")
-			password = properties["gpr.key"]?.toString() ?: System.getenv("GPR_TOKEN")
+			username = properties["gpr.user"]?.toString() ?: System.getenv("GITHUB_ACTOR")
+			password = properties["gpr.key"]?.toString() ?: System.getenv("GITHUB_TOKEN")
 		}
 	}
 }
