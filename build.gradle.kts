@@ -5,6 +5,7 @@ import me.modmuss50.mpp.ReleaseType
 import net.fabricmc.loom.task.RemapJarTask
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import red.jackf.GenerateChangelogTask
+import red.jackf.UpdateDependenciesTask
 import java.net.URI
 
 plugins {
@@ -142,7 +143,7 @@ dependencies {
 
 	include("red.jackf:jackfredlib:${properties["jackfredlib_version"]}")
 	modImplementation("red.jackf:jackfredlib:${properties["jackfredlib_version"]}")
-	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_api_version"]}")
+	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
 	// Config
 	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${properties["yacl_version"]}")
@@ -308,4 +309,9 @@ publishing {
 			}
 		}
 	}
+}
+
+tasks.register<UpdateDependenciesTask>("updateModDependencies") {
+	mcVersion.set(properties["minecraft_version"]!!.toString())
+	loader.set("fabric")
 }

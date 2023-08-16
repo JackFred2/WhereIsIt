@@ -60,13 +60,9 @@ abstract class GenerateChangelogTask : DefaultTask() {
      * Output path of the changelog file.
      */
     @get:OutputFile
-    val changelogFile: RegularFileProperty = project.objects.fileProperty()
-
-    init {
-        changelogFile.convention(project.provider {
-            project.layout.buildDirectory.file("changelogs/${lastTag.get()}..${newTag.get()}.md").get()
-        })
-    }
+    val changelogFile: RegularFileProperty = project.objects.fileProperty().also { it.convention(project.provider {
+        project.layout.buildDirectory.file("changelogs/${lastTag.get()}..${newTag.get()}.md").get()
+    })}
 
     @TaskAction
     fun generateChangelog() {
