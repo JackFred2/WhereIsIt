@@ -53,6 +53,7 @@ public class SearchInvokerDefaults {
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> { // on server connect
             ClientPlayNetworking.registerGlobalReceiver(ClientboundResultsPacket.TYPE, (packet, player, responseSender) -> {
+                // we didn't send a matching packet, so assume the default Where Is It handling of overlay render
                 if (packet.id() == ClientboundResultsPacket.WHEREIS_COMMAND_ID) {
                     WhereIsItClient.lastSearchTime = -1;
                     WhereIsItClient.recieveResults(packet.results());

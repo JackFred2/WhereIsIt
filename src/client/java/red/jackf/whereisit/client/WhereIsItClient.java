@@ -97,7 +97,7 @@ public class WhereIsItClient implements ClientModInitializer {
         });
 
         // mod default handlers
-        SearchRequestPopulator.EVENT.register(SearchRequestPopulatorDefaults::populate);
+        SearchRequestPopulatorDefaults.setup();
         OverlayStackBehaviorDefaults.setup();
         SearchInvokerDefaults.setup();
         ShouldIgnoreKeyDefaults.setup();

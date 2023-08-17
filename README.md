@@ -12,11 +12,15 @@ Also embeds [JackFredLib](https://github.com/JackFred2/JackFredLib).
 ## Features
 
 - Not required - vanilla clients can join without restricting mod users.
-- Server-side functionality - clients without the mod can use the command `/whereis` (default, changeable) to use the mod.
+- Detailed searching - search by item ID, name, item tag, fluid contents, enchantment, potions, and more, and any
+  combination of the previous.
+- Server-side functionality - clients without the mod can use the command `/whereis` (default, changeable) to use the
+  mod.
 - Support for recipe viewers, including the vanilla Recipe Book, and for JEI, REI, EMI:
-  - Ability to search for items containing specific fluids, and tags for recipes.
-  - Custom searches (search for enchantments using enchanted books, and potion effects using potions).
-  - Smart favourite handling - add a named Shulker Box in your favourites, and search for it regardless of the contents.
+    - Ability to search for items containing specific fluids, and tags for recipes.
+    - Custom searches (search for enchantments using enchanted books, and potion effects using potions).
+    - Smart favourite handling - add a named Shulker Box in your favourites, and search for it regardless of the
+      contents.
 
 ## Usage
 
@@ -47,18 +51,20 @@ An API is available under the `api` packages for the following purposes:
 
 ### Client
 
-- `OverlayStackBehavior.EVENT` - Custom behavior when searching a stack from an overlay; used to
-  search purely for enchantments or potions, for example.
+- `OverlayStackBehavior.EVENT` - Build a custom search request from an overlay stack if pressed; used for example to
+  look for enchantments on any item by using enchanted books, or potion effects from potions for example.
 - `SearchInvoker.EVENT` - Client-sided search initiators; could be asking the server or looking through a local cache.
 - `SearchRequestPopulator.EVENT` - Obtaining the correct criteria for a search from a given screen.
 - `ShouldIgnoreKey.EVENT` - Check to see if the keybind should be ignored in that instant - this is used to cancel if
   a search bar is focused, for example.
+- `RenderUtils` - Information on the currently displayed overlay, as well as scheduling text rendering.
 
 ### Common
 
 - `NestedItemStackSearcher.EVENT` - Testing against sub-items, such as for backpacks or other containers.
 - `BlockSearcher.EVENT` - By default, Where Is It uses the Fabric Transfer API to get all stacks in a block. You can use
   this event to override this for custom behavior/handling.
-- `ConnectedBlocksGrabber` - Used to detect which blocks are connected with each-other, such as chests or storage drawers.
+- `ConnectedBlocksGrabber` - Used to detect which blocks are connected with each-other, such as chests or storage
+  drawers.
 - `criteria.Criterion` - Class to extend if making new criteria; create a new `Criterion.Type<T>` to go along with it
   and register using `Criterion#register`.

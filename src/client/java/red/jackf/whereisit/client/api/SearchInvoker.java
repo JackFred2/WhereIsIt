@@ -36,6 +36,11 @@ public interface SearchInvoker {
     }
 
     /**
+     * Process a search request. For examples, see {@link red.jackf.whereisit.client.defaults.SearchInvokerDefaults} which
+     * sets up a network channel to ask the server, or Chest Tracker, which queries the local memory.
+     *
+     * @param request Request to search using
+     * @param resultConsumer Callback for successful results; should be called when
      * @return if the request was successfully started; not necessarily finished.
      */
     boolean search(SearchRequest request, Consumer<Collection<SearchResult>> resultConsumer);

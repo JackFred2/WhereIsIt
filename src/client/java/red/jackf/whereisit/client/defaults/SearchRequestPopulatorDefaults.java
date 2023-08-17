@@ -17,7 +17,11 @@ import java.util.ArrayList;
  * Populates a request from the vanilla GUIs/recipe book
  */
 public class SearchRequestPopulatorDefaults {
-    public static void populate(SearchRequest request, Screen screen, int mouseX, int mouseY) {
+    public static void setup() {
+        SearchRequestPopulator.EVENT.register(SearchRequestPopulatorDefaults::populate);
+    }
+
+    private static void populate(SearchRequest request, Screen screen, int mouseX, int mouseY) {
         // normal item
         if (screen instanceof AbstractContainerScreen<?> containerScreen) {
             // inventory slots
