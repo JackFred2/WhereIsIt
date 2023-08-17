@@ -61,11 +61,18 @@ abstract class UpdateDependenciesTask : DefaultTask() {
         return json[0].jsonObject["version_number"]?.jsonPrimitive?.content
     }
 
+    private fun stripLoaderSuffix(versionStr: String): String {
+        val regex = Regex("^(?<actualVersion>.+).${loader.get()}$")
+        val match = regex.matchEntire(versionStr) ?: return versionStr
+        return match.groups["actualVersion"]!!.value
+    }
+
     private val versionRegex = Regex("(?<slug>[\\w!@\$()`.+,\"\\-']{3,64})_version=(?<existing>.+)")
 
     private fun doFile(file: File) {
         var currentlyChecking = false
         val output = mutableListOf<String>()
+        var updateCount = 0
         file.forEachLine { line ->
             when {
                 line.contains(blockEndPrefix.get()) -> {
@@ -91,15 +98,25 @@ abstract class UpdateDependenciesTask : DefaultTask() {
                             println("nothing found")
                             output.add(line)
                         } else {
-                            println("found $version")
-                            output.add(line.replaceFirst(match.groups["existing"]!!.value, version))
+                            print("found $version")
+                            val processed = if (stripLoaderSuffix.get()) stripLoaderSuffix(version) else version
+                            if (match.groups["existing"]!!.value != processed) {
+                                println(".....updating")
+                                output.add(line.replaceFirst(match.groups["existing"]!!.value, processed))
+                                updateCount++
+                            } else {
+                                println()
+                                output.add(line)
+                            }
                         }
                     }
                 }
             }
         }
 
-        println(output.joinToString("\n"))
+        println("Updated $updateCount versions")
+
+        file.writeText(output.joinToString("\n"))
     }
 
     @TaskAction

@@ -132,6 +132,17 @@ loom {
 	accessWidenerPath.set(file("src/main/resources/whereisit.accesswidener"))
 }
 
+// from WTHIT
+fun DependencyHandlerScope.modCompileRuntime(any: String, configure: ExternalModuleDependency.() -> Unit = {}) {
+	modCompileOnly(any, configure)
+	modRuntimeOnly(any, configure)
+}
+
+fun DependencyHandlerScope.modImplementationInclude(any: String, configure: ExternalModuleDependency.() -> Unit = {}) {
+	modImplementation(any, configure)
+	include(any, configure)
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
@@ -141,19 +152,20 @@ dependencies {
 	})
 	modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
-	include("red.jackf:jackfredlib:${properties["jackfredlib_version"]}")
-	modImplementation("red.jackf:jackfredlib:${properties["jackfredlib_version"]}")
-	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
+	modImplementationInclude("red.jackf:jackfredlib:${properties["jackfredlib_version"]}")
+	modCompileRuntime("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
 	// Config
-	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${properties["yacl_version"]}")
+	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${properties["yacl_version"]}") {
+		exclude(group = "com.terraformersmc", module = "modmenu")
+	}
 	implementation("blue.endless:jankson:${properties["jankson_version"]}")
 
 	// Dev Util
 	modLocalRuntime("maven.modrinth:jsst:B39piMwB")
 
 	// COMPATIBILITY
-	modCompileOnly("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
+	modCompileRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
 
 	// Recipe Viewer APIs
 	// https://github.com/mezz/JustEnoughItems/issues/2891
@@ -171,7 +183,7 @@ dependencies {
 	// Recipe Viewer Runtimes
 	//modLocalRuntime("mezz.jei:jei-${properties["minecraft_version"]}-fabric:${properties["jei_version"]}")
 	modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}") {
-		exclude("net.fabricmc.fabric-api")
+		exclude(group = "net.fabricmc.fabric-api", module = "fabric-api")
 	}
 	//modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
 }
