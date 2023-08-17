@@ -37,6 +37,7 @@ import static net.minecraft.commands.Commands.literal;
 public class WhereIsCommand {
     private static final DynamicCommandExceptionType UNKNOWN_ITEM_TAG = new DynamicCommandExceptionType(tagId -> new LiteralMessage("Unknown tag: #" + tagId));
 
+    @SuppressWarnings("SameParameterValue")
     private static <T> SuggestionProvider<CommandSourceStack> suggestsRegistryTag(ResourceKey<Registry<T>> registryKey) {
         return (ctx, builder) ->
                 SharedSuggestionProvider.suggestResource(ctx.getSource()
@@ -91,7 +92,7 @@ public class WhereIsCommand {
         var player = ctx.getSource().getPlayerOrException();
         var request = new SearchRequest();
         request.accept(new ItemCriterion(ResourceArgument.getResource(ctx, "item_id", Registries.ITEM).value()));
-        SearchHandler.handle(request, player, results -> ServerSideRenderer.send(player, results));
+        SearchHandler.handle(request, player);
         return 0;
     }
 
@@ -102,14 +103,14 @@ public class WhereIsCommand {
         var tag = BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, tagId));
         if (tag.isEmpty()) throw UNKNOWN_ITEM_TAG.create(tagId);
         request.accept(new ItemTagCriterion(tag.get().key()));
-        SearchHandler.handle(request, player, results -> ServerSideRenderer.send(player, results));
+        SearchHandler.handle(request, player);
         return 0;
     }
 
     private static int searchEnchantment(ServerPlayer player, Holder.Reference<Enchantment> enchantment, Integer level) {
         var request = new SearchRequest();
         request.accept(new EnchantmentCriterion(enchantment.value(), level));
-        SearchHandler.handle(request, player, results -> ServerSideRenderer.send(player, results));
+        SearchHandler.handle(request, player);
         return 0;
     }
 }

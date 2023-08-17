@@ -3,10 +3,10 @@ package red.jackf.whereisit.serverside;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -19,7 +19,6 @@ import red.jackf.jackfredlib.api.lying.entity.builders.EntityBuilders;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.config.WhereIsItConfig;
-import red.jackf.whereisit.networking.ClientboundResultsPacket;
 
 import java.util.Collection;
 
@@ -29,42 +28,53 @@ import static net.minecraft.SharedConstants.TICKS_PER_SECOND;
  * Handles sending results to a player which may not have the mod installed client side
  */
 public class ServerSideRenderer {
+    private static final Block MAIN_BLOCK = Blocks.STRUCTURE_BLOCK;
+    private static final Block ALT_BLOCK = Blocks.JIGSAW;
+    private static final float HIGHLIGHT = 0.7f;
     private static final Multimap<GameProfile, ActiveLie<EntityLie>> playerHighlightLies = ArrayListMultimap.create();
 
+    /**
+     * Fade all server-side lies for a player
+     * @param player Player to fade lies for
+     */
     public static void fadeServerSide(ServerPlayer player) {
         playerHighlightLies.removeAll(player.getGameProfile()).forEach(ActiveLie::fade);
     }
 
-    public static void send(ServerPlayer player, Collection<SearchResult> results) {
-        if (WhereIsItConfig.INSTANCE.getConfig().getCommon().forceServerSideHighlightsOnly
-                || !ServerPlayNetworking.canSend(player, ClientboundResultsPacket.TYPE)) {
-            // draw server side highlights
-            doServersideRendering(player, results);
-        } else {
-
-            // send to player via packet
-            ServerPlayNetworking.send(player, new ClientboundResultsPacket(ClientboundResultsPacket.WHEREIS_COMMAND_ID, results));
-        }
-    }
-
+    /**
+     * Build an entity lie to show the given player, using ALT_BLOCK as the block.
+     * @param level Level to place the lie in
+     * @param pos Position to place the lie at
+     * @param colour Colour of the lie
+     * @return Built entity lie at the given position
+     */
     private static EntityLie makeAlternateBlockDisplay(ServerLevel level, BlockPos pos, Colour colour) {
         return EntityLie.builder(EntityBuilders.blockDisplay(level)
                         .positionCentered(pos)
-                        .state(Blocks.JIGSAW.defaultBlockState())
-                        .scaleAndCenter(0.7f)
+                        .state(ALT_BLOCK.defaultBlockState())
+                        .scaleAndCenter(HIGHLIGHT)
                         .glowing(true, colour)
                         .build())
                 .onFade(activeLie -> playerHighlightLies.get(activeLie.player().getGameProfile()).remove(activeLie))
                 .build();
     }
 
+    /**
+     * Return a random fade time, centered on the config time with some jitter
+     * @return Randomly generated fade time
+     */
     private static int randomFadeTime() {
         var baseTime = WhereIsItConfig.INSTANCE.getConfig().getCommon().serverSideHighlightFadeTime;
         int random = (int) ((4 * TICKS_PER_SECOND) * Math.random() - (2 * TICKS_PER_SECOND));
         return baseTime + random;
     }
 
-    private static void doServersideRendering(ServerPlayer player, Collection<SearchResult> results) {
+    /**
+     * Render a set of results to the player, using JackFredLib's lying module
+     * @param player Player to render server-side results for
+     * @param results Results to render
+     */
+    public static void doServersideRendering(ServerPlayer player, Collection<SearchResult> results) {
         WhereIsIt.LOGGER.debug("Doing server-side rendering for {}", player.getScoreboardName());
         var level = (ServerLevel) player.level();
 
@@ -76,8 +86,8 @@ public class ServerSideRenderer {
             var mainEntity = EntityBuilders.blockDisplay(level)
                     .position(Vec3.atBottomCenterOf(result.pos().above())
                             .add(result.name() != null ? result.nameOffset().subtract(0, 1, 0) : Vec3.ZERO))
-                    .state(Blocks.STRUCTURE_BLOCK.defaultBlockState())
-                    .scaleAndCenter(0.7f)
+                    .state(MAIN_BLOCK.defaultBlockState())
+                    .scaleAndCenter(HIGHLIGHT)
                     .addTranslation(new Vector3f(0, -0.5f, 0))
                     .glowing(true, colour);
 

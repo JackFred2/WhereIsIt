@@ -2,6 +2,7 @@ package red.jackf.whereisit.search;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -19,17 +20,15 @@ import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 import red.jackf.whereisit.serverside.ServerSideRenderer;
 import red.jackf.whereisit.util.RateLimiter;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.function.Consumer;
 
 public class SearchHandler {
 
-    public static void handleFromPacket(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender responder) {
-        handle(packet.request(), player, results -> responder.sendPacket(new ClientboundResultsPacket(packet.id(), results)));
+    public static void handleFromPacket(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender ignored) {
+        handle(packet.request(), player);
     }
 
-    public static void handle(SearchRequest request, ServerPlayer player, Consumer<Collection<SearchResult>> resultConsumer) {
+    public static void handle(SearchRequest request, ServerPlayer player) {
         ServerSideRenderer.fadeServerSide(player);
 
         // check rate limit for players
@@ -98,9 +97,10 @@ public class SearchHandler {
         // send to player
         if (!results.isEmpty()) {
             if (WhereIsItConfig.INSTANCE.getConfig().getCommon().forceServerSideHighlightsOnly) {
-                ServerSideRenderer.send(player, results.values());
+                ServerSideRenderer.doServersideRendering(player, results.values());
             } else {
-                resultConsumer.accept(results.values());
+                // send packet
+                ServerPlayNetworking.send(player, new ClientboundResultsPacket(ClientboundResultsPacket.WHEREIS_COMMAND_ID, results.values()));
             }
         }
     }
