@@ -223,7 +223,7 @@ if (lastTagVal != null && newTagVal != null) {
 	}
 
 	if (System.getenv().containsKey("GITHUB_TOKEN")) {
-		tasks.register<GithubReleaseTask>("githubRelease") {
+		tasks.named<GithubReleaseTask>("githubRelease") {
 			dependsOn(generateChangelogTask)
 
 			authorization.set(System.getenv("GITHUB_TOKEN")?.let { "Bearer $it" })
