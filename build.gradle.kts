@@ -3,7 +3,6 @@
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import me.modmuss50.mpp.ReleaseType
 import net.fabricmc.loom.task.RemapJarTask
-import net.fabricmc.loom.task.RemapSourcesJarTask
 import red.jackf.GenerateChangelogTask
 import red.jackf.UpdateDependenciesTask
 import java.net.URI
@@ -220,6 +219,7 @@ if (lastTagVal != null && newTagVal != null) {
 		lastTag.set(lastTagVal)
 		newTag.set(newTagVal)
 		githubUrl.set(properties["github_url"]!!.toString())
+		prefixFilters.set(properties["changelog_filter"]!!.toString().split(","))
 	}
 
 	if (System.getenv().containsKey("GITHUB_TOKEN")) {
@@ -256,7 +256,7 @@ if (lastTagVal != null && newTagVal != null) {
 			modLoaders.add("fabric")
 			modLoaders.add("quilt")
 			file.set(tasks.named<RemapJarTask>("remapJar").get().archiveFile)
-			additionalFiles.from(tasks.named<RemapSourcesJarTask>("remapSourcesJar").get().archiveFile)
+			// additionalFiles.from(tasks.named<RemapSourcesJarTask>("remapSourcesJar").get().archiveFile)
 
 			if (System.getenv().containsKey("CURSEFORGE_TOKEN") || dryRun.get()) {
 				curseforge {
