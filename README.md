@@ -1,5 +1,8 @@
 # Where Is It
 
+![Modrinth Downloads](https://img.shields.io/modrinth/dt/FCTyEqkn?style=flat-square&label=Modrinth&color=%2316AF54)
+![CurseForge Downloads](https://img.shields.io/curseforge/dt/378036?style=flat-square&label=CurseForge&color=%23E04E14)
+
 Minecraft mod to locate items in nearby inventories. Press Y over an item to search.
 
 ![An example image of the mod showing 4 results](https://i.imgur.com/lvebo0v.png)
