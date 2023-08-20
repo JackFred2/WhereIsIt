@@ -6,6 +6,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Display;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -31,7 +32,7 @@ public class ServerSideRenderer {
     private static final Block MAIN_BLOCK = Blocks.STRUCTURE_BLOCK;
     private static final Block ALT_BLOCK = Blocks.JIGSAW;
     private static final float HIGHLIGHT = 0.7f;
-    private static final Multimap<GameProfile, ActiveLie<EntityLie>> playerHighlightLies = ArrayListMultimap.create();
+    private static final Multimap<GameProfile, ActiveLie<EntityLie<Display.BlockDisplay>>> playerHighlightLies = ArrayListMultimap.create();
 
     /**
      * Fade all server-side lies for a player
@@ -48,7 +49,7 @@ public class ServerSideRenderer {
      * @param colour Colour of the lie
      * @return Built entity lie at the given position
      */
-    private static EntityLie makeAlternateBlockDisplay(ServerLevel level, BlockPos pos, Colour colour) {
+    private static EntityLie<Display.BlockDisplay> makeAlternateBlockDisplay(ServerLevel level, BlockPos pos, Colour colour) {
         return EntityLie.builder(EntityBuilders.blockDisplay(level)
                         .positionCentered(pos)
                         .state(ALT_BLOCK.defaultBlockState())

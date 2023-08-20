@@ -20,6 +20,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
+import red.jackf.jackfredlib.api.Memoizer;
+import red.jackf.jackfredlib.client.api.toasts.*;
+import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.api.SearchInvoker;
@@ -32,11 +35,11 @@ import red.jackf.whereisit.client.defaults.ShouldIgnoreKeyDefaults;
 import red.jackf.whereisit.client.render.CurrentGradientHolder;
 import red.jackf.whereisit.client.render.ScreenRendering;
 import red.jackf.whereisit.client.render.WorldRendering;
-import red.jackf.whereisit.client.util.NotificationToast;
 import red.jackf.whereisit.client.util.TextUtil;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 public class WhereIsItClient implements ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -47,6 +50,12 @@ public class WhereIsItClient implements ClientModInitializer {
     public static SearchRequest lastRequest = null;
     public static long lastSearchTime = 0;
     public static boolean closedScreenThisSearch = false;
+
+    private static final Supplier<CustomToast> NOT_INSTALLED = Memoizer.of(() -> ToastBuilder.builder(ToastFormat.DARK, Component.translatable("whereisit.config.title"))
+            .addMessage(Component.translatable("gui.whereisit.not_installed_serverside"))
+            .progressShowsVisibleTime()
+            .withImage(ImageSpec.modIcon(WhereIsIt.MODID))
+            .build());
 
     @Override
     public void onInitializeClient() {
@@ -118,7 +127,7 @@ public class WhereIsItClient implements ClientModInitializer {
 
         var anySucceeded = SearchInvoker.EVENT.invoker().search(request, WhereIsItClient::recieveResults);
 
-        if (!anySucceeded) NotificationToast.sendNotInstalledOnServer();
+        if (!anySucceeded) Toasts.INSTANCE.send(NOT_INSTALLED.get());
         else if (WhereIsItConfig.INSTANCE.getConfig().getClient().playSoundOnRequest) playRequestSound();
 
         return anySucceeded;
