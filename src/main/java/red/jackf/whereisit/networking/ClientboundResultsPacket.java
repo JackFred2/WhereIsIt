@@ -23,7 +23,7 @@ import java.util.Set;
  * <li>numberOfOtherPositions: Collection&lt;BlockPos&gt;</li>
  */
 public record ClientboundResultsPacket(long id, Collection<SearchResult> results) implements FabricPacket {
-    public static final PacketType<ClientboundResultsPacket> TYPE = PacketType.create(WhereIsIt.id("c2s_searchforitem"), ClientboundResultsPacket::new);
+    public static final PacketType<ClientboundResultsPacket> TYPE = PacketType.create(WhereIsIt.id("s2c_founditem"), ClientboundResultsPacket::new);
     public static final long WHEREIS_COMMAND_ID = -1L;
 
     public ClientboundResultsPacket(FriendlyByteBuf buf) {

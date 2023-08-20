@@ -29,6 +29,7 @@ public class SearchHandler {
     }
 
     public static void handle(SearchRequest request, ServerPlayer player) {
+        // clear last server side results
         ServerSideRenderer.fadeServerSide(player);
 
         // check rate limit for players
@@ -43,8 +44,6 @@ public class SearchHandler {
 
             RateLimiter.add(player, time);
         }
-
-        // clear last server side results
 
         // empty requests
         if (!request.hasCriteria()) {
@@ -96,7 +95,7 @@ public class SearchHandler {
 
         // send to player
         if (!results.isEmpty()) {
-            if (WhereIsItConfig.INSTANCE.getConfig().getCommon().forceServerSideHighlightsOnly) {
+            if (WhereIsItConfig.INSTANCE.getConfig().getCommon().forceServerSideHighlightsOnly || !ServerPlayNetworking.canSend(player, ClientboundResultsPacket.TYPE)) {
                 ServerSideRenderer.doServersideRendering(player, results.values());
             } else {
                 // send packet

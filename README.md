@@ -1,6 +1,8 @@
-# WhereIsIt
+# Where Is It
 
 Minecraft mod to locate items in nearby inventories. Press Y over an item to search.
+
+![An example image of the mod showing 4 results](https://i.imgur.com/lvebo0v.png)
 
 ## Requirements
 
