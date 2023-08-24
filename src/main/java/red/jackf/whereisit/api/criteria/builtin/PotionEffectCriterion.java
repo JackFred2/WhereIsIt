@@ -1,4 +1,4 @@
-package red.jackf.whereisit.api.criteria;
+package red.jackf.whereisit.api.criteria.builtin;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -6,14 +6,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
-import red.jackf.whereisit.criteria.VanillaCriteria;
+import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.criteria.CriterionType;
 
 public class PotionEffectCriterion extends Criterion {
+    public static final CriterionType<PotionEffectCriterion> TYPE = CriterionType.of(PotionEffectCriterion::new);
     private static final String KEY = "PotionId";
     private Potion potion;
 
     public PotionEffectCriterion() {
-        super(VanillaCriteria.POTION_EFFECT);
+        super(TYPE);
     }
 
     public PotionEffectCriterion(Potion potion) {

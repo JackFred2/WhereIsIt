@@ -1,4 +1,4 @@
-package red.jackf.whereisit.api.criteria;
+package red.jackf.whereisit.api.criteria.builtin;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -9,19 +9,21 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jetbrains.annotations.Nullable;
-import red.jackf.whereisit.criteria.VanillaCriteria;
+import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.criteria.CriterionType;
 
 /**
  * A criterion matching against an enchantment (or lack of), optionally along with a target level.
  */
 public class EnchantmentCriterion extends Criterion {
+    public static final CriterionType<EnchantmentCriterion> TYPE = CriterionType.of(EnchantmentCriterion::new);
     private static final String ID_KEY = "EnchantmentId";
     private static final String LEVEL_KEY = "EnchantmentLevel";
     private Enchantment enchantment = null;
     private Integer targetLevel = null;
 
     public EnchantmentCriterion() {
-        super(VanillaCriteria.ENCHANTMENT);
+        super(TYPE);
     }
 
     /**

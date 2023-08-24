@@ -23,9 +23,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.enchantment.Enchantment;
 import red.jackf.whereisit.api.SearchRequest;
-import red.jackf.whereisit.api.criteria.EnchantmentCriterion;
-import red.jackf.whereisit.api.criteria.ItemCriterion;
-import red.jackf.whereisit.api.criteria.ItemTagCriterion;
+import red.jackf.whereisit.api.criteria.builtin.EnchantmentCriterion;
+import red.jackf.whereisit.api.criteria.builtin.ItemCriterion;
+import red.jackf.whereisit.api.criteria.builtin.ItemTagCriterion;
 import red.jackf.whereisit.config.WhereIsItConfig;
 import red.jackf.whereisit.search.SearchHandler;
 

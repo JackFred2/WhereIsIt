@@ -8,8 +8,9 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.WhereIsIt;
-import red.jackf.whereisit.api.criteria.AllOfCriterion;
 import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.criteria.CriterionType;
+import red.jackf.whereisit.api.criteria.builtin.AllOfCriterion;
 import red.jackf.whereisit.api.search.NestedItemStackSearcher;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
@@ -50,7 +51,7 @@ public class SearchRequest implements Consumer<Criterion> {
         } else {
             var data = new CompoundTag();
             criterion.writeTag(data);
-            WhereIsIt.LOGGER.warn("Criterion data for " + Criterion.Type.REGISTRY.getKey(criterion.type) + " invalid: " + data);
+            WhereIsIt.LOGGER.warn("Criterion data for " + CriterionType.REGISTRY.getKey(criterion.type) + " invalid: " + data);
         }
     }
 
@@ -62,13 +63,13 @@ public class SearchRequest implements Consumer<Criterion> {
     }
 
     /**
-     * Serializes an individual criterion into a compound tag. Null if not registered to {@link Criterion.Type#REGISTRY}.
+     * Serializes an individual criterion into a compound tag. Null if not registered to {@link CriterionType#REGISTRY}.
      * @param criterion Criterion to serialize
      * @return Serialized criterion, or null if not registered.
      */
     @Nullable
     public static CompoundTag toTag(Criterion criterion) {
-        var type = Criterion.Type.REGISTRY.getKey(criterion.type);
+        var type = CriterionType.REGISTRY.getKey(criterion.type);
         if (type == null) return null;
         var tag = new CompoundTag();
         tag.putString(ID, type.toString());
@@ -102,7 +103,7 @@ public class SearchRequest implements Consumer<Criterion> {
     @Nullable
     public static Criterion fromTag(CompoundTag criterionTag) {
         var typeId = ResourceLocation.tryParse(criterionTag.getString(ID));
-        var type = Criterion.Type.REGISTRY.get(typeId);
+        var type = CriterionType.REGISTRY.get(typeId);
         if (type != null) {
             var data = criterionTag.getCompound(DATA);
             var criterion = type.get();

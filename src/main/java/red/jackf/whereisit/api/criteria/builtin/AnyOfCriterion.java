@@ -1,11 +1,12 @@
-package red.jackf.whereisit.api.criteria;
+package red.jackf.whereisit.api.criteria.builtin;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import red.jackf.whereisit.api.SearchRequest;
-import red.jackf.whereisit.criteria.VanillaCriteria;
+import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.criteria.CriterionType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,23 +16,24 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * Acts as an 'AND' gate for a list of criterion. Create this using {@link AllOfCriterion (Collection)}, then (recommended)
- * {@link AllOfCriterion#compact()} before you add it to a search request.
+ * Acts as an 'OR' gate for a list of criterion. Create this using {@link AnyOfCriterion(Collection)}, then (recommended)
+ * {@link AnyOfCriterion#compact()} before you add it to a search request.
  */
-public class AllOfCriterion extends Criterion implements Consumer<Criterion> {
-    private static final String KEY = "AllOf";
-    public final List<Criterion> criteria = new ArrayList<>();
-    public AllOfCriterion() {
-        super(VanillaCriteria.ALL_OF);
+public class AnyOfCriterion extends Criterion implements Consumer<Criterion> {
+    public static final CriterionType<AnyOfCriterion> TYPE = CriterionType.of(AnyOfCriterion::new);
+    private static final String KEY = "AnyOf";
+    private final List<Criterion> criteria = new ArrayList<>();
+    public AnyOfCriterion() {
+        super(TYPE);
     }
 
-    public AllOfCriterion(Collection<Criterion> criteria) {
-        this();
+    public AnyOfCriterion(Collection<Criterion> criteria) {
+        super(TYPE);
         this.criteria.addAll(criteria);
     }
 
     /**
-     * Flattens the AND condition if just 1 criterion is specified.
+     * Flattens the OR condition if just 1 criterion is specified.
      */
     public Criterion compact() {
         if (criteria.size() == 1) return criteria.get(0);
@@ -67,21 +69,17 @@ public class AllOfCriterion extends Criterion implements Consumer<Criterion> {
 
     @Override
     public boolean test(ItemStack stack) {
-        return criteria.stream().allMatch(c -> c.test(stack));
+        return criteria.stream().anyMatch(c -> c.test(stack));
     }
 
     @Override
     public void accept(Criterion criterion) {
-        if (criterion instanceof AllOfCriterion allOfCriterion) {
-            this.criteria.addAll(allOfCriterion.criteria);
-        } else {
-            this.criteria.add(criterion);
-        }
+        this.criteria.add(criterion);
     }
 
     @Override
     public String toString() {
-        return "AllOfCriterion[" +
+        return "AnyOfCriterion[" +
                 criteria.stream().map(Criterion::toString).collect(Collectors.joining(", ")) +
                 "]";
     }
@@ -90,7 +88,7 @@ public class AllOfCriterion extends Criterion implements Consumer<Criterion> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AllOfCriterion that = (AllOfCriterion) o;
+        AnyOfCriterion that = (AnyOfCriterion) o;
         return Objects.equals(criteria, that.criteria);
     }
 

@@ -1,10 +1,11 @@
-package red.jackf.whereisit.api.criteria;
+package red.jackf.whereisit.api.criteria.builtin;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import red.jackf.whereisit.criteria.VanillaCriteria;
+import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.criteria.CriterionType;
 
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ import java.util.Objects;
  * To match against a lack of tag, pass null.
  */
 public class NbtCriterion extends Criterion {
+    public static final CriterionType<NbtCriterion> TYPE = CriterionType.of(NbtCriterion::new);
     private static final String TAG_KEY = "Tag";
     private static final String IGNORE_DAMAGE = "IgnoreZeroDamage";
 
@@ -26,7 +28,7 @@ public class NbtCriterion extends Criterion {
     }
 
     public NbtCriterion() {
-        super(VanillaCriteria.NBT);
+        super(TYPE);
     }
 
     @Override

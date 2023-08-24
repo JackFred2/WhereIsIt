@@ -5,8 +5,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import red.jackf.whereisit.api.criteria.EnchantmentCriterion;
-import red.jackf.whereisit.api.criteria.PotionEffectCriterion;
+import red.jackf.whereisit.api.criteria.builtin.EnchantmentCriterion;
+import red.jackf.whereisit.api.criteria.builtin.PotionEffectCriterion;
 import red.jackf.whereisit.client.api.OverlayStackBehavior;
 
 import java.util.Set;

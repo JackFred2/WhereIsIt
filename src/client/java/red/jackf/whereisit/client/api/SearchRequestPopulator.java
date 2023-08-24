@@ -9,6 +9,7 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.*;
+import red.jackf.whereisit.api.criteria.builtin.*;
 import red.jackf.whereisit.client.WhereIsItClient;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.function.Consumer;
  * <p>Takes a {@link Screen} and mouse position, and attempts to add search criteria to a given request. Goes through all
  * listeners until one adds criteria.</p>
  *
- * <p>Normally, this just involves parsing a hovered {@link ItemStack}, using {@link red.jackf.whereisit.api.criteria.ItemCriterion}.
+ * <p>Normally, this just involves parsing a hovered {@link ItemStack}, using {@link ItemCriterion}.
  * It may also be used to add more specific criteria, such as a {@link ItemTagCriterion} in a recipe viewer,
  * or fluids/energy if hovered over a tank/battery.</p>
  *

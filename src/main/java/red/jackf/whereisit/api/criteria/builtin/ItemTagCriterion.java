@@ -1,4 +1,4 @@
-package red.jackf.whereisit.api.criteria;
+package red.jackf.whereisit.api.criteria.builtin;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -7,7 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import red.jackf.whereisit.criteria.VanillaCriteria;
+import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.criteria.CriterionType;
 
 import java.util.Objects;
 
@@ -15,10 +16,11 @@ import java.util.Objects;
  * Checks against an item tag.
  */
 public class ItemTagCriterion extends Criterion {
+    public static final CriterionType<ItemTagCriterion> TYPE = CriterionType.of(ItemTagCriterion::new);
     private static final String KEY = "TagId";
     private TagKey<Item> tag = null;
     public ItemTagCriterion() {
-        super(VanillaCriteria.TAG);
+        super(TYPE);
     }
 
     public ItemTagCriterion(TagKey<Item> tag) {

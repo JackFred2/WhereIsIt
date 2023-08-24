@@ -1,22 +1,24 @@
-package red.jackf.whereisit.api.criteria;
+package red.jackf.whereisit.api.criteria.builtin;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import red.jackf.whereisit.criteria.VanillaCriteria;
+import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.criteria.CriterionType;
 
 /**
  * Matches against the custom name of an ItemStack. If null, checks for lack of name. Looks for the whole name.
  */
 public class NameCriterion extends Criterion {
+    public static final CriterionType<NameCriterion> TYPE = CriterionType.of(NameCriterion::new);
     private static final String KEY = "Name";
 
     @Nullable
     private String name = null;
 
     public NameCriterion() {
-        super(VanillaCriteria.NAME);
+        super(TYPE);
     }
 
     public NameCriterion(@Nullable String name) {

@@ -1,4 +1,4 @@
-package red.jackf.whereisit.api.criteria;
+package red.jackf.whereisit.api.criteria.builtin;
 
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
@@ -10,7 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import red.jackf.whereisit.criteria.VanillaCriteria;
+import red.jackf.whereisit.api.criteria.Criterion;
+import red.jackf.whereisit.api.criteria.CriterionType;
 
 import java.util.Objects;
 
@@ -18,14 +19,15 @@ import java.util.Objects;
  * Matches against a specific fluid, by targeting buckets, bottles and similar containers. Uses Fabric's Transfer API.
  */
 public class FluidCriterion extends Criterion {
+    public static final CriterionType<FluidCriterion> TYPE = CriterionType.of(FluidCriterion::new);
     private static final String KEY = "FluidId";
     private Fluid fluid = Fluids.EMPTY;
     public FluidCriterion() {
-        super(VanillaCriteria.FLUID);
+        super(TYPE);
     }
 
     public FluidCriterion(Fluid fluid) {
-        this();
+        super(TYPE);
         this.fluid = fluid;
     }
 

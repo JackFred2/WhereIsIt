@@ -1,20 +1,18 @@
 package red.jackf.whereisit.api.criteria;
 
-import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.api.criteria.builtin.AnyOfCriterion;
 
 /**
- * A test for an ItemStack. Register a supplier to {@link #register(ResourceLocation, Type)}
+ * A test for an ItemStack. Register a supplier to {@link #register(ResourceLocation, CriterionType)}
  */
 public abstract class Criterion {
-    public final Type<?> type;
+    public final CriterionType<?> type;
 
-    public Criterion(Type<?> type) {
+    public Criterion(CriterionType<?> type) {
         this.type = type;
     }
     /**
@@ -58,14 +56,8 @@ public abstract class Criterion {
      * @return Type object of the criteria registered; equal to <code>type</code>.
      * @param <T> Extended Criterion class
      */
-    public static <T extends Criterion> Type<T> register(ResourceLocation id, Type<T> type) {
-        return Registry.register(Type.REGISTRY, id, type);
+    public static <T extends Criterion> CriterionType<T> register(ResourceLocation id, CriterionType<T> type) {
+        return Registry.register(CriterionType.REGISTRY, id, type);
     }
 
-    public interface Type<T extends Criterion> {
-        ResourceKey<Registry<Type<? extends Criterion>>> REGISTRY_KEY = ResourceKey.createRegistryKey(WhereIsIt.id("criteria_supplier"));
-        Registry<Type<? extends Criterion>> REGISTRY = FabricRegistryBuilder.createSimple(REGISTRY_KEY).buildAndRegister();
-
-        T get();
-    }
 }
