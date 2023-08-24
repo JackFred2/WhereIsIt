@@ -1,4 +1,4 @@
-package red.jackf.whereisit.serverside;
+package red.jackf.whereisit.command;
 
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -50,7 +50,7 @@ public class WhereIsCommand {
     private WhereIsCommand() {
     }
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection selection) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection ignored) {
         var config = WhereIsItConfig.INSTANCE.getConfig().getCommon();
         if (config.commandAliases.isEmpty()) return;
 

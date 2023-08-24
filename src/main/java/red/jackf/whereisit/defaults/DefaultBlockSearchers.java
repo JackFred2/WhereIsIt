@@ -1,4 +1,4 @@
-package red.jackf.whereisit.search;
+package red.jackf.whereisit.defaults;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;

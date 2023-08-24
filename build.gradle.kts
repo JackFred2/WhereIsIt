@@ -181,10 +181,10 @@ dependencies {
 
 	// Recipe Viewer Runtimes
 	//modLocalRuntime("mezz.jei:jei-${properties["minecraft_version"]}-fabric:${properties["jei_version"]}")
-	modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}") {
+	/*modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}") {
 		exclude(group = "net.fabricmc.fabric-api", module = "fabric-api")
-	}
-	//modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
+	}*/
+	modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
 }
 
 tasks.withType<ProcessResources>().configureEach {

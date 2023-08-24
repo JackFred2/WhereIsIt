@@ -1,4 +1,4 @@
-package red.jackf.whereisit.search;
+package red.jackf.whereisit.defaults;
 
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.state.properties.ChestType;

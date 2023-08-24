@@ -1,4 +1,4 @@
-package red.jackf.whereisit.search;
+package red.jackf.whereisit.defaults;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.ContainerHelper;
