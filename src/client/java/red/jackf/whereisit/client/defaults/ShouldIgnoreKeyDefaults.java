@@ -7,7 +7,7 @@ import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import red.jackf.whereisit.client.api.ShouldIgnoreKey;
 
 public class ShouldIgnoreKeyDefaults {
-    public static void setup() {
+    static void setup() {
         // Creative mode search bar and anvil bar
         ShouldIgnoreKey.EVENT.register(() -> {
             var screen = Minecraft.getInstance().screen;

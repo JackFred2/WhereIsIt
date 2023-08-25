@@ -18,7 +18,7 @@ import red.jackf.whereisit.config.WhereIsItConfig;
 import java.util.HashSet;
 
 public class DefaultBlockSearchers {
-    public static void setup() {
+    static void setup() {
         setupTransferApi();
         setupEnderChest();
         setupCheckShulkerItself();

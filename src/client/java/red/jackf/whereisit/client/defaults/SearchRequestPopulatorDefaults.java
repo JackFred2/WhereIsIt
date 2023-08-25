@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * Populates a request from the vanilla GUIs/recipe book
  */
 public class SearchRequestPopulatorDefaults {
-    public static void setup() {
+    static void setup() {
         SearchRequestPopulator.EVENT.register(SearchRequestPopulatorDefaults::populate);
     }
 

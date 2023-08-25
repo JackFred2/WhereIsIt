@@ -8,7 +8,7 @@ import red.jackf.whereisit.api.search.NestedItemStackSearcher;
 import java.util.Set;
 
 public class DefaultNestedItemStackSearchers {
-    public static void setup() {
+    static void setup() {
         setupShulkerBoxes();
         setupBundles();
     }

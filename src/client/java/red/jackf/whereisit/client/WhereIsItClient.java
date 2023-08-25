@@ -28,10 +28,7 @@ import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.api.SearchInvoker;
 import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.client.api.ShouldIgnoreKey;
-import red.jackf.whereisit.client.defaults.OverlayStackBehaviorDefaults;
-import red.jackf.whereisit.client.defaults.SearchInvokerDefaults;
-import red.jackf.whereisit.client.defaults.SearchRequestPopulatorDefaults;
-import red.jackf.whereisit.client.defaults.ShouldIgnoreKeyDefaults;
+import red.jackf.whereisit.client.plugin.WhereIsItClientPluginLoader;
 import red.jackf.whereisit.client.render.CurrentGradientHolder;
 import red.jackf.whereisit.client.render.ScreenRendering;
 import red.jackf.whereisit.client.render.WorldRendering;
@@ -105,12 +102,7 @@ public class WhereIsItClient implements ClientModInitializer {
             }
         });
 
-        // mod default handlers
-        SearchRequestPopulatorDefaults.setup();
-        OverlayStackBehaviorDefaults.setup();
-        SearchInvokerDefaults.setup();
-        ShouldIgnoreKeyDefaults.setup();
-
+        WhereIsItClientPluginLoader.load();
         WorldRendering.setup();
     }
 

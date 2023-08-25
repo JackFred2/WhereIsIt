@@ -73,3 +73,5 @@ An API is available under the `api` packages for the following purposes:
   drawers.
 - `criteria.Criterion` - Class to extend if making new criteria; create a new `Criterion.Type<T>` to go along with it
   and register using `Criterion#register`.
+
+### Using the API

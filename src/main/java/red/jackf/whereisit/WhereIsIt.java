@@ -9,11 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import red.jackf.whereisit.command.WhereIsCommand;
 import red.jackf.whereisit.config.WhereIsItConfig;
-import red.jackf.whereisit.defaults.BuiltInCriteria;
-import red.jackf.whereisit.defaults.DefaultBlockSearchers;
-import red.jackf.whereisit.defaults.DefaultConnectedBlocksGrabbers;
-import red.jackf.whereisit.defaults.DefaultNestedItemStackSearchers;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
+import red.jackf.whereisit.plugin.WhereIsItPluginLoader;
 import red.jackf.whereisit.search.SearchHandler;
 import red.jackf.whereisit.util.RateLimiter;
 
@@ -35,12 +32,10 @@ public class WhereIsIt implements ModInitializer {
 		WhereIsItConfig.INSTANCE.save();
 		LOGGER.debug("Setup Common");
 
-		BuiltInCriteria.setup();
-		DefaultBlockSearchers.setup();
-		DefaultConnectedBlocksGrabbers.setup();
-		DefaultNestedItemStackSearchers.setup();
 		CommandRegistrationCallback.EVENT.register(WhereIsCommand::register);
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> RateLimiter.disconnected(handler.player));
 		ServerPlayNetworking.registerGlobalReceiver(ServerboundSearchForItemPacket.TYPE, SearchHandler::handleFromPacket);
+
+		WhereIsItPluginLoader.load();
 	}
 }

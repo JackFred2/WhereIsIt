@@ -10,7 +10,7 @@ public class BuiltInCriteria {
         Registry.register(CriterionType.REGISTRY, WhereIsIt.id(path), type);
     }
 
-    public static void setup() {
+    static void setup() {
         register("all_of", AllOfCriterion.TYPE);
         register("any_of", AnyOfCriterion.TYPE);
         register("enchantment", EnchantmentCriterion.TYPE);

@@ -35,7 +35,7 @@ public class SearchInvokerDefaults {
         };
     }
 
-    public static void setup() {
+    static void setup() {
         SearchInvoker.EVENT.register((request, resultConsumer) -> {
             if (ClientPlayNetworking.canSend(ServerboundSearchForItemPacket.TYPE)) {
                 var id = packetCounter.incrementAndGet();

@@ -5,7 +5,7 @@ import net.minecraft.world.level.block.state.properties.ChestType;
 import red.jackf.whereisit.api.search.ConnectedBlocksGrabber;
 
 public class DefaultConnectedBlocksGrabbers {
-    public static void setup() {
+    static void setup() {
         setupDoubleChests();
     }
 

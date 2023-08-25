@@ -12,7 +12,7 @@ import red.jackf.whereisit.client.api.OverlayStackBehavior;
 import java.util.Set;
 
 public class OverlayStackBehaviorDefaults {
-    public static void setup() {
+    static void setup() {
         OverlayStackBehavior.EVENT.register((consumer, stack, alternate) -> {
             if (!stack.is(Items.ENCHANTED_BOOK)) return false;
             var enchantments = EnchantmentHelper.getEnchantments(stack);

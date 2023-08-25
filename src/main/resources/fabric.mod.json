@@ -19,8 +19,14 @@
 		"main": [
 			"red.jackf.whereisit.WhereIsIt"
 		],
+		"whereisit": [
+			"red.jackf.whereisit.defaults.WhereIsItDefaultPlugin"
+		],
 		"client": [
 			"red.jackf.whereisit.client.WhereIsItClient"
+		],
+		"whereisit_client": [
+			"red.jackf.whereisit.client.defaults.WhereIsItDefaultClientPlugin"
 		],
 		"modmenu": [
 			"red.jackf.whereisit.client.compat.WhereIsItModMenu"
