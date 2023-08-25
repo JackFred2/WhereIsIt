@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.CriterionType;
 
+import java.util.Locale;
+
 /**
  * Matches against the custom name of an ItemStack. If null, checks for lack of name. Looks for the whole name.
  */
@@ -39,7 +41,8 @@ public class NameCriterion extends Criterion {
     @Override
     public boolean test(ItemStack stack) {
         if (stack.hasCustomHoverName()) {
-            return stack.getHoverName().getString().equals(name);
+            if (name == null) return false;
+            return stack.getHoverName().getString().toLowerCase(Locale.ROOT).contains(name.toLowerCase(Locale.ROOT));
         } else {
             return name == null;
         }
