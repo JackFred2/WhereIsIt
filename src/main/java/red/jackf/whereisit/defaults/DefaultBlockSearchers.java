@@ -4,9 +4,11 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import red.jackf.jackfredlib.api.ResultHolder;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
@@ -19,8 +21,10 @@ public class DefaultBlockSearchers {
     public static void setup() {
         setupTransferApi();
         setupEnderChest();
+        setupCheckShulkerItself();
     }
 
+    // check the regular contents of an inventory
     @SuppressWarnings("UnstableApiUsage")
     private static void setupTransferApi() {
         BlockSearcher.EVENT.register(BlockSearcher.FALLBACK, (request, player, level, state, pos) -> {
@@ -49,6 +53,7 @@ public class DefaultBlockSearchers {
         });
     }
 
+    // check inside a player's local ender chest inventory
     private static void setupEnderChest() {
         BlockSearcher.EVENT.register(BlockSearcher.DEFAULT, (request, player, level, state, pos) -> {
             if (!WhereIsItConfig.INSTANCE.getConfig().getCommon().enableDefaultSearchers) return ResultHolder.pass();
@@ -61,5 +66,24 @@ public class DefaultBlockSearchers {
             // there's very likely no other inventory directly at the ender chest so cancel here
             return ResultHolder.empty();
         });
+    }
+
+    // if searching for a shulker box, check if a placed down box is valid
+    private static void setupCheckShulkerItself() {
+        BlockSearcher.EVENT.register(BlockSearcher.DEFAULT, ((request, player, level, state, pos) -> {
+            if (!WhereIsItConfig.INSTANCE.getConfig().getCommon().enableDefaultSearchers) return ResultHolder.pass();
+            if (!state.is(BlockTags.SHULKER_BOXES)) return ResultHolder.pass();
+            var shulkerBoxBe = level.getBlockEntity(pos, BlockEntityType.SHULKER_BOX);
+            if (shulkerBoxBe.isEmpty()) return ResultHolder.pass();
+            var fakeItem = new ItemStack(state.getBlock().asItem());
+            fakeItem.setHoverName(shulkerBoxBe.get().getCustomName());
+            if (SearchRequest.check(fakeItem, request)) {
+                return ResultHolder.value(SearchResult.builder(pos)
+                    .item(fakeItem)
+                    .name(shulkerBoxBe.get().getCustomName(), null)
+                    .build());
+            }
+            return ResultHolder.pass();
+        }));
     }
 }
