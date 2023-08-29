@@ -95,7 +95,7 @@ repositories {
 		name = "GitHubPackages"
 		url = URI("https://maven.pkg.github.com/JackFred2/JackFredLib")
 		content {
-			includeGroup("red.jackf")
+			includeGroupByRegex("red.jackf.*")
 		}
 		credentials {
 			username = properties["gpr.user"]?.toString() ?: System.getenv("GITHUB_ACTOR")
@@ -151,7 +151,7 @@ dependencies {
 	})
 	modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
-	modImplementationInclude("red.jackf:jackfredlib:${properties["jackfredlib_version"]}")
+	modImplementationInclude("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")
 	modCompileRuntime("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
 	// Config

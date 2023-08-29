@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import red.jackf.jackfredlib.api.colour.Colour;
-import red.jackf.jackfredlib.client.api.GradientUtils;
+import red.jackf.jackfredlib.client.api.colour.GradientUtils;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.client.render.CurrentGradientHolder;
 import red.jackf.whereisit.config.ColourScheme;
