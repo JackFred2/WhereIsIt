@@ -9,6 +9,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -17,38 +20,26 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
+import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
-import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.*;
 
 @SuppressWarnings("resource") // i really don't want to call ClientLevel#close() thanks
-public class WorldRendering {
-    // had a nice shader going but alas, https://github.com/IrisShaders/Iris/blob/1.19.4/docs/development/compatibility/core-shaders.md
-    // they're right btw don't put this on iris
-    /*
-    public static final RenderType BLOCK_HIGHLIGHT = RenderType.create("whereisit_block_highlight",
-            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 256 * 256, false, false,
-            RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
-                    .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
-                    .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                    .setTextureState(RenderStateShard.NO_TEXTURE)
-                    .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
-                    .setCullState(RenderStateShard.CULL)
-                    .setLightmapState(RenderStateShard.NO_LIGHTMAP)
-                    .setWriteMaskState(RenderStateShard.COLOR_WRITE)
-                    .createCompositeState(false));*/
-
+public class Rendering {
     private static final Map<BlockPos, SearchResult> results = new HashMap<>();
     private static final Map<BlockPos, SearchResult> namedResults = new HashMap<>();
 
     private static final List<Pair<Vec3, Component>> scheduledLabels = new ArrayList<>();
 
-    private static float progress = 1f;
+    private static long lastSearchTime = 0;
+    @Nullable
+    private static SearchRequest lastRequest = null;
 
     public static void setup() {
         // schedule highlight label renders
@@ -71,22 +62,84 @@ public class WorldRendering {
         WorldRenderEvents.END.register(context -> {
             if (results.isEmpty()) return;
 
-            progress = Mth.clamp((context.world()
-                    .getGameTime() + context.tickDelta() - WhereIsItClient.lastSearchTime) / WhereIsItConfig.INSTANCE.getConfig()
+            var progress = Mth.clamp((context.world()
+                    .getGameTime() + context.tickDelta() - getLastSearchTime()) / WhereIsItConfig.INSTANCE.getConfig()
                     .getClient().fadeoutTimeTicks, 0f, 1f);
 
             if (context.world() == null || progress > 1f) {
                 return;
             }
 
-            renderBoxes(context);
+            renderBoxes(context, progress);
         });
     }
 
+    // smooth scaling for the cube highlights
+    private static float easingFunc(float progress) {
+        var power = 32f;
+        return (float) ((1 - Math.pow(progress, power)) * (1 - Math.pow(1 - progress, power)) * (1 - (progress / 4f)));
+    }
+
+    public static void addResults(Collection<SearchResult> newResults) {
+        for (SearchResult result : newResults) {
+            // TODO: when names are added, prioritise the one with a name
+            results.put(result.pos(), result);
+            if (result.name() != null) namedResults.put(result.pos(), result);
+        }
+    }
+
+    public static void setLastRequest(@Nullable SearchRequest request) {
+        lastRequest = request;
+    }
+
+    public static void clearResults() {
+        lastRequest = null;
+        results.clear();
+        namedResults.clear();
+    }
+
+    public static Map<BlockPos, SearchResult> getResults() {
+        return results;
+    }
+
+    public static Map<BlockPos, SearchResult> getNamedResults() {
+        return namedResults;
+    }
+
+    //////////////////////
+    // SCREEN RENDERING //
+    //////////////////////
+
+    // render a highlight behind an item
+    public static void renderSlotHighlight(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float tickDelta) {
+        if (screen instanceof AbstractContainerScreen<?> containerScreen) {
+            var time = Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() + tickDelta : 0;
+            for (Slot slot : containerScreen.getMenu().slots) {
+                if (slot.isActive() && slot.hasItem() && lastRequest != null &&
+                        SearchRequest.check(slot.getItem(), lastRequest)) {
+                    var x = slot.x + containerScreen.leftPos;
+                    var y = slot.y + containerScreen.topPos;
+                    var progress = 2 * time // shift over time
+                            + slot.x // offset by slot X
+                            - (mouseX + mouseY) / 6; // parallax with maths
+                    progress /= 256; // slow down
+                    var colour = CurrentGradientHolder.getColour(progress);
+                    graphics.fill(x, y, x + 16, y + 16, colour);
+                }
+            }
+        }
+    }
+
+    ////////////////////
+    // TEXT RENDERING //
+    ////////////////////
+
+    // schedule a label to be rendered; should be called before BEFORE_BLOCK_OUTLINE every frame
     public static void scheduleLabel(Vec3 pos, Component name) {
         scheduledLabels.add(Pair.of(pos, name));
     }
 
+    // does the rendering of labels at BEFORE_BLOCK_OUTLINE
     @SuppressWarnings("DataFlowIssue")
     private static void renderLabels(WorldRenderContext context) {
         scheduledLabels.stream().sorted(Comparator.comparingDouble(pair ->
@@ -103,6 +156,7 @@ public class WorldRendering {
                         context.consumers()));
     }
 
+    // render an individual label
     public static void renderLabel(Vec3 pos, Component name, PoseStack pose, Camera camera, MultiBufferSource consumers) {
         pose.pushPose();
 
@@ -136,7 +190,12 @@ public class WorldRendering {
         pose.popPose();
     }
 
-    private static void renderBoxes(WorldRenderContext context) {
+    /////////////////////
+    // WORLD RENDERING //
+    /////////////////////
+
+    // render all boxes at END
+    private static void renderBoxes(WorldRenderContext context, float progress) {
         var camera = context.camera();
 
         var pose = new PoseStack();
@@ -194,6 +253,7 @@ public class WorldRendering {
 
     }
 
+    // render an individual box
     private static void renderBox(BlockPos pos, VertexConsumer consumer, PoseStack pose, float scale) {
         pose.pushPose();
         pose.translate(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
@@ -239,29 +299,11 @@ public class WorldRendering {
         pose.popPose();
     }
 
-    private static float easingFunc(float progress) {
-        var power = 32f;
-        return (float) ((1 - Math.pow(progress, power)) * (1 - Math.pow(1 - progress, power)) * (1 - (progress / 4f)));
+    public static long getLastSearchTime() {
+        return lastSearchTime;
     }
 
-    public static void addResults(Collection<SearchResult> newResults) {
-        for (SearchResult result : newResults) {
-            // TODO: when names are added, prioritise the one with a name
-            results.put(result.pos(), result);
-            if (result.name() != null) namedResults.put(result.pos(), result);
-        }
-    }
-
-    public static void clearResults() {
-        results.clear();
-        namedResults.clear();
-    }
-
-    public static Map<BlockPos, SearchResult> getResults() {
-        return results;
-    }
-
-    public static Map<BlockPos, SearchResult> getNamedResults() {
-        return namedResults;
+    public static void setLastSearchTime(long lastSearchTime) {
+        Rendering.lastSearchTime = lastSearchTime;
     }
 }

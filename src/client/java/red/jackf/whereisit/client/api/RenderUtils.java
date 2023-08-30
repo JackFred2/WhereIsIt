@@ -3,7 +3,7 @@ package red.jackf.whereisit.client.api;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
-import red.jackf.whereisit.client.render.WorldRendering;
+import red.jackf.whereisit.client.render.Rendering;
 
 import java.util.Set;
 
@@ -16,7 +16,7 @@ public interface RenderUtils {
      * @return Get all positions currently being rendered by Where Is It.
      */
     static Set<BlockPos> getCurrentlyRendered() {
-        return WorldRendering.getResults().keySet();
+        return Rendering.getResults().keySet();
     }
 
     /**
@@ -24,7 +24,7 @@ public interface RenderUtils {
      * Tracker to skip label rendering when results are shown for the same position.
      */
     static Set<BlockPos> getCurrentlyRenderedWithNames() {
-        return WorldRendering.getNamedResults().keySet();
+        return Rendering.getNamedResults().keySet();
     }
 
     /**
@@ -34,6 +34,6 @@ public interface RenderUtils {
      * @param name Label to render at said position
      */
     static void scheduleLabelRender(Vec3 pos, Component name) {
-        WorldRendering.scheduleLabel(pos, name);
+        Rendering.scheduleLabel(pos, name);
     }
 }

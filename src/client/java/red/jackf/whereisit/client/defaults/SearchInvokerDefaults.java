@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.WhereIsItClient;
 import red.jackf.whereisit.client.api.SearchInvoker;
+import red.jackf.whereisit.client.render.Rendering;
 import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;
 
@@ -55,7 +56,7 @@ public class SearchInvokerDefaults {
             ClientPlayNetworking.registerGlobalReceiver(ClientboundResultsPacket.TYPE, (packet, player, responseSender) -> {
                 // we didn't send a matching packet, so assume the default Where Is It handling of overlay render
                 if (packet.id() == ClientboundResultsPacket.WHEREIS_COMMAND_ID) {
-                    WhereIsItClient.lastSearchTime = -1;
+                    Rendering.setLastSearchTime(-1);
                     WhereIsItClient.recieveResults(packet.results());
                 } else {
                     var consumer = consumers.remove(packet.id());

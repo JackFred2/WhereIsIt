@@ -17,7 +17,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import red.jackf.jackfredlib.api.Memoizer;
@@ -30,8 +29,7 @@ import red.jackf.whereisit.client.api.SearchRequestPopulator;
 import red.jackf.whereisit.client.api.ShouldIgnoreKey;
 import red.jackf.whereisit.client.plugin.WhereIsItClientPluginLoader;
 import red.jackf.whereisit.client.render.CurrentGradientHolder;
-import red.jackf.whereisit.client.render.ScreenRendering;
-import red.jackf.whereisit.client.render.WorldRendering;
+import red.jackf.whereisit.client.render.Rendering;
 import red.jackf.whereisit.client.util.TextUtil;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
@@ -43,9 +41,6 @@ public class WhereIsItClient implements ClientModInitializer {
     private static final KeyMapping SEARCH = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.whereisit.search", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y, "key.categories.whereisit"));
 
     private boolean inGame = false;
-    @Nullable
-    public static SearchRequest lastRequest = null;
-    public static long lastSearchTime = 0;
     public static boolean closedScreenThisSearch = false;
 
     private static final Supplier<CustomToast> NOT_INSTALLED = Memoizer.of(() -> ToastBuilder.builder(ToastFormat.DARK, Component.translatable("whereisit.config.title"))
@@ -60,10 +55,9 @@ public class WhereIsItClient implements ClientModInitializer {
         CurrentGradientHolder.refreshColourScheme();
 
         ScreenEvents.BEFORE_INIT.register((client, _screen, scaledWidth, scaledHeight) -> {
-
 			if (inGame) {
                 if (WhereIsItConfig.INSTANCE.getConfig().getClient().showSlotHighlights)
-                    ScreenEvents.afterRender(_screen).register(ScreenRendering::render);
+                    ScreenEvents.afterRender(_screen).register(Rendering::renderSlotHighlight);
 
                 // listen for keypress in-GUI
                 ScreenKeyboardEvents.afterKeyPress(_screen).register((screen, key, scancode, modifiers) -> {
@@ -79,15 +73,17 @@ public class WhereIsItClient implements ClientModInitializer {
 
         // don't try to search in the main menu lmao
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> inGame = true);
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> inGame = false);
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            inGame = false;
+            Rendering.clearResults();
+        });
 
         ClientTickEvents.START_WORLD_TICK.register(level -> {
-            if (lastSearchTime == -1) {
-                lastSearchTime = level.getGameTime();
-            } else if (level.getGameTime() > lastSearchTime + WhereIsItConfig.INSTANCE.getConfig().getClient().fadeoutTimeTicks) {
+            if (Rendering.getLastSearchTime() == -1) {
+                Rendering.setLastSearchTime(level.getGameTime());
+            } else if (level.getGameTime() > Rendering.getLastSearchTime() + WhereIsItConfig.INSTANCE.getConfig().getClient().fadeoutTimeTicks) {
                 // clear rendered slots after time limit
-                lastRequest = null;
-                WorldRendering.clearResults();
+                Rendering.clearResults();
             }
 
             if (WhereIsItConfig.INSTANCE.getConfig().getClient().searchUsingItemInHand && Minecraft.getInstance().screen == null && SEARCH.consumeClick()) {
@@ -103,11 +99,11 @@ public class WhereIsItClient implements ClientModInitializer {
         });
 
         WhereIsItClientPluginLoader.load();
-        WorldRendering.setup();
+        Rendering.setup();
     }
 
     public static boolean doSearch(SearchRequest request) {
-        WhereIsItClient.lastSearchTime = -1;
+        Rendering.setLastSearchTime(-1);
         updateRendering(request);
         LOGGER.debug("Starting request: %s".formatted(request));
 
@@ -132,14 +128,14 @@ public class WhereIsItClient implements ClientModInitializer {
             if (Minecraft.getInstance().screen != null && Minecraft.getInstance().player != null)
                 Minecraft.getInstance().player.closeContainer();
         }
-        WorldRendering.addResults(results);
+        Rendering.addResults(results);
     }
 
     // clear previous state for rendering
     private static void updateRendering(SearchRequest request) {
-        lastRequest = request;
+        Rendering.clearResults();
+        Rendering.setLastRequest(request);
         closedScreenThisSearch = false;
-        WorldRendering.clearResults();
 
         CurrentGradientHolder.refreshColourScheme();
     }
