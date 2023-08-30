@@ -80,7 +80,7 @@ public class WhereIsItClient implements ClientModInitializer {
 
         ClientTickEvents.START_WORLD_TICK.register(level -> {
             Rendering.incrementTicksSinceSearch();
-            if (Rendering.getTicksSinceSearch() > WhereIsItConfig.INSTANCE.getConfig().getClient().fadeoutTimeTicks) {
+            if (Rendering.getTicksSinceSearch() > WhereIsItConfig.INSTANCE.getConfig().getCommon().fadeoutTimeTicks) {
                 // clear rendered slots after time limit
                 Rendering.clearResults();
             }

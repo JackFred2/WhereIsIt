@@ -64,9 +64,6 @@ public class WhereIsItConfig {
         public boolean closeGuiOnFoundResults = true;
 
         @ConfigEntry
-        public int fadeoutTimeTicks = 15 * TICKS_PER_SECOND;
-
-        @ConfigEntry
         public boolean showSlotHighlights = true;
 
         @ConfigEntry
@@ -88,7 +85,6 @@ public class WhereIsItConfig {
         public boolean printSearchRequestsInChat = false;
 
         public void validate() {
-            this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
             this.solidColour = new Color(this.solidColour.getRGB() | 0xFF_000000);
             this.containerNameLabelScale = Mth.clamp(this.containerNameLabelScale, 0.25f, 2f);
         }
@@ -128,14 +124,14 @@ public class WhereIsItConfig {
         );
 
         @ConfigEntry
-        public int serverSideHighlightFadeTime = 15 * TICKS_PER_SECOND;
+        public int fadeoutTimeTicks = 15 * TICKS_PER_SECOND;
 
         @ConfigEntry
         public boolean forceServerSideHighlightsOnly = false;
 
         public void validate() {
             this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 16);
-            this.serverSideHighlightFadeTime = Mth.clamp(this.serverSideHighlightFadeTime, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
+            this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
         }
     }
 

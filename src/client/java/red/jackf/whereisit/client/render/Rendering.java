@@ -63,7 +63,7 @@ public class Rendering {
             if (results.isEmpty()) return;
 
             var progress = Mth.clamp((getTicksSinceSearch() + context.tickDelta()) / WhereIsItConfig.INSTANCE.getConfig()
-                    .getClient().fadeoutTimeTicks, 0f, 1f);
+                    .getCommon().fadeoutTimeTicks, 0f, 1f);
 
             if (context.world() == null || progress > 1f) {
                 return;

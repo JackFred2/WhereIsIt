@@ -112,19 +112,6 @@ public class WhereIsItConfigScreenBuilder {
                                 .coloured(true)
                                 .yesNoFormatter())
                         .build())
-                .option(Option.<Integer>createBuilder()
-                        .name(translatable("whereisit.config.client.fadeoutTime"))
-                        .binding(
-                                defaults.getClient().fadeoutTimeTicks,
-                                () -> config.getClient().fadeoutTimeTicks,
-                                i -> config.getClient().fadeoutTimeTicks = i
-                        )
-                        .description(OptionDescription.of(translatable("whereisit.config.client.fadeoutTime.description")))
-                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                .range(5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND)
-                                .step(1)
-                                .valueFormatter(i -> translatable("whereisit.config.client.fadeoutTime.slider", "%.2f".formatted(i.floatValue() / 20))))
-                        .build())
                 .option(Option.<Boolean>createBuilder()
                         .name(translatable("whereisit.config.client.showSlotHighlights"))
                         .binding(
@@ -465,17 +452,20 @@ public class WhereIsItConfigScreenBuilder {
                                 .onOffFormatter())
                         .build())
                 .option(Option.<Integer>createBuilder()
-                        .name(translatable("whereisit.config.common.serverSideHighlightFadeTime"))
+                        .name(translatable("whereisit.config.common.fadeoutTime"))
                         .binding(
-                                defaults.getCommon().serverSideHighlightFadeTime,
-                                () -> config.getCommon().serverSideHighlightFadeTime,
-                                i -> config.getCommon().serverSideHighlightFadeTime = i
+                                defaults.getCommon().fadeoutTimeTicks,
+                                () -> config.getCommon().fadeoutTimeTicks,
+                                i -> config.getCommon().fadeoutTimeTicks = i
                         )
-                        .description(OptionDescription.of(translatable("whereisit.config.common.serverSideHighlightFadeTime.description")))
+                        .description(OptionDescription.of(
+                                translatable("whereisit.config.common.fadeoutTime.description1"),
+                                translatable("whereisit.config.common.fadeoutTime.description2")
+                        ))
                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                 .range(5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND)
                                 .step(1)
-                                .valueFormatter(i -> translatable("whereisit.config.client.fadeoutTime.slider", "%.2f".formatted(i.floatValue() / 20))))
+                                .valueFormatter(i -> translatable("whereisit.config.common.fadeoutTime.slider", "%.2f".formatted(i.floatValue() / 20))))
                         .build())
                 .build();
     }
