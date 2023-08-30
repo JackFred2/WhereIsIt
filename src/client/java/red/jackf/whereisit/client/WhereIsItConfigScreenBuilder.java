@@ -2,7 +2,7 @@ package red.jackf.whereisit.client;
 
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.*;
-import dev.isxander.yacl3.gui.ImageRenderer;
+import dev.isxander.yacl3.gui.image.ImageRenderer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -176,7 +176,7 @@ public class WhereIsItConfigScreenBuilder {
             private static final int labelRefWidth = 136;
             private static final int labelRefHeight = 54;
             @Override
-            public int render(GuiGraphics graphics, int x, int y, int renderWidth) {
+            public int render(GuiGraphics graphics, int x, int y, int renderWidth, float tickDelta) {
                 float ratio = (float) renderWidth / imageWidth;
                 int height = (int) (imageHeight * ratio);
 
@@ -391,7 +391,7 @@ public class WhereIsItConfigScreenBuilder {
             }
 
             @Override
-            public int render(GuiGraphics graphics, int x, int y, int renderWidth) {
+            public int render(GuiGraphics graphics, int x, int y, int renderWidth, float tickDelta) {
                 int borderThickness = 8;
                 int renderHeight = 64;
 
