@@ -79,9 +79,8 @@ public class WhereIsItClient implements ClientModInitializer {
         });
 
         ClientTickEvents.START_WORLD_TICK.register(level -> {
-            if (Rendering.getLastSearchTime() == -1) {
-                Rendering.setLastSearchTime(level.getGameTime());
-            } else if (level.getGameTime() > Rendering.getLastSearchTime() + WhereIsItConfig.INSTANCE.getConfig().getClient().fadeoutTimeTicks) {
+            Rendering.incrementTicksSinceSearch();
+            if (Rendering.getTicksSinceSearch() > WhereIsItConfig.INSTANCE.getConfig().getClient().fadeoutTimeTicks) {
                 // clear rendered slots after time limit
                 Rendering.clearResults();
             }
@@ -103,7 +102,7 @@ public class WhereIsItClient implements ClientModInitializer {
     }
 
     public static boolean doSearch(SearchRequest request) {
-        Rendering.setLastSearchTime(-1);
+        Rendering.resetSearchTime();
         updateRendering(request);
         LOGGER.debug("Starting request: %s".formatted(request));
 

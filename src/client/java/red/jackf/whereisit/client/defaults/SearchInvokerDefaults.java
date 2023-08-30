@@ -56,7 +56,7 @@ public class SearchInvokerDefaults {
             ClientPlayNetworking.registerGlobalReceiver(ClientboundResultsPacket.TYPE, (packet, player, responseSender) -> {
                 // we didn't send a matching packet, so assume the default Where Is It handling of overlay render
                 if (packet.id() == ClientboundResultsPacket.WHEREIS_COMMAND_ID) {
-                    Rendering.setLastSearchTime(-1);
+                    Rendering.resetSearchTime();
                     WhereIsItClient.recieveResults(packet.results());
                 } else {
                     var consumer = consumers.remove(packet.id());

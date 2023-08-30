@@ -37,7 +37,7 @@ public class Rendering {
 
     private static final List<Pair<Vec3, Component>> scheduledLabels = new ArrayList<>();
 
-    private static long lastSearchTime = 0;
+    private static long ticksSinceSearch = 0;
     @Nullable
     private static SearchRequest lastRequest = null;
 
@@ -62,8 +62,7 @@ public class Rendering {
         WorldRenderEvents.END.register(context -> {
             if (results.isEmpty()) return;
 
-            var progress = Mth.clamp((context.world()
-                    .getGameTime() + context.tickDelta() - getLastSearchTime()) / WhereIsItConfig.INSTANCE.getConfig()
+            var progress = Mth.clamp((getTicksSinceSearch() + context.tickDelta()) / WhereIsItConfig.INSTANCE.getConfig()
                     .getClient().fadeoutTimeTicks, 0f, 1f);
 
             if (context.world() == null || progress > 1f) {
@@ -113,7 +112,7 @@ public class Rendering {
     // render a highlight behind an item
     public static void renderSlotHighlight(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float tickDelta) {
         if (screen instanceof AbstractContainerScreen<?> containerScreen) {
-            var time = Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() + tickDelta : 0;
+            var time = getTicksSinceSearch() + tickDelta;
             for (Slot slot : containerScreen.getMenu().slots) {
                 if (slot.isActive() && slot.hasItem() && lastRequest != null &&
                         SearchRequest.check(slot.getItem(), lastRequest)) {
@@ -206,7 +205,7 @@ public class Rendering {
 
         // from 100% to 50%
         var alpha = 1 - (progress / 2f);
-        var colour = CurrentGradientHolder.getColour(((context.world().getGameTime() + context.tickDelta()) % 80) / 80);
+        var colour = CurrentGradientHolder.getColour(((getTicksSinceSearch() + context.tickDelta()) % 80) / 80);
         var scale = easingFunc(progress);
 
         var tesselator = Tesselator.getInstance();
@@ -299,11 +298,15 @@ public class Rendering {
         pose.popPose();
     }
 
-    public static long getLastSearchTime() {
-        return lastSearchTime;
+    public static long getTicksSinceSearch() {
+        return ticksSinceSearch;
     }
 
-    public static void setLastSearchTime(long lastSearchTime) {
-        Rendering.lastSearchTime = lastSearchTime;
+    public static void incrementTicksSinceSearch() {
+        ticksSinceSearch++;
+    }
+
+    public static void resetSearchTime() {
+        ticksSinceSearch = 0;
     }
 }
