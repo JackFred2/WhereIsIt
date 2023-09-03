@@ -153,11 +153,6 @@ fun DependencyHandlerScope.modCompileRuntime(any: String, configure: ExternalMod
 	modRuntimeOnly(any, configure)
 }
 
-fun DependencyHandlerScope.modImplementationInclude(any: String, configure: ExternalModuleDependency.() -> Unit = {}) {
-	modImplementation(any, configure)
-	include(any, configure)
-}
-
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
@@ -167,7 +162,9 @@ dependencies {
 	})
 	modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
-	modImplementationInclude("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")
+	modApi("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")
+	include("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")
+
 	modCompileRuntime("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
 	// Config
