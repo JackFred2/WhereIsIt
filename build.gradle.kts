@@ -92,14 +92,10 @@ repositories {
 
 	// JackFredLib
 	maven {
-		name = "GitHubPackages"
-		url = URI("https://maven.pkg.github.com/JackFred2/JackFredLib")
+		name = "JackFredMaven"
+		url = URI("https://maven.jackf.red/releases")
 		content {
 			includeGroupByRegex("red.jackf.*")
-		}
-		credentials {
-			username = properties["gpr.user"]?.toString() ?: System.getenv("GITHUB_ACTOR")
-			password = properties["gpr.key"]?.toString() ?: System.getenv("GITHUB_TOKEN")
 		}
 	}
 }
@@ -204,7 +200,6 @@ tasks.withType<ProcessResources>().configureEach {
 	inputs.property("version", version)
 
 	filesMatching("fabric.mod.json") {
-		print("match")
 		expand(inputs.properties)
 	}
 }
@@ -326,11 +321,14 @@ publishing {
 
 	repositories {
 		maven {
-			name = "GitHubPackages"
-			url = URI("https://maven.pkg.github.com/JackFred2/WhereIsIt")
+			name = "JackFredMaven"
+			url = URI("https://maven.jackf.red/releases/")
+			content {
+				includeGroupByRegex("red.jackf.*")
+			}
 			credentials {
-				username = System.getenv("GITHUB_ACTOR")
-				password = System.getenv("GITHUB_TOKEN")
+				username = properties["jfmaven.user"]?.toString() ?: System.getenv("JACKFRED_MAVEN_USER")
+				password = properties["jfmaven.key"]?.toString() ?: System.getenv("JACKFRED_MAVEN_PASS")
 			}
 		}
 	}
