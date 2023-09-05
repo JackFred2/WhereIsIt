@@ -5,7 +5,6 @@ import me.modmuss50.mpp.ReleaseType
 import net.fabricmc.loom.task.RemapJarTask
 import red.jackf.GenerateChangelogTask
 import red.jackf.UpdateDependenciesTask
-import java.net.URI
 
 plugins {
 	id("maven-publish")
@@ -28,7 +27,7 @@ repositories {
 	// Parchment Mappings
 	maven {
 		name = "ParchmentMC"
-		url = URI("https://maven.parchmentmc.org")
+		url = uri("https://maven.parchmentmc.org")
 		content {
 			includeGroup("org.parchmentmc.data")
 		}
@@ -37,7 +36,7 @@ repositories {
 	// Mod Menu, EMI
 	maven {
 		name = "TerraformersMC"
-		url = URI("https://maven.terraformersmc.com/releases/")
+		url = uri("https://maven.terraformersmc.com/releases/")
 		content {
 			includeGroup("com.terraformersmc")
 			includeGroup("dev.emi")
@@ -47,7 +46,7 @@ repositories {
 	// JEI
 	maven {
 		name = "Jared"
-		url = URI("https://maven.blamejared.com/")
+		url = uri("https://maven.blamejared.com/")
 		content {
 			includeGroup("mezz.jei")
 		}
@@ -56,9 +55,9 @@ repositories {
 	// REI
 	maven {
 		name = "Shedaniel"
-		url = URI("https://maven.shedaniel.me")
+		url = uri("https://maven.shedaniel.me")
 		content {
-			includeGroupByRegex("me.shedaniel.*")
+			includeGroupAndSubgroups("me.shedaniel")
 			includeGroup("dev.architectury")
 		}
 	}
@@ -66,7 +65,7 @@ repositories {
 	// YACL
 	maven {
 		name = "Xander Maven"
-		url = URI("https://maven.isxander.dev/releases")
+		url = uri("https://maven.isxander.dev/releases")
 		content {
 			includeGroup("dev.isxander.yacl")
 		}
@@ -75,16 +74,16 @@ repositories {
 	// YACL Dependencies
 	maven {
 		name = "Sonatype"
-		url = URI("https://oss.sonatype.org/content/repositories/snapshots")
+		url = uri("https://oss.sonatype.org/content/repositories/snapshots")
 		content {
-			includeGroupByRegex("com.twelvemonkeys.*")
+			includeGroupAndSubgroups("com.twelvemonkeys")
 		}
 	}
 
 	// JEI, JSST
 	maven {
 		name = "Modrinth"
-		url = URI("https://api.modrinth.com/maven")
+		url = uri("https://api.modrinth.com/maven")
 		content {
 			includeGroup("maven.modrinth")
 		}
@@ -93,9 +92,9 @@ repositories {
 	// JackFredLib
 	maven {
 		name = "JackFredMaven"
-		url = URI("https://maven.jackf.red/releases")
+		url = uri("https://maven.jackf.red/releases")
 		content {
-			includeGroupByRegex("red.jackf.*")
+			includeGroupAndSubgroups("red.jackf")
 		}
 	}
 }
@@ -158,8 +157,7 @@ dependencies {
 	})
 	modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
-	modApi("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")
-	include("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")
+	include(modApi("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")!!)
 
 	modCompileRuntime("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
@@ -181,8 +179,8 @@ dependencies {
 	// modCompileOnlyApi("mezz.jei:jei-${properties["minecraft_version"]}-fabric-api:${properties["jei_version"]}")
 	modCompileOnly("maven.modrinth:jei:${properties["jei_modrinth_id"]}")
 
-	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${properties["rei_version"]}")
-	modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${properties["rei_version"]}")
+	// modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${properties["rei_version"]}")
+	// modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${properties["rei_version"]}")
 	modCompileOnly("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}")
 
 	//modCompileOnly("dev.emi:emi-fabric:${properties["emi_version"]}:api")
@@ -322,7 +320,7 @@ publishing {
 	repositories {
 		maven {
 			name = "JackFredMaven"
-			url = URI("https://maven.jackf.red/releases/")
+			url = uri("https://maven.jackf.red/releases/")
 			content {
 				includeGroupByRegex("red.jackf.*")
 			}
