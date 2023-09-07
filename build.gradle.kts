@@ -15,7 +15,7 @@ plugins {
 }
 
 group = properties["maven_group"]!!
-version = properties["mod_version"] ?: "dev"
+version = "${properties["mod_version"]}+${properties["minecraft_version"]}"
 
 val modReleaseType = properties["type"]?.toString() ?: "release"
 
