@@ -130,7 +130,7 @@ public class WhereIsItConfig {
         public boolean forceServerSideHighlightsOnly = false;
 
         public void validate() {
-            this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 16);
+            this.searchRangeBlocks = Mth.clamp(this.searchRangeBlocks, 4, 24);
             this.fadeoutTimeTicks = Mth.clamp(this.fadeoutTimeTicks, 5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND);
         }
     }

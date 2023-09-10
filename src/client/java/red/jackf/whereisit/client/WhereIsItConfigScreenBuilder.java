@@ -431,7 +431,7 @@ public class WhereIsItConfigScreenBuilder {
                         )
                         .description(OptionDescription.of(translatable("whereisit.config.common.searchRange.description")))
                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                .range(4, 16)
+                                .range(4, 24)
                                 .step(1)
                                 .valueFormatter(i -> translatable("whereisit.config.common.searchRange.slider", i)))
                         .build())
