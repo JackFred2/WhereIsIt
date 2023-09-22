@@ -16,11 +16,10 @@ Also embeds [JackFredLib](https://github.com/JackFred2/JackFredLib), which embed
 
 ## Features
 
-- Not required - vanilla clients can join without restricting mod users.
-- Detailed searching - search by item ID, name, item tag, fluid contents, enchantment, potions, and more, and any
-  combination of the previous.
 - Server-side functionality - clients without the mod can use the command `/whereis` (default, changeable) to use the
   mod.
+- Detailed searching - search by item ID, name, item tag, fluid contents, enchantment, potions, and more, and any
+  combination of the previous.
 - Support for recipe viewers, including the vanilla Recipe Book, and for JEI, REI, EMI:
     - Ability to search for items containing specific fluids, and tags for recipes.
     - Custom searches (search for enchantments using enchanted books, and potion effects using potions).
@@ -62,6 +61,8 @@ An API is available under the `api` packages for the following purposes:
 - `SearchRequestPopulator.EVENT` - Obtaining the correct criteria for a search from a given screen.
 - `ShouldIgnoreKey.EVENT` - Check to see if the keybind should be ignored in that instant - this is used to cancel if
   a search bar is focused, for example.
+- `OnResult.EVENT` - Called whenever any search returns a value, with all results. Use to, for example, add additional
+  overlays or recording.
 - `RenderUtils` - Information on the currently displayed overlay, as well as scheduling text rendering.
 
 ### Common
@@ -75,3 +76,5 @@ An API is available under the `api` packages for the following purposes:
   and register using `Criterion#register`.
 
 ### Using the API
+
+[See the wiki](https://github.com/JackFred2/WhereIsIt/wiki/Development).
