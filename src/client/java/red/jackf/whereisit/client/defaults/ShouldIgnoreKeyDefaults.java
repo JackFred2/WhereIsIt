@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
-import red.jackf.whereisit.client.api.ShouldIgnoreKey;
+import red.jackf.whereisit.client.api.events.ShouldIgnoreKey;
 
 public class ShouldIgnoreKeyDefaults {
     static void setup() {

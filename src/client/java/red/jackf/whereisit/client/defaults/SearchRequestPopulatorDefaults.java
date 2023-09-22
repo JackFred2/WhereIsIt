@@ -8,7 +8,7 @@ import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.builtin.AnyOfCriterion;
 import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.builtin.ItemTagCriterion;
-import red.jackf.whereisit.client.api.SearchRequestPopulator;
+import red.jackf.whereisit.client.api.events.SearchRequestPopulator;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.ArrayList;

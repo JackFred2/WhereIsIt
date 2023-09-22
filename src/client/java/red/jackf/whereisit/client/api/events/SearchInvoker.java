@@ -1,4 +1,4 @@
-package red.jackf.whereisit.client.api;
+package red.jackf.whereisit.client.api.events;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

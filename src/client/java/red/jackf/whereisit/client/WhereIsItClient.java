@@ -24,9 +24,10 @@ import red.jackf.jackfredlib.client.api.toasts.*;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
-import red.jackf.whereisit.client.api.SearchInvoker;
-import red.jackf.whereisit.client.api.SearchRequestPopulator;
-import red.jackf.whereisit.client.api.ShouldIgnoreKey;
+import red.jackf.whereisit.client.api.events.OnResult;
+import red.jackf.whereisit.client.api.events.SearchInvoker;
+import red.jackf.whereisit.client.api.events.SearchRequestPopulator;
+import red.jackf.whereisit.client.api.events.ShouldIgnoreKey;
 import red.jackf.whereisit.client.plugin.WhereIsItClientPluginLoader;
 import red.jackf.whereisit.client.render.CurrentGradientHolder;
 import red.jackf.whereisit.client.render.Rendering;
@@ -127,7 +128,7 @@ public class WhereIsItClient implements ClientModInitializer {
             if (Minecraft.getInstance().screen != null && Minecraft.getInstance().player != null)
                 Minecraft.getInstance().player.closeContainer();
         }
-        Rendering.addResults(results);
+        OnResult.EVENT.invoker().onResults(results);
     }
 
     // clear previous state for rendering

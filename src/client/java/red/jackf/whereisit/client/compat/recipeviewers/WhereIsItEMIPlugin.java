@@ -17,8 +17,8 @@ import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.builtin.FluidCriterion;
 import red.jackf.whereisit.api.criteria.builtin.ItemTagCriterion;
 import red.jackf.whereisit.client.WhereIsItClient;
-import red.jackf.whereisit.client.api.SearchRequestPopulator;
-import red.jackf.whereisit.client.api.ShouldIgnoreKey;
+import red.jackf.whereisit.client.api.events.SearchRequestPopulator;
+import red.jackf.whereisit.client.api.events.ShouldIgnoreKey;
 import red.jackf.whereisit.client.compat.CompatUtils;
 import red.jackf.whereisit.config.WhereIsItConfig;
 

@@ -4,7 +4,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import red.jackf.whereisit.WhereIsIt;
-import red.jackf.whereisit.client.api.ShouldIgnoreKey;
+import red.jackf.whereisit.client.api.WhereIsItPlugin;
+import red.jackf.whereisit.client.api.events.ShouldIgnoreKey;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -14,9 +15,9 @@ public class WhereIsItClientPluginLoader {
     private static final String KEY = "whereisit_client";
     private static final String IGNORE_KEY_OBJECTSHARE_KEY = "whereisit:shouldignorekey";
     public static void load() {
-        for (var container : FabricLoader.getInstance().getEntrypointContainers(KEY, Runnable.class)) {
+        for (var container : FabricLoader.getInstance().getEntrypointContainers(KEY, WhereIsItPlugin.class)) {
             LOGGER.debug("Loading entrypoint from mod {}", container.getProvider().getMetadata().getId());
-            container.getEntrypoint().run();
+            container.getEntrypoint().load();
         }
 
         Consumer<Supplier<Boolean>> eventTranslator = callback -> {

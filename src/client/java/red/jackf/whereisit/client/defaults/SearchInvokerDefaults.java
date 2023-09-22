@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.WhereIsItClient;
-import red.jackf.whereisit.client.api.SearchInvoker;
+import red.jackf.whereisit.client.api.events.SearchInvoker;
 import red.jackf.whereisit.client.render.Rendering;
 import red.jackf.whereisit.networking.ClientboundResultsPacket;
 import red.jackf.whereisit.networking.ServerboundSearchForItemPacket;

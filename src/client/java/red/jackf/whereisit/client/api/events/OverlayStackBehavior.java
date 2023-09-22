@@ -1,4 +1,4 @@
-package red.jackf.whereisit.client.api;
+package red.jackf.whereisit.client.api.events;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -8,7 +8,7 @@ import red.jackf.whereisit.api.criteria.Criterion;
 import java.util.function.Consumer;
 
 /**
- * <p>This allows you to use Recipe Viewer (JEI, REI, EMI) stacks as custom triggers for searches. For example, the mod
+ * <p>This allows you to use Recipe Viewer (JEI, REI, EMI) stacks as custom triggers for searches. For example, Where Is It
  * overrides behavior for enchanted books in order to search for enchantments directly.</p>
  *
  * <p>For examples, see {@link red.jackf.whereisit.client.defaults.OverlayStackBehaviorDefaults}</p>
