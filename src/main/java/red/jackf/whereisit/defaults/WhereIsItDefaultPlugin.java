@@ -1,8 +1,10 @@
 package red.jackf.whereisit.defaults;
 
-public class WhereIsItDefaultPlugin implements Runnable {
+import red.jackf.whereisit.api.WhereIsItPlugin;
+
+public class WhereIsItDefaultPlugin implements WhereIsItPlugin {
     @Override
-    public void run() {
+    public void load() {
         BuiltInCriteria.setup();
         DefaultBlockSearchers.setup();
         DefaultConnectedBlocksGrabbers.setup();

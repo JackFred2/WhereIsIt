@@ -1,7 +1,7 @@
-package red.jackf.whereisit.client.api;
+package red.jackf.whereisit.api;
 
 /**
- * <p>Represents a plugin for Where Is It.</p>
+ * <p>Represents a common plugin for Where Is It.</p>
  *
  * <p>Currently matches a Runnable, however may include additional features in the future.</p>
  */
