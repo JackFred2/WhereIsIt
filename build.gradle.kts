@@ -80,6 +80,14 @@ repositories {
 		}
 	}
 
+	maven {
+		name = "QuiltMC"
+		url = uri("https://maven.quiltmc.org/repository/release")
+		content {
+			includeGroupAndSubgroups("org.quiltmc")
+		}
+	}
+
 	// JEI, JSST
 	maven {
 		name = "Modrinth"
