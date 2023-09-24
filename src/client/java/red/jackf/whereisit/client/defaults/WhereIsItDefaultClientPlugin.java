@@ -2,6 +2,7 @@ package red.jackf.whereisit.client.defaults;
 
 import red.jackf.whereisit.client.api.WhereIsItClientPlugin;
 import red.jackf.whereisit.client.api.events.OnResult;
+import red.jackf.whereisit.client.api.events.OnResultsCleared;
 import red.jackf.whereisit.client.render.Rendering;
 
 public class WhereIsItDefaultClientPlugin implements WhereIsItClientPlugin {
@@ -11,5 +12,6 @@ public class WhereIsItDefaultClientPlugin implements WhereIsItClientPlugin {
         SearchInvokerDefaults.setup();
         ShouldIgnoreKeyDefaults.setup();
         OnResult.EVENT.register(Rendering::addResults);
+        OnResultsCleared.EVENT.register(Rendering::clearResults);
     }
 }

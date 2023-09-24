@@ -24,10 +24,7 @@ import red.jackf.jackfredlib.client.api.toasts.*;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
-import red.jackf.whereisit.client.api.events.OnResult;
-import red.jackf.whereisit.client.api.events.SearchInvoker;
-import red.jackf.whereisit.client.api.events.SearchRequestPopulator;
-import red.jackf.whereisit.client.api.events.ShouldIgnoreKey;
+import red.jackf.whereisit.client.api.events.*;
 import red.jackf.whereisit.client.plugin.WhereIsItClientPluginLoader;
 import red.jackf.whereisit.client.render.CurrentGradientHolder;
 import red.jackf.whereisit.client.render.Rendering;
@@ -76,14 +73,14 @@ public class WhereIsItClient implements ClientModInitializer {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> inGame = true);
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             inGame = false;
-            Rendering.clearResults();
+            clearResults();
         });
 
         ClientTickEvents.START_WORLD_TICK.register(level -> {
             Rendering.incrementTicksSinceSearch();
             if (Rendering.getTicksSinceSearch() > WhereIsItConfig.INSTANCE.getConfig().getCommon().fadeoutTimeTicks) {
                 // clear rendered slots after time limit
-                Rendering.clearResults();
+                clearResults();
             }
 
             if (WhereIsItConfig.INSTANCE.getConfig().getClient().searchUsingItemInHand && Minecraft.getInstance().screen == null && SEARCH.consumeClick()) {
@@ -131,9 +128,13 @@ public class WhereIsItClient implements ClientModInitializer {
         OnResult.EVENT.invoker().onResults(results);
     }
 
+    private static void clearResults() {
+        OnResultsCleared.EVENT.invoker().onResultsCleared();
+    }
+
     // clear previous state for rendering
     private static void updateRendering(SearchRequest request) {
-        Rendering.clearResults();
+        clearResults();
         Rendering.setLastRequest(request);
         closedScreenThisSearch = false;
 
