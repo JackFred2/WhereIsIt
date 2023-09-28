@@ -6,7 +6,7 @@ import net.minecraft.world.Nameable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import red.jackf.jackfredlib.api.ResultHolder;
+import red.jackf.jackfredlib.api.base.ResultHolder;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.api.search.BlockSearcher;
