@@ -33,7 +33,7 @@ public class SearchHandler {
         ServerSideRenderer.fadeServerSide(player);
 
         // check rate limit for players
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER && WhereIsItConfig.INSTANCE.getConfig().getServer().rateLimit) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER && WhereIsItConfig.INSTANCE.instance().getServer().rateLimit) {
             //don't close the level
             //noinspection resource
             var time = player.level().getGameTime();
@@ -60,7 +60,7 @@ public class SearchHandler {
         var level = (ServerLevel) player.level();
         var pos = new BlockPos.MutableBlockPos();
         var results = new HashMap<BlockPos, SearchResult>();
-        var range = WhereIsItConfig.INSTANCE.getConfig().getCommon().searchRangeBlocks;
+        var range = WhereIsItConfig.INSTANCE.instance().getCommon().searchRangeBlocks;
         var maxRange = range * range;
         for (int x = startPos.getX() - range; x <= startPos.getX() + range; x++) {
             pos.setX(x);
@@ -91,11 +91,11 @@ public class SearchHandler {
         var time = System.nanoTime() - startTime;
         var timingStr = "Search time: %.2fms (%dns)".formatted((float) time / 1_000_000, time);
         WhereIsIt.LOGGER.debug(timingStr);
-        if (WhereIsItConfig.INSTANCE.getConfig().getCommon().printSearchTime) player.sendSystemMessage(Component.literal("[Where Is It] " + timingStr).withStyle(ChatFormatting.YELLOW));
+        if (WhereIsItConfig.INSTANCE.instance().getCommon().debug.printSearchTime) player.sendSystemMessage(Component.literal("[Where Is It] " + timingStr).withStyle(ChatFormatting.YELLOW));
 
         // send to player
         if (!results.isEmpty()) {
-            if (WhereIsItConfig.INSTANCE.getConfig().getCommon().forceServerSideHighlightsOnly || !ServerPlayNetworking.canSend(player, ClientboundResultsPacket.TYPE)) {
+            if (WhereIsItConfig.INSTANCE.instance().getCommon().debug.forceServerSideHighlightsOnly || !ServerPlayNetworking.canSend(player, ClientboundResultsPacket.TYPE)) {
                 ServerSideRenderer.doServersideRendering(player, results.values());
             } else {
                 // send packet

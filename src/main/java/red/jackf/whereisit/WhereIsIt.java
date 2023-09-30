@@ -24,8 +24,9 @@ public class WhereIsIt implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		try {
+			WhereIsItConfig.cleanupOldConfig();
 			WhereIsItConfig.INSTANCE.load();
-			WhereIsItConfig.INSTANCE.getConfig().validate();
+			WhereIsItConfig.INSTANCE.instance().validate();
 		} catch (Exception ex) {
 			LOGGER.error("Error loading WhereIsIt config, restoring default", ex);
 		}

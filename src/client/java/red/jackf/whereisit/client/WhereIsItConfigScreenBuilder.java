@@ -37,8 +37,8 @@ public class WhereIsItConfigScreenBuilder {
                 .title(translatable("whereisit.config.title"))
                 .category(ConfigCategory.createBuilder()
                         .name(translatable("whereisit.config.title"))
-                        .group(makeClientGroup(instance.getDefaults(), instance.getConfig()))
-                        .group(makeCommonGroup(instance.getDefaults(), instance.getConfig()))
+                        .group(makeClientGroup(instance.defaults(), instance.instance()))
+                        .group(makeCommonGroup(instance.defaults(), instance.instance()))
                         .group(ListOption.<String>createBuilder()
                                 .name(translatable("whereisit.config.common.commandAliases"))
                                 .description(OptionDescription.of(
@@ -47,21 +47,21 @@ public class WhereIsItConfigScreenBuilder {
                                 ))
                                 .controller(StringControllerBuilder::create)
                                 .binding(
-                                        instance.getDefaults().getCommon().commandAliases,
-                                        () -> instance.getConfig().getCommon().commandAliases,
-                                        l -> instance.getConfig().getCommon().commandAliases = l
+                                        instance.defaults().getCommon().commandAliases,
+                                        () -> instance.instance().getCommon().commandAliases,
+                                        l -> instance.instance().getCommon().commandAliases = l
                                 ).initial("find")
                                 .insertEntriesAtEnd(true)
                                 .build())
                         .build())
                 .category(ConfigCategory.createBuilder()
                         .name(translatable("whereisit.config.compatibility"))
-                        .group(makeClientCompatibilityGroup(instance.getDefaults(), instance.getConfig()))
+                        .group(makeClientCompatibilityGroup(instance.defaults(), instance.instance()))
                         .build())
                 .category(ConfigCategory.createBuilder()
                         .name(translatable("whereisit.config.debug"))
-                        .group(makeClientDebugGroup(instance.getDefaults(), instance.getConfig()))
-                        .group(makeCommonDebugGroup(instance.getDefaults(), instance.getConfig()))
+                        .group(makeClientDebugGroup(instance.defaults(), instance.instance()))
+                        .group(makeCommonDebugGroup(instance.defaults(), instance.instance()))
                         .build())
                 .save(() -> {
                     instance.save();
@@ -145,7 +145,7 @@ public class WhereIsItConfigScreenBuilder {
                         f -> config.getClient().containerNameLabelScale = f
                 )
                 .controller(opt -> FloatSliderControllerBuilder.create(opt)
-                        .valueFormatter(f -> translatable("mco.download.percent", (int) (f * 100)))
+                        .formatValue(f -> translatable("mco.download.percent", (int) (f * 100)))
                         .range(0.25f, 2f)
                         .step(0.01f))
                 .build();
@@ -241,9 +241,9 @@ public class WhereIsItConfigScreenBuilder {
                 .option(Option.<Boolean>createBuilder()
                         .name(translatable("whereisit.config.debug.client.printSearchRequestsInChat"))
                         .binding(
-                                defaults.getClient().printSearchRequestsInChat,
-                                () -> config.getClient().printSearchRequestsInChat,
-                                b -> config.getClient().printSearchRequestsInChat = b
+                                defaults.getClient().debug.printSearchRequestsInChat,
+                                () -> config.getClient().debug.printSearchRequestsInChat,
+                                b -> config.getClient().debug.printSearchRequestsInChat = b
                         )
                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                 .coloured(true)
@@ -259,9 +259,9 @@ public class WhereIsItConfigScreenBuilder {
                         .name(translatable("whereisit.config.debug.common.printSearchTime"))
                         .description(OptionDescription.of(translatable("whereisit.config.debug.common.printSearchTime.description")))
                         .binding(
-                                defaults.getCommon().printSearchTime,
-                                () -> config.getCommon().printSearchTime,
-                                b -> config.getCommon().printSearchTime = b
+                                defaults.getCommon().debug.printSearchTime,
+                                () -> config.getCommon().debug.printSearchTime,
+                                b -> config.getCommon().debug.printSearchTime = b
                         )
                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                 .coloured(true)
@@ -270,9 +270,9 @@ public class WhereIsItConfigScreenBuilder {
                 .option(Option.<Boolean>createBuilder()
                         .name(translatable("whereisit.config.common.enableDefaultSearchers"))
                         .binding(
-                                defaults.getCommon().enableDefaultSearchers,
-                                () -> config.getCommon().enableDefaultSearchers,
-                                b -> config.getCommon().enableDefaultSearchers = b
+                                defaults.getCommon().debug.enableDefaultSearchers,
+                                () -> config.getCommon().debug.enableDefaultSearchers,
+                                b -> config.getCommon().debug.enableDefaultSearchers = b
                         )
                         .description(OptionDescription.of(translatable("whereisit.config.common.enableDefaultSearchers.description")))
                         .controller(opt -> BooleanControllerBuilder.create(opt)
@@ -282,9 +282,9 @@ public class WhereIsItConfigScreenBuilder {
                 .option(Option.<Boolean>createBuilder()
                         .name(translatable("whereisit.config.debug.common.forceServerSideHighlightsOnly"))
                         .binding(
-                                defaults.getCommon().forceServerSideHighlightsOnly,
-                                () -> config.getCommon().forceServerSideHighlightsOnly,
-                                b -> config.getCommon().forceServerSideHighlightsOnly = b
+                                defaults.getCommon().debug.forceServerSideHighlightsOnly,
+                                () -> config.getCommon().debug.forceServerSideHighlightsOnly,
+                                b -> config.getCommon().debug.forceServerSideHighlightsOnly = b
                         )
                         .description(OptionDescription.of(translatable("whereisit.config.debug.common.forceServerSideHighlightsOnly.description")))
                         .controller(opt -> BooleanControllerBuilder.create(opt)
@@ -433,7 +433,7 @@ public class WhereIsItConfigScreenBuilder {
                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                 .range(4, 24)
                                 .step(1)
-                                .valueFormatter(i -> translatable("whereisit.config.common.searchRange.slider", i)))
+                                .formatValue(i -> translatable("whereisit.config.common.searchRange.slider", i)))
                         .build())
                 .option(Option.<Boolean>createBuilder()
                         .name(translatable("whereisit.config.common.nestedSearching"))
@@ -465,7 +465,7 @@ public class WhereIsItConfigScreenBuilder {
                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                 .range(5 * TICKS_PER_SECOND, 30 * TICKS_PER_SECOND)
                                 .step(1)
-                                .valueFormatter(i -> translatable("whereisit.config.common.fadeoutTime.slider", "%.2f".formatted(i.floatValue() / 20))))
+                                .formatValue(i -> translatable("whereisit.config.common.fadeoutTime.slider", "%.2f".formatted(i.floatValue() / 20))))
                         .build())
                 .build();
     }

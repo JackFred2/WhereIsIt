@@ -36,7 +36,7 @@ public final class WhereIsItJEIPlugin implements IModPlugin {
         if (!setup) {
             WhereIsItClient.LOGGER.info("Hooking into JEI");
             SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
-                if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.jeiSupport) return;
+                if (!WhereIsItConfig.INSTANCE.instance().getClient().compatibility.jeiSupport) return;
                 if (hasErrored) return;
                 try {
                     if (runtime != null) {

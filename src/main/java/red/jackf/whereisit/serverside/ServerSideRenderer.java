@@ -65,7 +65,7 @@ public class ServerSideRenderer {
      * @return Randomly generated fade time
      */
     private static int randomFadeTime() {
-        var baseTime = WhereIsItConfig.INSTANCE.getConfig().getCommon().fadeoutTimeTicks;
+        var baseTime = WhereIsItConfig.INSTANCE.instance().getCommon().fadeoutTimeTicks;
         int random = (int) ((4 * TICKS_PER_SECOND) * Math.random() - (2 * TICKS_PER_SECOND));
         return baseTime + random;
     }

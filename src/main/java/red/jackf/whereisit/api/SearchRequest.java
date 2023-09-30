@@ -34,7 +34,7 @@ public class SearchRequest implements Consumer<Criterion> {
      * @return Whether this ItemStack or any sub-items if applicable matches the request
      */
     public static boolean check(ItemStack stack, SearchRequest request) {
-        return request.test(stack) || (WhereIsItConfig.INSTANCE.getConfig().getCommon().doNestedSearch && NestedItemStackSearcher.EVENT.invoker().check(stack, request::test));
+        return request.test(stack) || (WhereIsItConfig.INSTANCE.instance().getCommon().doNestedSearch && NestedItemStackSearcher.EVENT.invoker().check(stack, request::test));
     }
 
     /**

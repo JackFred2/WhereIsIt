@@ -23,7 +23,7 @@ public class DefaultBlockSearchers {
     @SuppressWarnings("UnstableApiUsage")
     private static void setupTransferApi() {
         BlockSearcher.EVENT.register(BlockSearcher.FALLBACK, (request, player, level, state, pos) -> {
-            if (!WhereIsItConfig.INSTANCE.getConfig().getCommon().enableDefaultSearchers) return ResultHolder.pass();
+            if (!WhereIsItConfig.INSTANCE.instance().getCommon().debug.enableDefaultSearchers) return ResultHolder.pass();
             var storage = ItemStorage.SIDED.find(level, pos, state, null, null);
             if (storage != null) { // storage exists here
                 for (var view : storage.nonEmptyViews()) { // for each view in this side
@@ -46,7 +46,7 @@ public class DefaultBlockSearchers {
     // check inside a player's local ender chest inventory
     private static void setupEnderChest() {
         BlockSearcher.EVENT.register(BlockSearcher.DEFAULT, (request, player, level, state, pos) -> {
-            if (!WhereIsItConfig.INSTANCE.getConfig().getCommon().enableDefaultSearchers) return ResultHolder.pass();
+            if (!WhereIsItConfig.INSTANCE.instance().getCommon().debug.enableDefaultSearchers) return ResultHolder.pass();
             if (!state.is(Blocks.ENDER_CHEST)) return ResultHolder.pass();
             for (ItemStack enderItem : player.getEnderChestInventory().items)
                 if (SearchRequest.check(enderItem, request))
@@ -61,7 +61,7 @@ public class DefaultBlockSearchers {
     // if searching for a shulker box, check if a placed down box is valid
     private static void setupCheckShulkerItself() {
         BlockSearcher.EVENT.register(BlockSearcher.DEFAULT, ((request, player, level, state, pos) -> {
-            if (!WhereIsItConfig.INSTANCE.getConfig().getCommon().enableDefaultSearchers) return ResultHolder.pass();
+            if (!WhereIsItConfig.INSTANCE.instance().getCommon().debug.enableDefaultSearchers) return ResultHolder.pass();
             if (!state.is(BlockTags.SHULKER_BOXES)) return ResultHolder.pass();
             var shulkerBoxBe = level.getBlockEntity(pos, BlockEntityType.SHULKER_BOX);
             if (shulkerBoxBe.isEmpty()) return ResultHolder.pass();

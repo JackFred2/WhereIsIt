@@ -44,7 +44,7 @@ public class Rendering {
     public static void setup() {
         // schedule highlight label renders
         WorldRenderEvents.START.register(context -> {
-            if (!WhereIsItConfig.INSTANCE.getConfig().getClient().showContainerNamesInResults) return;
+            if (!WhereIsItConfig.INSTANCE.instance().getClient().showContainerNamesInResults) return;
             for (SearchResult value : namedResults.values())
                 scheduleLabel(value.pos().getCenter().add(value.nameOffset()), value.name());
         });
@@ -62,7 +62,7 @@ public class Rendering {
         WorldRenderEvents.END.register(context -> {
             if (results.isEmpty()) return;
 
-            var progress = Mth.clamp((getTicksSinceSearch() + context.tickDelta()) / WhereIsItConfig.INSTANCE.getConfig()
+            var progress = Mth.clamp((getTicksSinceSearch() + context.tickDelta()) / WhereIsItConfig.INSTANCE.instance()
                     .getCommon().fadeoutTimeTicks, 0f, 1f);
 
             if (context.world() == null || progress > 1f) {
@@ -163,7 +163,7 @@ public class Rendering {
 
         pose.translate(pos.x, pos.y, pos.z);
         pose.mulPose(camera.rotation());
-        var factor = 0.025f * WhereIsItConfig.INSTANCE.getConfig().getClient().containerNameLabelScale;
+        var factor = 0.025f * WhereIsItConfig.INSTANCE.instance().getClient().containerNameLabelScale;
         pose.scale(-factor, -factor, factor);
         var matrix4f = pose.last().pose();
         var width = Minecraft.getInstance().font.width(name);

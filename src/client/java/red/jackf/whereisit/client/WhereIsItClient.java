@@ -54,7 +54,7 @@ public class WhereIsItClient implements ClientModInitializer {
 
         ScreenEvents.BEFORE_INIT.register((client, _screen, scaledWidth, scaledHeight) -> {
 			if (inGame) {
-                if (WhereIsItConfig.INSTANCE.getConfig().getClient().showSlotHighlights)
+                if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights)
                     ScreenEvents.afterRender(_screen).register(Rendering::renderSlotHighlight);
 
                 // listen for keypress in-GUI
@@ -78,12 +78,12 @@ public class WhereIsItClient implements ClientModInitializer {
 
         ClientTickEvents.START_WORLD_TICK.register(level -> {
             Rendering.incrementTicksSinceSearch();
-            if (Rendering.getTicksSinceSearch() > WhereIsItConfig.INSTANCE.getConfig().getCommon().fadeoutTimeTicks) {
+            if (Rendering.getTicksSinceSearch() > WhereIsItConfig.INSTANCE.instance().getCommon().fadeoutTimeTicks) {
                 // clear rendered slots after time limit
                 clearResults();
             }
 
-            if (WhereIsItConfig.INSTANCE.getConfig().getClient().searchUsingItemInHand && Minecraft.getInstance().screen == null && SEARCH.consumeClick()) {
+            if (WhereIsItConfig.INSTANCE.instance().getClient().searchUsingItemInHand && Minecraft.getInstance().screen == null && SEARCH.consumeClick()) {
                 var player = Minecraft.getInstance().player;
                 if (player == null) return;
                 ItemStack item = player.getItemInHand(InteractionHand.MAIN_HAND);
@@ -104,7 +104,7 @@ public class WhereIsItClient implements ClientModInitializer {
         updateRendering(request);
         LOGGER.debug("Starting request: %s".formatted(request));
 
-        if (WhereIsItConfig.INSTANCE.getConfig().getClient().printSearchRequestsInChat && Minecraft.getInstance().player != null) {
+        if (WhereIsItConfig.INSTANCE.instance().getClient().debug.printSearchRequestsInChat && Minecraft.getInstance().player != null) {
             var text = TextUtil.prettyPrint(request.pack());
             for (Component component : text)
                 Minecraft.getInstance().player.sendSystemMessage(component);
@@ -113,14 +113,14 @@ public class WhereIsItClient implements ClientModInitializer {
         var anySucceeded = SearchInvoker.EVENT.invoker().search(request, WhereIsItClient::recieveResults);
 
         if (!anySucceeded) Toasts.INSTANCE.send(NOT_INSTALLED.get());
-        else if (WhereIsItConfig.INSTANCE.getConfig().getClient().playSoundOnRequest) playRequestSound();
+        else if (WhereIsItConfig.INSTANCE.instance().getClient().playSoundOnRequest) playRequestSound();
 
         return anySucceeded;
     }
 
     public static void recieveResults(Collection<SearchResult> results) {
         WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
-        if (WhereIsItConfig.INSTANCE.getConfig().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {
+        if (WhereIsItConfig.INSTANCE.instance().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {
             closedScreenThisSearch = true;
             if (Minecraft.getInstance().screen != null && Minecraft.getInstance().player != null)
                 Minecraft.getInstance().player.closeContainer();

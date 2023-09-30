@@ -40,7 +40,7 @@ public class WhereIsCommand {
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection ignored) {
-        var config = WhereIsItConfig.INSTANCE.getConfig().getCommon();
+        var config = WhereIsItConfig.INSTANCE.instance().getCommon();
         if (config.commandAliases.isEmpty()) return;
 
         var root = dispatcher.register(literal(config.commandAliases.get(0)).requires(CommandSourceStack::isPlayer));

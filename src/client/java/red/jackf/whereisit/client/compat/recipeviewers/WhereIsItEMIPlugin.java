@@ -40,7 +40,7 @@ public class WhereIsItEMIPlugin implements EmiPlugin {
     static {
         WhereIsItClient.LOGGER.info("Hooking into EMI");
         SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
-            if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.emiSupport) return;
+            if (!WhereIsItConfig.INSTANCE.instance().getClient().compatibility.emiSupport) return;
             if (hasErrored) return;
             try {
                 populate(request, screen, mouseX, mouseY);

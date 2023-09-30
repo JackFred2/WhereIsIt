@@ -33,7 +33,7 @@ public class SearchRequestPopulatorDefaults {
             }
 
             // grab from recipe book highlights
-            if (WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.recipeBookSupport && containerScreen instanceof RecipeUpdateListener recipeBookHolder) {
+            if (WhereIsItConfig.INSTANCE.instance().getClient().compatibility.recipeBookSupport && containerScreen instanceof RecipeUpdateListener recipeBookHolder) {
                 var book = recipeBookHolder.getRecipeBookComponent();
                 if (book.ghostRecipe.getRecipe() != null) {
                     for (var i = 0; i < book.ghostRecipe.size(); i++) {

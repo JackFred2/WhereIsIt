@@ -25,12 +25,12 @@ public class CurrentGradientHolder {
 
     public static void refreshColourScheme() {
         Gradient selected;
-        if (WhereIsItConfig.INSTANCE.getConfig().getClient().randomScheme) {
+        if (WhereIsItConfig.INSTANCE.instance().getClient().randomScheme) {
             selected = RANDOM_CANDIDATES[(int) (Math.random() * RANDOM_CANDIDATES.length)].getGradient();
         } else {
-            var scheme = WhereIsItConfig.INSTANCE.getConfig().getClient().colourScheme;
+            var scheme = WhereIsItConfig.INSTANCE.instance().getClient().colourScheme;
             if (scheme == ColourScheme.SOLID) {
-                selected = Colour.fromInt(WhereIsItConfig.INSTANCE.getConfig().getClient().solidColour.getRGB());
+                selected = Colour.fromInt(WhereIsItConfig.INSTANCE.instance().getClient().solidColour.getRGB());
             } else {
                 selected = scheme.getGradient();
             }

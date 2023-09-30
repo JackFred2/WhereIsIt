@@ -37,7 +37,7 @@ public class WhereIsItREIPlugin implements REIClientPlugin {
         WhereIsItClient.LOGGER.info("Hooking into REI");
 
         SearchRequestPopulator.EVENT.register((request, screen, mouseX, mouseY) -> {
-            if (!WhereIsItConfig.INSTANCE.getConfig().getClient().compatibility.reiSupport) return;
+            if (!WhereIsItConfig.INSTANCE.instance().getClient().compatibility.reiSupport) return;
             if (hasErrored) return;
             try {
                 if (REIRuntime.getInstance().isOverlayVisible()) {
