@@ -154,6 +154,19 @@ public class WhereIsItConfigScreenBuilder {
                                 f -> config.getClient().slotHighlightXFactor = f
                         )
                         .build())
+                .option(Option.<Float>createBuilder()
+                        .name(translatable("whereisit.config.client.highlightTimeFactor"))
+                        .description(OptionDescription.of(translatable("whereisit.config.client.highlightTimeFactor.description")))
+                        .controller(opt -> FloatSliderControllerBuilder.create(opt)
+                                .formatValue(f -> translatable("mco.download.percent", (int) (f * 100)))
+                                .step(0.01f)
+                                .range(0.1f, 4f))
+                        .binding(
+                                defaults.getClient().highlightTimeFactor,
+                                () -> config.getClient().highlightTimeFactor,
+                                f -> config.getClient().highlightTimeFactor = f
+                        )
+                        .build())
                 .options(makeLabelOptions(defaults, config))
                 .options(makeColourOptions(defaults, config))
                 .build();

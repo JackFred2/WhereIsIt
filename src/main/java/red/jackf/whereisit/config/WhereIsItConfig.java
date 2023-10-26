@@ -90,6 +90,9 @@ public class WhereIsItConfig {
         @SerialEntry(comment = "How much a slot's X position influences the colour of a slot highlight. Range: [0, 4]")
         public float slotHighlightXFactor = 1f;
 
+        @SerialEntry(comment = "Modifier for how fast Where Is It will cycle through the current colour scheme's gradient. Range: [0.1, 4]")
+        public float highlightTimeFactor = 1f;
+
         @SerialEntry(comment = "Show Container Names for Results.")
         public boolean showContainerNamesInResults = true;
 
@@ -133,6 +136,7 @@ public class WhereIsItConfig {
         public void validate() {
             this.slotHighlightMouseFactor = Mth.clamp(this.slotHighlightMouseFactor, 0f, 4f);
             this.slotHighlightXFactor = Mth.clamp(this.slotHighlightXFactor, 0f, 4f);
+            this.highlightTimeFactor = Mth.clamp(this.slotHighlightXFactor, 0.1f, 4f);
             this.solidColour = new Color(this.solidColour.getRGB() | 0xFF_000000);
             this.containerNameLabelScale = Mth.clamp(this.containerNameLabelScale, 0.25f, 2f);
         }

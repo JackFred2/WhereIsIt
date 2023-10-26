@@ -105,6 +105,12 @@ public class Rendering {
         return namedResults;
     }
 
+    private static float getBaseProgress(long ticks, float delta) {
+        float base = ticks + delta;
+        base *= WhereIsItConfig.INSTANCE.instance().getClient().highlightTimeFactor;
+        return (base % 80) / 80;
+    }
+
     //////////////////////
     // SCREEN RENDERING //
     //////////////////////
@@ -112,7 +118,7 @@ public class Rendering {
     // render a highlight behind an item
     public static void renderSlotHighlight(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float tickDelta) {
         if (screen instanceof AbstractContainerScreen<?> containerScreen) {
-            var time = ((getTicksSinceSearch() + tickDelta) % 80) / 80;
+            var time = getBaseProgress(getTicksSinceSearch(), tickDelta);
             for (Slot slot : containerScreen.getMenu().slots) {
                 if (slot.isActive() && slot.hasItem() && lastRequest != null &&
                         SearchRequest.check(slot.getItem(), lastRequest)) {
@@ -204,7 +210,7 @@ public class Rendering {
 
         // from 100% to 50%
         var alpha = 1 - (progress / 2f);
-        var colour = CurrentGradientHolder.getColour(((getTicksSinceSearch() + context.tickDelta()) % 80) / 80);
+        var colour = CurrentGradientHolder.getColour(getBaseProgress(getTicksSinceSearch(), context.tickDelta()));
         var scale = easingFunc(progress);
 
         var tesselator = Tesselator.getInstance();
