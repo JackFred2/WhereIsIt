@@ -64,6 +64,11 @@ public class SearchInvokerDefaults {
                         client.execute(() -> consumer.accept(packet.results()));
                     }
                 }
+
+                // update request, in case we don't have one
+                if (packet.request() != null) {
+                    Rendering.setLastRequest(packet.request());
+                }
             });
         });
     }

@@ -4,7 +4,9 @@ import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.WhereIsIt;
+import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
 
 import java.util.Collection;
@@ -13,6 +15,8 @@ import java.util.Set;
 
 /**
  * Buffer format:
+ * <li>id: long</li>
+ * For each result:
  * <li>position: BlockPos</li>
  * <li>hasItemDetails: boolean</li>
  * <li>if (hasItemDetails) item: ItemStack</li>
@@ -21,16 +25,24 @@ import java.util.Set;
  * <li>if (hasCustomName) hasCustomNameOffset: boolean</li>
  * <li>if (hasCustomName && hasCustomNameOffset) nameOffset: 3 * double</li>
  * <li>numberOfOtherPositions: Collection&lt;BlockPos&gt;</li>
+ * After:
+ * <li>hasRequest: boolean</li>
+ * <li>if (hasRequest) request: SearchRequest</li>
  */
-public record ClientboundResultsPacket(long id, Collection<SearchResult> results) implements FabricPacket {
+public record ClientboundResultsPacket(long id, Collection<SearchResult> results, @Nullable SearchRequest request) implements FabricPacket {
     public static final PacketType<ClientboundResultsPacket> TYPE = PacketType.create(WhereIsIt.id("s2c_founditem"), ClientboundResultsPacket::new);
     public static final long WHEREIS_COMMAND_ID = -1L;
 
     public ClientboundResultsPacket(FriendlyByteBuf buf) {
-        this(buf.readLong(), parse(buf));
+        this(buf.readLong(), parseResults(buf), parseRequest(buf));
     }
 
-    private static Set<SearchResult> parse(FriendlyByteBuf bbuf) {
+    private static @Nullable SearchRequest parseRequest(FriendlyByteBuf bbuf) {
+        if (bbuf.readBoolean()) return SearchRequest.load(bbuf.readNbt());
+        return null;
+    }
+
+    private static Set<SearchResult> parseResults(FriendlyByteBuf bbuf) {
         return bbuf.readCollection(HashSet::new, bbuf2 -> {
             var result = SearchResult.builder(bbuf2.readBlockPos());
             if (bbuf2.readBoolean())
@@ -63,6 +75,8 @@ public record ClientboundResultsPacket(long id, Collection<SearchResult> results
             }
             bbuf2.writeCollection(result.otherPositions(), FriendlyByteBuf::writeBlockPos);
         });
+        bbuf.writeBoolean(request != null);
+        if (request != null) bbuf.writeNbt(request.pack());
     }
 
     @Override

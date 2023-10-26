@@ -99,7 +99,7 @@ public class SearchHandler {
                 ServerSideRenderer.doServersideRendering(player, results.values());
             } else {
                 // send packet
-                ServerPlayNetworking.send(player, new ClientboundResultsPacket(ClientboundResultsPacket.WHEREIS_COMMAND_ID, results.values()));
+                ServerPlayNetworking.send(player, new ClientboundResultsPacket(ClientboundResultsPacket.WHEREIS_COMMAND_ID, results.values(), request));
             }
         }
     }
