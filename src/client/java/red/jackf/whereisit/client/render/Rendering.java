@@ -112,16 +112,15 @@ public class Rendering {
     // render a highlight behind an item
     public static void renderSlotHighlight(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float tickDelta) {
         if (screen instanceof AbstractContainerScreen<?> containerScreen) {
-            var time = getTicksSinceSearch() + tickDelta;
+            var time = ((getTicksSinceSearch() + tickDelta) % 80) / 80;
             for (Slot slot : containerScreen.getMenu().slots) {
                 if (slot.isActive() && slot.hasItem() && lastRequest != null &&
                         SearchRequest.check(slot.getItem(), lastRequest)) {
                     var x = slot.x + containerScreen.leftPos;
                     var y = slot.y + containerScreen.topPos;
-                    var progress = 2 * time // shift over time
-                            + slot.x // offset by slot X
-                            - (mouseX + mouseY) / 6; // parallax with maths
-                    progress /= 256; // slow down
+                    var progress = time;
+                    progress += (slot.x / 256f) * WhereIsItConfig.INSTANCE.instance().getClient().slotHighlightXFactor;
+                    progress -= ((mouseX + mouseY) / 1280f) * WhereIsItConfig.INSTANCE.instance().getClient().slotHighlightMouseFactor;
                     var colour = CurrentGradientHolder.getColour(progress);
                     graphics.fill(x, y, x + 16, y + 16, colour);
                 }

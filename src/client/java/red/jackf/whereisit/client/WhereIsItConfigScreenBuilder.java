@@ -128,6 +128,32 @@ public class WhereIsItConfigScreenBuilder {
                                 .coloured(true)
                                 .onOffFormatter())
                         .build())
+                .option(Option.<Float>createBuilder()
+                        .name(translatable("whereisit.config.client.showSlotHighlights.mouseFactor"))
+                        .description(OptionDescription.of(translatable("whereisit.config.client.showSlotHighlights.mouseFactor.description")))
+                        .controller(opt -> FloatSliderControllerBuilder.create(opt)
+                                .formatValue(f -> translatable("mco.download.percent", (int) (f * 100)))
+                                .step(0.01f)
+                                .range(0f, 4f))
+                        .binding(
+                                defaults.getClient().slotHighlightMouseFactor,
+                                () -> config.getClient().slotHighlightMouseFactor,
+                                f -> config.getClient().slotHighlightMouseFactor = f
+                        )
+                        .build())
+                .option(Option.<Float>createBuilder()
+                        .name(translatable("whereisit.config.client.showSlotHighlights.xFactor"))
+                        .description(OptionDescription.of(translatable("whereisit.config.client.showSlotHighlights.xFactor.description")))
+                        .controller(opt -> FloatSliderControllerBuilder.create(opt)
+                                .formatValue(f -> translatable("mco.download.percent", (int) (f * 100)))
+                                .step(0.01f)
+                                .range(0f, 4f))
+                        .binding(
+                                defaults.getClient().slotHighlightXFactor,
+                                () -> config.getClient().slotHighlightXFactor,
+                                f -> config.getClient().slotHighlightXFactor = f
+                        )
+                        .build())
                 .options(makeLabelOptions(defaults, config))
                 .options(makeColourOptions(defaults, config))
                 .build();
