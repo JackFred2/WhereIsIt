@@ -14,7 +14,7 @@
   "whereisit.config.client.showSlotHighlights.description": "Whether to highlight slots that matched the last search.",
   "whereisit.config.client.showSlotHighlights.mouseFactor": "Slot Highlight Mouse Factor",
   "whereisit.config.client.showSlotHighlights.mouseFactor.description": "How much the mouse's position influences the colour of a slot highlight.",
-  "whereisit.config.client.showSlotHighlights.xFactor": "Slot highlight X Position Factor",
+  "whereisit.config.client.showSlotHighlights.xFactor": "Slot Highlight X Position Factor",
   "whereisit.config.client.showSlotHighlights.xFactor.description": "How much a slot's X position influences the colour of a slot highlight.",
   "whereisit.config.client.highlightTimeFactor": "Highlight Time Factor",
   "whereisit.config.client.highlightTimeFactor.description": "Modifier for how fast Where Is It will cycle through the current colour scheme's gradient.",
