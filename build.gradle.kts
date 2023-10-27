@@ -68,6 +68,7 @@ repositories {
 		url = uri("https://maven.isxander.dev/releases")
 		content {
 			includeGroup("dev.isxander.yacl")
+			includeGroupAndSubgroups("org.quiltmc")
 		}
 	}
 
@@ -80,15 +81,7 @@ repositories {
 		}
 	}
 
-	maven {
-		name = "QuiltMC"
-		url = uri("https://maven.quiltmc.org/repository/release")
-		content {
-			includeGroupAndSubgroups("org.quiltmc")
-		}
-	}
-
-	// JEI, JSST
+	// JEI
 	maven {
 		name = "Modrinth"
 		url = uri("https://api.modrinth.com/maven")
@@ -173,10 +166,6 @@ dependencies {
 	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${properties["yacl_version"]}") {
 		exclude(group = "com.terraformersmc", module = "modmenu")
 	}
-	implementation("blue.endless:jankson:${properties["jankson_version"]}")
-
-	// Dev Util
-	modLocalRuntime("maven.modrinth:jsst:B39piMwB")
 
 	// COMPATIBILITY
 	modCompileRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
@@ -196,10 +185,10 @@ dependencies {
 
 	// Recipe Viewer Runtimes
 	//modLocalRuntime("mezz.jei:jei-${properties["minecraft_version"]}-fabric:${properties["jei_version"]}")
-	modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}") {
+	/*modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}") {
 		exclude(group = "net.fabricmc.fabric-api", module = "fabric-api")
-	}
-	//modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
+	}*/
+	modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
 }
 
 tasks.withType<ProcessResources>().configureEach {
