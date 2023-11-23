@@ -72,12 +72,13 @@ repositories {
 		}
 	}
 
-	// YACL Dependencies
+	// YACL Snapshots
 	maven {
-		name = "Sonatype"
-		url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+		name = "Xander Snapshot Maven"
+		url = uri("https://maven.isxander.dev/snapshots")
 		content {
-			includeGroupAndSubgroups("com.twelvemonkeys")
+			includeGroup("dev.isxander.yacl")
+			includeGroupAndSubgroups("org.quiltmc")
 		}
 	}
 
@@ -188,7 +189,7 @@ dependencies {
 	/*modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}") {
 		exclude(group = "net.fabricmc.fabric-api", module = "fabric-api")
 	}*/
-	modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
+	//modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
 }
 
 tasks.withType<ProcessResources>().configureEach {
