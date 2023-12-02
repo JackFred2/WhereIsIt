@@ -274,7 +274,7 @@ if (lastTagVal != null && newTagVal != null) {
 				curseforge {
 					projectId.set("378036")
 					accessToken.set(System.getenv("CURSEFORGE_TOKEN"))
-					properties["game_versions"]!!.toString().split(",").forEach {
+					properties["game_versions_curse"]!!.toString().split(",").forEach {
 						minecraftVersions.add(it)
 					}
 					displayName.set("${properties["prefix"]!!} ${properties["mod_name"]!!} ${version.get()}")
@@ -295,7 +295,7 @@ if (lastTagVal != null && newTagVal != null) {
 				modrinth {
 					accessToken.set(System.getenv("MODRINTH_TOKEN"))
 					projectId.set("FCTyEqkn")
-					properties["game_versions"]!!.toString().split(",").forEach {
+					properties["game_versions_mr"]!!.toString().split(",").forEach {
 						minecraftVersions.add(it)
 					}
 					displayName.set("${properties["mod_name"]!!} ${version.get()}")
