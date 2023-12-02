@@ -19,7 +19,7 @@ plugins {
 val grgit: Grgit? = project.grgit
 
 fun getVersionSuffix(): String {
-	return grgit?.branch?.current()?.name ?: "nogit"
+	return grgit?.branch?.current()?.name ?: "nogit+${properties["minecraft_version"]}"
 }
 
 group = properties["maven_group"]!!
