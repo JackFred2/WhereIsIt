@@ -154,7 +154,7 @@ loom {
 // from WTHIT
 fun DependencyHandlerScope.modCompileRuntime(any: String, configure: ExternalModuleDependency.() -> Unit = {}) {
 	modCompileOnly(any, configure)
-	modRuntimeOnly(any, configure)
+	modLocalRuntime(any, configure)
 }
 
 dependencies {
