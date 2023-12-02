@@ -12,7 +12,7 @@ Minecraft mod to locate items in nearby inventories. Press Y over an item to sea
 - [Fabric API](https://modrinth.com/mod/fabric-api)
 - [YACL](https://modrinth.com/mod/yacl)
 
-Also embeds [JackFredLib](https://github.com/JackFred2/JackFredLib), which embeds [MixinExtras](https://github.com/LlamaLad7/MixinExtras).
+Also embeds [JackFredLib](https://github.com/JackFred2/JackFredLib).
 
 ## Features
 
