@@ -24,8 +24,6 @@ fun getVersionSuffix(): String {
 group = properties["maven_group"]!!
 version = "${properties["mod_version"]}+${getVersionSuffix()}"
 
-val modReleaseType = properties["type"]?.toString() ?: "release"
-
 base {
 	archivesName.set("${properties["archives_base_name"]}")
 }
@@ -151,12 +149,6 @@ loom {
 	accessWidenerPath.set(file("src/main/resources/whereisit.accesswidener"))
 }
 
-// from WTHIT
-fun DependencyHandlerScope.modCompileRuntime(any: String, configure: ExternalModuleDependency.() -> Unit = {}) {
-	modCompileOnly(any, configure)
-	modLocalRuntime(any, configure)
-}
-
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
@@ -168,7 +160,7 @@ dependencies {
 
 	include(modApi("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")!!)
 
-	modCompileRuntime("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
+	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
 	// Config
 	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${properties["yacl_version"]}") {
@@ -176,7 +168,8 @@ dependencies {
 	}
 
 	// COMPATIBILITY
-	modCompileRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
+	modCompileOnly("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
+	modLocalRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
 
 	// Recipe Viewer APIs
 	// https://github.com/mezz/JustEnoughItems/issues/2891
@@ -223,6 +216,15 @@ tasks.jar {
 	}
 }
 
+fun makeChangelogPrologue(): String {
+	return """
+		|Bundled:
+		|  - JackFredLib: ${properties["jackfredlib_version"]}
+		|  """.trimMargin()
+}
+
+println(makeChangelogPrologue())
+
 val lastTagVal = properties["lastTag"]?.toString()
 val newTagVal = properties["newTag"]?.toString()
 
@@ -232,8 +234,9 @@ var changelogTask: TaskProvider<GenerateChangelogTask>? = null
 changelogText = if (lastTagVal != null && newTagVal != null) {
     changelogTask = tasks.register<GenerateChangelogTask>("generateChangelog") {
         lastTag.set(lastTagVal)
-        newTag.set(newTagVal)
-        githubUrl.set(properties["github_url"]!!.toString())
+		newTag.set(newTagVal)
+		prologue.set(makeChangelogPrologue())
+		githubUrl.set(properties["github_url"]!!.toString())
         prefixFilters.set(properties["changelog_filter"]!!.toString().split(","))
     }
 
@@ -271,7 +274,11 @@ tasks.named<DefaultTask>("publishMods") {
 if (listOf("CURSEFORGE_TOKEN", "MODRINTH_TOKEN").any { System.getenv().containsKey(it) }) {
     publishMods {
         changelog.set(changelogText)
-        type.set(ReleaseType.STABLE)
+		type.set(when(properties["release_type"]) {
+			"release" -> ReleaseType.STABLE
+			"beta" -> ReleaseType.BETA
+			else -> ReleaseType.ALPHA
+		})
         modLoaders.add("fabric")
         modLoaders.add("quilt")
         file.set(tasks.named<RemapJarTask>("remapJar").get().archiveFile)
