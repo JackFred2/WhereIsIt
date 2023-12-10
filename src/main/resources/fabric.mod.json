@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "whereisit",
 	"version": "${version}",
-	"name": "WhereIsIt",
+	"name": "Where Is It",
 	"description": "Find items in nearby inventories.",
 	"authors": [
 		"JackFred"
