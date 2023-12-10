@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "whereisit",
 	"version": "${version}",
-	"name": "WhereIsIt",
+	"name": "Where Is It",
 	"description": "Find items in nearby inventories.",
 	"authors": [
 		"JackFred"
@@ -45,7 +45,7 @@
 	"accessWidener": "whereisit.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.15.0",
-		"minecraft": ">=1.20.2",
+		"minecraft": ">=1.20.3",
 		"java": ">=17",
 		"fabric-api": "*",
 		"yet_another_config_lib_v3": ">=3.2.0"
