@@ -102,7 +102,7 @@ public class WhereIsItConfig {
         @SerialEntry(comment = "Whether to use a random pride colour scheme each search.")
         public boolean randomScheme = true;
 
-        @SerialEntry(comment = "Highlight Colour Scheme. One of SOLID, PRIDE, GAY, LESBIAN, BISEXUAL, PANSEXUAL, INTERSEX, NONBINARY, TRANS, ACE, ARO, BRITISH")
+        @SerialEntry(comment = "Highlight Colour Scheme. One of SOLID, FLASHING, PRIDE, GAY, LESBIAN, BISEXUAL, PANSEXUAL, INTERSEX, NONBINARY, TRANS, ACE, ARO, BRITISH")
         public ColourScheme colourScheme = ColourScheme.PRIDE;
 
         @SerialEntry(comment = "Highlight colour to use when colourScheme is SOLID.")
