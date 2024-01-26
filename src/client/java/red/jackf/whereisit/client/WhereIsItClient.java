@@ -44,7 +44,7 @@ public class WhereIsItClient implements ClientModInitializer {
     private static final Supplier<CustomToast> NOT_INSTALLED = Memoizer.of(() -> ToastBuilder.builder(ToastFormat.DARK, Component.translatable("whereisit.config.title"))
             .addMessage(Component.translatable("gui.whereisit.not_installed_serverside"))
             .progressShowsVisibleTime()
-            .withImage(ImageSpec.modIcon(WhereIsIt.MODID))
+            .withIcon(ToastIcon.modIcon(WhereIsIt.MODID))
             .build());
 
     @Override

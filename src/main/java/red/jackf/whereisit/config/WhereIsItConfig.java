@@ -139,6 +139,8 @@ public class WhereIsItConfig {
             this.highlightTimeFactor = Mth.clamp(this.slotHighlightXFactor, 0.1f, 4f);
             this.solidColour = new Color(this.solidColour.getRGB() | 0xFF_000000);
             this.containerNameLabelScale = Mth.clamp(this.containerNameLabelScale, 0.25f, 2f);
+
+            if (this.colourScheme == null) this.colourScheme = ColourScheme.SOLID;
         }
     }
 
