@@ -31,6 +31,9 @@ public class CurrentGradientHolder {
             var scheme = WhereIsItConfig.INSTANCE.instance().getClient().colourScheme;
             if (scheme == ColourScheme.SOLID) {
                 selected = Colour.fromInt(WhereIsItConfig.INSTANCE.instance().getClient().solidColour.getRGB());
+            } else if (scheme == ColourScheme.FLASHING) {
+                Colour solid = Colour.fromInt(WhereIsItConfig.INSTANCE.instance().getClient().solidColour.getRGB());
+                selected = Gradient.of(solid, Colours.BLACK, solid).repeat(2);
             } else {
                 selected = scheme.getGradient();
             }

@@ -6,6 +6,7 @@ import red.jackf.jackfredlib.api.colour.Gradients;
 
 public enum ColourScheme {
     SOLID(Colours.RED),
+    FLASHING(Gradient.of(Colours.RED, Colours.BLACK, Colours.RED).repeat(2)),
     PRIDE(Gradients.RAINBOW),
     GAY(Gradients.GAY),
     LESBIAN(Gradients.LESBIAN),

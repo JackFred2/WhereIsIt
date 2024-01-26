@@ -10,6 +10,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import red.jackf.jackfredlib.api.colour.Colour;
+import red.jackf.jackfredlib.api.colour.Colours;
+import red.jackf.jackfredlib.api.colour.Gradient;
 import red.jackf.jackfredlib.client.api.colour.GradientUtils;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.client.render.CurrentGradientHolder;
@@ -400,7 +402,7 @@ public class WhereIsItConfigScreenBuilder {
                         .build())
                 .controller(opt -> EnumControllerBuilder.create(opt)
                         .enumClass(ColourScheme.class))
-                .listener((opt, scheme) -> solidColourOption.setAvailable(scheme == ColourScheme.SOLID))
+                .listener((opt, scheme) -> solidColourOption.setAvailable(scheme == ColourScheme.SOLID || scheme == ColourScheme.FLASHING))
                 .build();
 
         var randomSchemeOption = Option.<Boolean>createBuilder()
@@ -415,7 +417,7 @@ public class WhereIsItConfigScreenBuilder {
                         .onOffFormatter()
                         .coloured(true))
                 .listener((opt, enabled) -> {
-                    solidColourOption.setAvailable(!enabled && colourSchemeOption.pendingValue() == ColourScheme.SOLID);
+                    solidColourOption.setAvailable(!enabled && (colourSchemeOption.pendingValue() == ColourScheme.SOLID || colourSchemeOption.pendingValue() == ColourScheme.FLASHING));
                     colourSchemeOption.setAvailable(!enabled);
                 })
                 .build();
@@ -423,7 +425,7 @@ public class WhereIsItConfigScreenBuilder {
         return List.of(randomSchemeOption, colourSchemeOption, solidColourOption);
     }
 
-    private static Optional<ImageRenderer> getGradientPreview(ColourScheme scheme, Color solid) {
+    private static Optional<ImageRenderer> getGradientPreview(ColourScheme scheme, Color solidColour) {
         var renderer = new ImageRenderer() {
             private static void blit(GuiGraphics graphics, int x, int y, int width, int height, int u, int v, int regionWidth, int regionHeight) {
                 graphics.blit(COLOUR_PREVIEW_BORDER, x, y, width, height, u, v, regionWidth, regionHeight, 24, 64);
@@ -443,8 +445,16 @@ public class WhereIsItConfigScreenBuilder {
                 blit(graphics, renderWidth - borderThickness, 0, borderThickness, renderHeight, 2 * borderThickness, 0, borderThickness, renderHeight); // right
                 blit(graphics, borderThickness, 0, width, borderThickness, borderThickness, 0, borderThickness, borderThickness); // top
                 blit(graphics, borderThickness, renderHeight - borderThickness, width, borderThickness, borderThickness, renderHeight - borderThickness, borderThickness, borderThickness); // bottom
-                GradientUtils.drawHorizontalGradient(graphics, borderThickness, borderThickness, width, height,
-                        scheme == ColourScheme.SOLID ? Colour.fromInt(solid.getRGB()) : scheme.getGradient(), 0, 1);
+                Gradient previewScheme;
+                Colour solid = Colour.fromInt(solidColour.getRGB());
+                if (scheme == ColourScheme.SOLID) {
+                    previewScheme = solid;
+                } else if (scheme == ColourScheme.FLASHING) {
+                    previewScheme = Gradient.of(solid, Colours.BLACK, solid).repeat(2);
+                } else {
+                    previewScheme = scheme.getGradient();
+                }
+                GradientUtils.drawHorizontalGradient(graphics, borderThickness, borderThickness, width, height, previewScheme, 0, 1);
                 graphics.pose().popPose();
 
                 return renderHeight;
