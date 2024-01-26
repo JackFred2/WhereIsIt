@@ -1,5 +1,5 @@
 name: Publish
-run-name: Publish Eye Spy
+run-name: Publish Where Is It
 
 on:
   workflow_dispatch:
