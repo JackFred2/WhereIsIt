@@ -135,12 +135,12 @@ loom {
 	log4jConfigs.from(file("log4j2.xml"))
 
 	runs {
-
 		getByName("client") {
 			environment = "client"
 			configName = "Run Client"
 			runDir = "run"
-			source(sourceSets["client"])
+            programArgs.addAll("--username JackFred".split(" "))
+            source(sourceSets["client"])
 			ideConfigGenerated(true)
 			client()
 		}
