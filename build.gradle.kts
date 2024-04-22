@@ -120,7 +120,7 @@ java {
 }
 
 tasks.withType<JavaCompile> {
-	options.release.set(17)
+	options.release.set(21)
 }
 
 loom {
@@ -195,7 +195,7 @@ dependencies {
 	modCompileOnly("dev.emi:emi-fabric:${properties["emi_version"]}")
 
 	// Recipe Viewer Runtimes
-	modLocalRuntime("mezz.jei:jei-${properties["minecraft_version"]}-fabric:${properties["jei_version"]}")
+	//modLocalRuntime("mezz.jei:jei-${properties["minecraft_version"]}-fabric:${properties["jei_version"]}")
 	/*modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}") {
 		exclude(group = "net.fabricmc.fabric-api", module = "fabric-api")
 	}*/
