@@ -1,6 +1,7 @@
 package red.jackf.whereisit.defaults;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +21,6 @@ public class DefaultBlockSearchers {
     }
 
     // check the regular contents of an inventory
-    @SuppressWarnings("UnstableApiUsage")
     private static void setupTransferApi() {
         BlockSearcher.EVENT.register(BlockSearcher.FALLBACK, (request, player, level, state, pos) -> {
             if (!WhereIsItConfig.INSTANCE.instance().getCommon().debug.enableDefaultSearchers) return ResultHolder.pass();
@@ -66,7 +66,8 @@ public class DefaultBlockSearchers {
             var shulkerBoxBe = level.getBlockEntity(pos, BlockEntityType.SHULKER_BOX);
             if (shulkerBoxBe.isEmpty()) return ResultHolder.pass();
             var fakeItem = new ItemStack(state.getBlock().asItem());
-            fakeItem.setHoverName(shulkerBoxBe.get().getCustomName());
+            if (shulkerBoxBe.get().getCustomName() != null)
+                fakeItem.set(DataComponents.CUSTOM_NAME, shulkerBoxBe.get().getCustomName());
             if (SearchRequest.check(fakeItem, request)) {
                 return ResultHolder.value(SearchResult.builder(pos)
                     .item(fakeItem)

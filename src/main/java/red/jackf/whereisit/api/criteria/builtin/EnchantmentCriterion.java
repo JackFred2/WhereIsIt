@@ -5,9 +5,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.CriterionType;
@@ -46,7 +46,7 @@ public class EnchantmentCriterion extends Criterion {
 
     @Override
     public void writeTag(CompoundTag tag) {
-        tag.putString(ID_KEY, String.valueOf(EnchantmentHelper.getEnchantmentId(enchantment)));
+        tag.putString(ID_KEY, String.valueOf(BuiltInRegistries.ENCHANTMENT.getKey(enchantment)));
         if (targetLevel != null) tag.putInt(LEVEL_KEY, targetLevel);
     }
 
@@ -57,11 +57,12 @@ public class EnchantmentCriterion extends Criterion {
 
     @Override
     public boolean test(ItemStack stack) {
-        var level = stack.is(Items.ENCHANTED_BOOK) ?
-                EnchantmentHelper.getEnchantments(stack).getOrDefault(enchantment, 0) :
-                EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack);
+        ItemEnchantments component = stack.get(EnchantmentHelper.getComponentType(stack));
+        if (component == null) return false;
+
+        int level = component.getLevel(enchantment);
         if (targetLevel != null) return targetLevel == level;
-        return level > 0;
+        else return level > 0;
     }
 
     @Override

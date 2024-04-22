@@ -15,8 +15,7 @@ accessible field net/minecraft/world/item/crafting/Ingredient$ItemValue item Lne
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
 
-# search contents of bundles for nested searching
-accessible method net/minecraft/world/item/BundleItem getContents (Lnet/minecraft/world/item/ItemStack;)Ljava/util/stream/Stream;
+accessible method net/minecraft/world/item/enchantment/EnchantmentHelper getComponentType (Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/core/component/DataComponentType;
 
 # text bars to not search when typing
 accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen searchBox Lnet/minecraft/client/gui/components/EditBox;

@@ -1,11 +1,12 @@
 package red.jackf.whereisit.api.criteria.builtin;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.CriterionType;
 
@@ -40,7 +41,9 @@ public class PotionEffectCriterion extends Criterion {
 
     @Override
     public boolean test(ItemStack stack) {
-        return PotionUtils.getPotion(stack) == potion;
+        PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);
+        if (contents == null) return false;
+        return contents.potion().isPresent() && contents.potion().get().value().equals(this.potion);
     }
 
     @Override

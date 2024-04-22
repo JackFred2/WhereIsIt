@@ -1,7 +1,9 @@
 package red.jackf.whereisit.api.criteria.builtin;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.api.criteria.Criterion;
@@ -40,11 +42,13 @@ public class NameCriterion extends Criterion {
 
     @Override
     public boolean test(ItemStack stack) {
-        if (stack.hasCustomHoverName()) {
-            if (name == null) return false;
-            return stack.getHoverName().getString().toLowerCase(Locale.ROOT).contains(name.toLowerCase(Locale.ROOT));
-        } else {
+        Component customName = stack.get(DataComponents.CUSTOM_NAME);
+        if (customName == null) {
             return name == null;
+        } else if (this.name == null) {
+            return false;
+        } else {
+            return customName.getString().toLowerCase(Locale.ROOT).contains(this.name.toLowerCase(Locale.ROOT));
         }
     }
 

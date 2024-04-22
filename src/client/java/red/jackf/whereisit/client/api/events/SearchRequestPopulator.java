@@ -1,12 +1,18 @@
 package red.jackf.whereisit.client.api.events;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.*;
 import red.jackf.whereisit.api.criteria.builtin.*;
@@ -68,10 +74,20 @@ public interface SearchRequestPopulator {
             if (context == Context.INVENTORY_PRECISE || context == Context.OVERLAY_ALTERNATE) {
                 criterion.add(new NbtCriterion(stack.getTag(), true));
             } else if (context == Context.FAVOURITE) {
-                if (stack.hasCustomHoverName()) criterion.add(new NameCriterion(stack.getHoverName().getString()));
-                EnchantmentHelper.getEnchantments(stack).forEach((ench, level) -> criterion.add(new EnchantmentCriterion(ench, level)));
-                var potion = PotionUtils.getPotion(stack);
-                if (potion != Potions.EMPTY) criterion.add(new PotionEffectCriterion(potion));
+                if (stack.has(DataComponents.CUSTOM_NAME))
+                    criterion.add(new NameCriterion(stack.getHoverName().getString()));
+
+                ItemEnchantments enchantments = stack.get(EnchantmentHelper.getComponentType(stack));
+                if (enchantments != null) {
+                    for (Object2IntMap.Entry<Holder<Enchantment>> entry : enchantments.entrySet()) {
+                        criterion.add(new EnchantmentCriterion(entry.getKey().value(), entry.getIntValue()));
+                    }
+                }
+
+                PotionContents potion = stack.get(DataComponents.POTION_CONTENTS);
+                if (potion != null && potion.potion().isPresent()) {
+                    criterion.add(new PotionEffectCriterion(potion.potion().get().value()));
+                }
             }
         }
 
