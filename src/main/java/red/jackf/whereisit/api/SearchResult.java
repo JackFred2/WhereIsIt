@@ -1,15 +1,35 @@
 package red.jackf.whereisit.api;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import red.jackf.whereisit.util.Codecs;
 
 import java.util.*;
 
 public final class SearchResult {
+    public static final StreamCodec<RegistryFriendlyByteBuf, SearchResult> STREAM_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC,
+            SearchResult::pos,
+            ItemStack.STREAM_CODEC.apply(ByteBufCodecs::optional).map(opt -> opt.orElse(null), Optional::ofNullable),
+            SearchResult::item,
+            ComponentSerialization.OPTIONAL_STREAM_CODEC.map(opt -> opt.orElse(null), Optional::ofNullable),
+            SearchResult::name,
+            Codecs.VEC3.apply(ByteBufCodecs::optional).map(opt -> opt.orElse(null), Optional::ofNullable),
+            SearchResult::customNameOffset,
+            BlockPos.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)),
+            SearchResult::otherPositions,
+            SearchResult::new
+    );
+
     private final BlockPos pos;
     private final @Nullable ItemStack item;
     private final @Nullable Component name;

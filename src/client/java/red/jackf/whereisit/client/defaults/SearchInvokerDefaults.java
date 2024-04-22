@@ -1,6 +1,5 @@
 package red.jackf.whereisit.client.defaults;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.client.WhereIsItClient;
@@ -52,24 +51,22 @@ public class SearchInvokerDefaults {
             }
         });
 
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> { // on server connect
-            ClientPlayNetworking.registerGlobalReceiver(ClientboundResultsPacket.TYPE, (packet, player, responseSender) -> {
-                // we didn't send a matching packet, so assume the default Where Is It handling of overlay render
-                if (packet.id() == ClientboundResultsPacket.WHEREIS_COMMAND_ID) {
-                    Rendering.resetSearchTime();
-                    WhereIsItClient.recieveResults(packet.results());
-                } else {
-                    var consumer = consumers.remove(packet.id());
-                    if (consumer != null) {
-                        client.execute(() -> consumer.accept(packet.results()));
-                    }
+        ClientPlayNetworking.registerGlobalReceiver(ClientboundResultsPacket.TYPE, (packet, context) -> {
+            // we didn't send a matching packet, so assume the default Where Is It handling of overlay render
+            if (packet.id() == ClientboundResultsPacket.WHEREIS_COMMAND_ID) {
+                Rendering.resetSearchTime();
+                WhereIsItClient.recieveResults(packet.results());
+            } else {
+                var consumer = consumers.remove(packet.id());
+                if (consumer != null) {
+                    context.client().execute(() -> consumer.accept(packet.results()));
                 }
+            }
 
-                // update request, in case we don't have one
-                if (packet.request() != null) {
-                    Rendering.setLastRequest(packet.request());
-                }
-            });
+            // update request, in case we don't have one
+            if (packet.request() != null) {
+                Rendering.setLastRequest(packet.request());
+            }
         });
     }
 }

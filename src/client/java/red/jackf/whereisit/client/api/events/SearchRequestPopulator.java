@@ -8,8 +8,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -72,7 +70,7 @@ public interface SearchRequestPopulator {
         if (!triggeredOverlayBehavior) {
             criterion.add(new ItemCriterion(stack.getItem()));
             if (context == Context.INVENTORY_PRECISE || context == Context.OVERLAY_ALTERNATE) {
-                criterion.add(new NbtCriterion(stack.getTag(), true));
+                criterion.add(new ComponentsCriterion(stack));
             } else if (context == Context.FAVOURITE) {
                 if (stack.has(DataComponents.CUSTOM_NAME))
                     criterion.add(new NameCriterion(stack.getHoverName().getString()));

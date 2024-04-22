@@ -18,7 +18,8 @@ public class BuiltInCriteria {
         register("item", ItemCriterion.TYPE);
         register("item_tag", ItemTagCriterion.TYPE);
         register("name", NameCriterion.TYPE);
-        register("nbt", NbtCriterion.TYPE);
+        register("component", ComponentsCriterion.TYPE);
+        // register("nbt", NbtCriterion.TYPE);
         register("potion_effect", PotionEffectCriterion.TYPE);
     }
 }

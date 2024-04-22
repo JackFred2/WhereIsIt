@@ -1,32 +1,25 @@
 package red.jackf.whereisit.networking;
 
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import org.jetbrains.annotations.NotNull;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.SearchRequest;
 
-public record ServerboundSearchForItemPacket(long id, SearchRequest request) implements FabricPacket {
-    public static final PacketType<ServerboundSearchForItemPacket> TYPE = PacketType.create(WhereIsIt.id("c2s_searchforitem"), ServerboundSearchForItemPacket::new);
-
-    public ServerboundSearchForItemPacket(FriendlyByteBuf buf) {
-        this(buf.readLong(), getRequest(buf));
-    }
-
-    private static SearchRequest getRequest(FriendlyByteBuf buf) {
-        var nbt = buf.readNbt();
-        return nbt != null ? SearchRequest.load(nbt) : new SearchRequest();
-    }
+public record ServerboundSearchForItemPacket(long id, SearchRequest request) implements CustomPacketPayload {
+    public static final Type<ServerboundSearchForItemPacket> TYPE = new Type<>(WhereIsIt.id("c2s_searchforitem"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSearchForItemPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_LONG,
+            ServerboundSearchForItemPacket::id,
+            ByteBufCodecs.COMPOUND_TAG.map(SearchRequest::load, SearchRequest::pack),
+            ServerboundSearchForItemPacket::request,
+            ServerboundSearchForItemPacket::new
+    );
 
     @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeLong(id);
-        var packed = request.pack();
-        buf.writeNbt(packed);
-    }
-
-    @Override
-    public PacketType<?> getType() {
+    public @NotNull Type<ServerboundSearchForItemPacket> type() {
         return TYPE;
     }
 }
