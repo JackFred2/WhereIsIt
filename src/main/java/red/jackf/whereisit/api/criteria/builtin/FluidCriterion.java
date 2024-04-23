@@ -1,45 +1,27 @@
 package red.jackf.whereisit.api.criteria.builtin;
 
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.CriterionType;
 
-import java.util.Objects;
-
 /**
  * Matches against a specific fluid, by targeting buckets, bottles and similar containers. Uses Fabric's Transfer API.
  */
-public class FluidCriterion extends Criterion {
-    public static final CriterionType<FluidCriterion> TYPE = CriterionType.of(FluidCriterion::new);
-    private static final String KEY = "FluidId";
-    private Fluid fluid = Fluids.EMPTY;
-    public FluidCriterion() {
-        super(TYPE);
-    }
-
-    public FluidCriterion(Fluid fluid) {
-        super(TYPE);
-        this.fluid = fluid;
-    }
+public record FluidCriterion(Fluid fluid) implements Criterion {
+    public static final MapCodec<FluidCriterion> CODEC = BuiltInRegistries.FLUID.byNameCodec().fieldOf("fluid").xmap(FluidCriterion::new, FluidCriterion::fluid);
+    public static final CriterionType<FluidCriterion> TYPE = CriterionType.of(CODEC);
 
     @Override
-    public void writeTag(CompoundTag tag) {
-        tag.putString(KEY, BuiltInRegistries.FLUID.getKey(this.fluid).toString());
-    }
-
-    @Override
-    public void readTag(CompoundTag tag) {
-        var fluid = BuiltInRegistries.FLUID.get(ResourceLocation.tryParse(tag.getString(KEY)));
-        if (fluid != Fluids.EMPTY) this.fluid = fluid;
+    public CriterionType<?> type() {
+        return TYPE;
     }
 
     @Override
@@ -47,7 +29,6 @@ public class FluidCriterion extends Criterion {
         return this.fluid != Fluids.EMPTY;
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     @Override
     public boolean test(ItemStack stack) {
         var storage = FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
@@ -57,25 +38,5 @@ public class FluidCriterion extends Criterion {
             if (resource.getFluid() == this.fluid) return true;
         }
         return false;
-    }
-
-    @Override
-    public String toString() {
-        return "FluidCriterion{" +
-                "fluid=" + fluid +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FluidCriterion that = (FluidCriterion) o;
-        return Objects.equals(fluid, that.fluid);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(fluid);
     }
 }

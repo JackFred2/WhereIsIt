@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;

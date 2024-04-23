@@ -14,14 +14,21 @@ import java.util.function.Consumer;
 
 public class TextUtil {
 
-    public static List<Component> prettyPrint(CompoundTag root) {
-        var list = new ArrayList<Component>();
+    public static List<Component> prettyPrint(Tag root) {
+        var text = new ArrayList<Component>();
 
-        list.add(Component.literal("Search Request:"));
+        text.add(Component.literal("Search Request:"));
 
-        prettyPrintCompound(list::add, null, 0, root);
+        if (root instanceof CompoundTag compound) {
+            prettyPrintCompound(text::add, null, 0, compound);
+        } else {
+            // wrap for ease
+            CompoundTag wrapped = new CompoundTag();
+            wrapped.put("request", root);
+            prettyPrintCompound(text::add, null, 0, wrapped);
+        }
 
-        return list;
+        return text;
     }
 
     private static MutableComponent white(String str) {

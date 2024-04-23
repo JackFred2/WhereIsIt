@@ -1,27 +1,16 @@
 package red.jackf.whereisit.api.criteria;
 
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import red.jackf.whereisit.WhereIsIt;
 
-import java.util.function.Supplier;
-
-public class CriterionType<T extends Criterion> {
+public record CriterionType<T extends Criterion>(MapCodec<T> codec) {
     public static final ResourceKey<Registry<CriterionType<? extends Criterion>>> REGISTRY_KEY = ResourceKey.createRegistryKey(WhereIsIt.id("criteria_supplier"));
-    public static final Registry<CriterionType<? extends Criterion>> REGISTRY = FabricRegistryBuilder.createSimple(REGISTRY_KEY)
-            .buildAndRegister();
-    private final Supplier<T> constructor;
+    public static final Registry<CriterionType<? extends Criterion>> REGISTRY = FabricRegistryBuilder.createSimple(REGISTRY_KEY).buildAndRegister();
 
-    public T get() {
-        return constructor.get();
-    }
-
-    private CriterionType(Supplier<T> constructor) {
-        this.constructor = constructor;
-    }
-
-    public static <T extends Criterion> CriterionType<T> of(Supplier<T> constructor) {
-        return new CriterionType<>(constructor);
+    public static <T extends Criterion> CriterionType<T> of(MapCodec<T> codec) {
+        return new CriterionType<>(codec);
     }
 }

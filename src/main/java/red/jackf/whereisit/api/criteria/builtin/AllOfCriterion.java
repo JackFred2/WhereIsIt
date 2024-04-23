@@ -1,35 +1,29 @@
 package red.jackf.whereisit.api.criteria.builtin;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.item.ItemStack;
-import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.CriterionType;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Acts as an 'AND' gate for a list of criterion. Create this using {@link AllOfCriterion (Collection)}, then (recommended)
  * {@link AllOfCriterion#compact()} before you add it to a search request.
  */
-public class AllOfCriterion extends Criterion implements Consumer<Criterion> {
-    public static final CriterionType<AllOfCriterion> TYPE = CriterionType.of(AllOfCriterion::new);
-    private static final String KEY = "AllOf";
+public class AllOfCriterion implements Criterion, Consumer<Criterion> {
+    public static final MapCodec<AllOfCriterion> CODEC = Criterion.CODEC.listOf().xmap(AllOfCriterion::new, all -> all.criteria).fieldOf("all_of");
+    public static final CriterionType<AllOfCriterion> TYPE = CriterionType.of(CODEC);
+
     public final List<Criterion> criteria = new ArrayList<>();
 
-    public AllOfCriterion() {
-        super(TYPE);
-    }
+    @SuppressWarnings("unused")
+    public AllOfCriterion() {}
 
     public AllOfCriterion(Collection<Criterion> criteria) {
-        this();
         this.criteria.addAll(criteria);
     }
 
@@ -42,25 +36,8 @@ public class AllOfCriterion extends Criterion implements Consumer<Criterion> {
     }
 
     @Override
-    public void writeTag(CompoundTag tag) {
-        var list = new ListTag();
-        for (Criterion criterion : criteria) {
-            list.add(SearchRequest.toTag(criterion));
-        }
-        tag.put(KEY, list);
-    }
-
-    @Override
-    public void readTag(CompoundTag tag) {
-        if (tag.contains(KEY, Tag.TAG_LIST)) {
-            var list = tag.getList(KEY, Tag.TAG_COMPOUND);
-            for (Tag entry : list) {
-                if (entry instanceof CompoundTag compound) {
-                    var criterion = SearchRequest.fromTag(compound);
-                    if (criterion != null && criterion.valid()) criteria.add(criterion);
-                }
-            }
-        }
+    public CriterionType<?> type() {
+        return TYPE;
     }
 
     @Override
@@ -84,21 +61,8 @@ public class AllOfCriterion extends Criterion implements Consumer<Criterion> {
 
     @Override
     public String toString() {
-        return "AllOfCriterion[" +
-                criteria.stream().map(Criterion::toString).collect(Collectors.joining(", ")) +
-                "]";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AllOfCriterion that = (AllOfCriterion) o;
-        return Objects.equals(criteria, that.criteria);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(criteria);
+        return "AllOfCriterion{" +
+                "criteria=" + criteria +
+                '}';
     }
 }

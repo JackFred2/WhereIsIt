@@ -11,7 +11,6 @@ import red.jackf.whereisit.api.SearchResult;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
 
 /**
  * Buffer format:
@@ -36,7 +35,7 @@ public record ClientboundResultsPacket(long id, Collection<SearchResult> results
             ClientboundResultsPacket::id,
             SearchResult.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)),
             ClientboundResultsPacket::results,
-            ByteBufCodecs.COMPOUND_TAG.map(SearchRequest::load, SearchRequest::pack).apply(ByteBufCodecs::optional).map(opt -> opt.orElse(null), Optional::ofNullable),
+            ByteBufCodecs.fromCodec(SearchRequest.CODEC),
             ClientboundResultsPacket::request,
             ClientboundResultsPacket::new
     );

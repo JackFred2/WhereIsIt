@@ -1,15 +1,14 @@
 package red.jackf.whereisit.api;
 
-import net.minecraft.nbt.CompoundTag;
+import com.google.common.collect.Lists;
+import com.mojang.serialization.Codec;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.criteria.Criterion;
-import red.jackf.whereisit.api.criteria.CriterionType;
 import red.jackf.whereisit.api.criteria.builtin.AllOfCriterion;
 import red.jackf.whereisit.api.search.NestedItemStackSearcher;
 import red.jackf.whereisit.config.WhereIsItConfig;
@@ -23,9 +22,18 @@ import java.util.stream.Collectors;
  * Represents a request to search for an item.
  */
 public class SearchRequest implements Consumer<Criterion> {
+    public static final Codec<SearchRequest> CODEC = Criterion.CODEC.listOf().xmap(SearchRequest::new, req -> req.criteria);
+
     public static final String ID = "Id";
-    public static final String DATA = "Data";
-    private final List<Criterion> criteria = new ArrayList<>();
+    private final List<Criterion> criteria;
+
+    public SearchRequest() {
+        this.criteria = new ArrayList<>();
+    }
+
+    public SearchRequest(List<Criterion> criteria) {
+        this.criteria = Lists.newArrayList(criteria);
+    }
 
     /**
      * Perform a check on an ItemStack with the given request. Use this method to correctly handle nested items.
@@ -35,6 +43,13 @@ public class SearchRequest implements Consumer<Criterion> {
      */
     public static boolean check(ItemStack stack, SearchRequest request) {
         return request.test(stack) || (WhereIsItConfig.INSTANCE.instance().getCommon().doNestedSearch && NestedItemStackSearcher.EVENT.invoker().check(stack, request::test));
+    }
+
+    /**
+     * @return Whether this request has any criteria.
+     */
+    public boolean hasCriteria() {
+        return !criteria.isEmpty();
     }
 
     /**
@@ -49,105 +64,24 @@ public class SearchRequest implements Consumer<Criterion> {
                 this.criteria.add(criterion);
             }
         } else {
-            var data = new CompoundTag();
-            criterion.writeTag(data);
-            WhereIsIt.LOGGER.warn("Criterion data for " + CriterionType.REGISTRY.getKey(criterion.type) + " invalid: " + data);
+            WhereIsIt.LOGGER.warn("Invalid criterion: " + criterion);
         }
     }
 
     /**
-     * @return Whether this request has any criteria.
+     * Serialises this request into a Tag for debugging purposes.
+     *
+     * @return Search request formatted into a Tag
      */
-    public boolean hasCriteria() {
-        return !criteria.isEmpty();
-    }
-
-    /**
-     * Serializes an individual criterion into a compound tag. Null if not registered to {@link CriterionType#REGISTRY}.
-     * @param criterion Criterion to serialize
-     * @return Serialized criterion, or null if not registered.
-     */
-    @Nullable
-    public static CompoundTag toTag(Criterion criterion) {
-        var type = CriterionType.REGISTRY.getKey(criterion.type);
-        if (type == null) return null;
-        var tag = new CompoundTag();
-        tag.putString(ID, type.toString());
-        var data = new CompoundTag();
-        criterion.writeTag(data);
-        tag.put(DATA, data);
-        return tag;
-    }
-
-    /**
-     * Serailizes this request into a Compound Tag.
-     * @return Serialized search request
-     */
-    public CompoundTag pack() {
-        var list = new ListTag();
-        for (Criterion criterion : this.criteria) {
-            var tag = toTag(criterion);
-            if (tag != null)
-                list.add(tag);
-        }
-        var tag = new CompoundTag();
-        tag.put(DATA, list);
-        return tag;
-    }
-
-    /**
-     * Load an individual criterion from a compound tag. Null if invalid or unknown.
-     * @param criterionTag Compound tag to read the criterion's data from
-     * @return Deserialized criterion, or null if unknown or an error occured.
-     */
-    @Nullable
-    public static Criterion fromTag(CompoundTag criterionTag) {
-        var typeId = ResourceLocation.tryParse(criterionTag.getString(ID));
-        var type = CriterionType.REGISTRY.get(typeId);
-        if (type != null) {
-            var data = criterionTag.getCompound(DATA);
-            var criterion = type.get();
-            criterion.readTag(data);
-            if (criterion.valid())
-                return criterion;
-            else
-                WhereIsIt.LOGGER.warn("Criterion data for " + typeId + " invalid: " + data);
-        } else {
-            WhereIsIt.LOGGER.warn("Unknown criterion: " + typeId);
-        }
-
-        return null;
-    }
-
-    /**
-     * Load a search request from a Compound Tag.
-     * @param root Compound tag to read from
-     * @return Constructed search request. If an error occcurs, an empty request is returned which is not checked.
-     */
-    public static SearchRequest load(CompoundTag root) {
-        try {
-            var request = new SearchRequest();
-            if (root.contains(DATA, Tag.TAG_LIST)) {
-                var list = root.getList(DATA, Tag.TAG_COMPOUND);
-                for (Tag tag : list) {
-                    if (tag instanceof CompoundTag compound
-                            && compound.contains(ID, Tag.TAG_STRING)
-                            && compound.contains(DATA, Tag.TAG_COMPOUND)) {
-                        var criterion = fromTag(compound);
-                        if (criterion != null)
-                            request.accept(criterion);
-                    } else {
-                        WhereIsIt.LOGGER.warn("Invalid criterion tag: " + tag);
-                    }
-                }
-            } else {
-                WhereIsIt.LOGGER.warn("No data for search request");
+    public ListTag toTag() {
+        var encoded = CODEC.encodeStart(NbtOps.INSTANCE, this);
+        if (encoded.isSuccess()) {
+            Tag tag = encoded.getOrThrow();
+            if (tag instanceof ListTag listTag) {
+                return listTag;
             }
-            return request;
-        } catch (Exception ex) {
-            WhereIsIt.LOGGER.error("Error decoding search request", ex);
-            return new SearchRequest();
         }
+        return new ListTag();
     }
 
     /**
@@ -157,7 +91,7 @@ public class SearchRequest implements Consumer<Criterion> {
      * @return If no criterion fail against the itemstack.
      */
     @ApiStatus.Internal
-    public boolean test(ItemStack stack) {
+    private boolean test(ItemStack stack) {
         for (Criterion criterion : criteria)
             if (!criterion.test(stack)) return false;
         return true;

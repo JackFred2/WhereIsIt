@@ -1,37 +1,22 @@
 package red.jackf.whereisit.api.criteria.builtin;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.CriterionType;
 
-public class PotionEffectCriterion extends Criterion {
-    public static final CriterionType<PotionEffectCriterion> TYPE = CriterionType.of(PotionEffectCriterion::new);
-    private static final String KEY = "PotionId";
-    private Potion potion;
-
-    public PotionEffectCriterion() {
-        super(TYPE);
-    }
-
-    public PotionEffectCriterion(Potion potion) {
-        this();
-        this.potion = potion;
-    }
+public record PotionEffectCriterion(Potion potion) implements Criterion {
+    public static final MapCodec<PotionEffectCriterion> CODEC = BuiltInRegistries.POTION.byNameCodec().xmap(PotionEffectCriterion::new, PotionEffectCriterion::potion)
+            .fieldOf("potion");
+    public static final CriterionType<PotionEffectCriterion> TYPE = CriterionType.of(CODEC);
 
     @Override
-    public void writeTag(CompoundTag tag) {
-        tag.putString(KEY, BuiltInRegistries.POTION.getKey(potion).toString());
-    }
-
-    @Override
-    public void readTag(CompoundTag tag) {
-        this.potion = BuiltInRegistries.POTION.get(ResourceLocation.tryParse(tag.getString(KEY)));
+    public CriterionType<?> type() {
+        return TYPE;
     }
 
     @Override
@@ -44,12 +29,5 @@ public class PotionEffectCriterion extends Criterion {
         PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);
         if (contents == null) return false;
         return contents.potion().isPresent() && contents.potion().get().value().equals(this.potion);
-    }
-
-    @Override
-    public String toString() {
-        return "PotionEffectCriterion{" +
-                "potion=" + potion +
-                '}';
     }
 }

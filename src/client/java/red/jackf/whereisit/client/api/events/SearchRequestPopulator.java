@@ -70,7 +70,7 @@ public interface SearchRequestPopulator {
         if (!triggeredOverlayBehavior) {
             criterion.add(new ItemCriterion(stack.getItem()));
             if (context == Context.INVENTORY_PRECISE || context == Context.OVERLAY_ALTERNATE) {
-                criterion.add(new ComponentsCriterion(stack));
+                criterion.add(new ComponentsCriterion(stack.getComponentsPatch()));
             } else if (context == Context.FAVOURITE) {
                 if (stack.has(DataComponents.CUSTOM_NAME))
                     criterion.add(new NameCriterion(stack.getHoverName().getString()));

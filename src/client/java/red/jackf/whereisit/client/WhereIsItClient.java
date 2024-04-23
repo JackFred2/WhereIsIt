@@ -105,7 +105,7 @@ public class WhereIsItClient implements ClientModInitializer {
         LOGGER.debug("Starting request: %s".formatted(request));
 
         if (WhereIsItConfig.INSTANCE.instance().getClient().debug.printSearchRequestsInChat && Minecraft.getInstance().player != null) {
-            var text = TextUtil.prettyPrint(request.pack());
+            var text = TextUtil.prettyPrint(request.toTag());
             for (Component component : text)
                 Minecraft.getInstance().player.sendSystemMessage(component);
         }
