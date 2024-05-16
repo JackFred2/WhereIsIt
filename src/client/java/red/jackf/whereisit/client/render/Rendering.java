@@ -205,8 +205,6 @@ public class Rendering {
         var pose = new PoseStack();
         pose.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
         pose.mulPose(Axis.YP.rotationDegrees(camera.getYRot() - 180f));
-        var projected = camera.getPosition();
-        pose.translate(-projected.x, -projected.y, -projected.z);
 
         // from 100% to 50%
         var alpha = 1 - (progress / 2f);
@@ -226,6 +224,7 @@ public class Rendering {
 
         for (SearchResult result : results.values()) {
             renderBox(
+                    camera.getPosition(),
                     result.pos(),
                     builder,
                     pose,
@@ -234,6 +233,7 @@ public class Rendering {
 
             for (BlockPos otherPos : result.otherPositions()) {
                 renderBox(
+                        camera.getPosition(),
                         otherPos,
                         builder,
                         pose,
@@ -258,9 +258,13 @@ public class Rendering {
     }
 
     // render an individual box
-    private static void renderBox(BlockPos pos, VertexConsumer consumer, PoseStack pose, float scale) {
+    private static void renderBox(Vec3 cameraPos, BlockPos pos, VertexConsumer consumer, PoseStack pose, float scale) {
         pose.pushPose();
-        pose.translate(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
+        // done here to fix floating point issues (e.g. at world border)
+        final double xOffset = pos.getX() + (0.5 - cameraPos.x);
+        final double yOffset = pos.getY() + (0.5 - cameraPos.y);
+        final double zOffset = pos.getZ() + (0.5 - cameraPos.z);
+        pose.translate(xOffset, yOffset, zOffset);
         pose.scale(scale * 0.5f, scale * 0.5f, scale * 0.5f);
         var resultMatrix = pose.last().pose();
 
