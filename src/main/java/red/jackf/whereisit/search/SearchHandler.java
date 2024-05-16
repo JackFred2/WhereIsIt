@@ -25,10 +25,10 @@ import java.util.HashMap;
 public class SearchHandler {
 
     public static void handleFromPacket(ServerboundSearchForItemPacket packet, ServerPlayer player, PacketSender ignored) {
-        handle(packet.request(), player);
+        handle(packet.id(), packet.request(), player);
     }
 
-    public static void handle(SearchRequest request, ServerPlayer player) {
+    public static void handle(long requestId, SearchRequest request, ServerPlayer player) {
         // clear last server side results
         ServerSideRenderer.fadeServerSide(player);
 
@@ -99,7 +99,7 @@ public class SearchHandler {
                 ServerSideRenderer.doServersideRendering(player, results.values());
             } else {
                 // send packet
-                ServerPlayNetworking.send(player, new ClientboundResultsPacket(ClientboundResultsPacket.WHEREIS_COMMAND_ID, results.values(), request));
+                ServerPlayNetworking.send(player, new ClientboundResultsPacket(requestId, results.values(), request));
             }
         }
     }
