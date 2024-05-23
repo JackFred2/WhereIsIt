@@ -3,15 +3,11 @@ package red.jackf.whereisit.config;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.Nullable;
 import red.jackf.whereisit.WhereIsIt;
 
 import java.awt.*;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,43 +24,28 @@ public class WhereIsItConfig {
             .build();
 
     @SuppressWarnings("FieldMayBeFinal")
-    @SerialEntry(nullable = true, required = false)
-    @Nullable
-    private Client client = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? new Client() : null;
+    @SerialEntry
+    private Client client = new Client();
 
     @SuppressWarnings("FieldMayBeFinal")
     @SerialEntry
     private Common common = new Common();
 
     @SuppressWarnings("FieldMayBeFinal")
-    @SerialEntry(nullable = true, required = false)
-    @Nullable
-    private Server server = FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER ? new Server() : null;
-
-    public static void cleanupOldConfig() {
-        try {
-            var oldPath = FabricLoader.getInstance().getConfigDir().resolve("whereisit.json");
-            var newPath = FabricLoader.getInstance().getConfigDir().resolve("whereisit.json5");
-            if (Files.isRegularFile(oldPath) && !Files.exists(newPath)) {
-                WhereIsIt.LOGGER.info("Think we're first load of new version, removing old config file");
-                Files.delete(oldPath);
-            }
-        } catch (IOException ignored) {}
-    }
+    @SerialEntry
+    private Server server = new Server();
 
     public void validate() {
-        if (this.client != null) this.client.validate();
+        this.client.validate();
         this.common.validate();
     }
 
     public Client getClient() {
-        if (client != null) return client;
-        throw new AssertionError("Attempted to get client config on dedicated server");
+        return client;
     }
 
     public Server getServer() {
-        if (server != null) return server;
-        throw new AssertionError("Attempted to get server config on client");
+        return server;
     }
 
     public Common getCommon() {
