@@ -35,7 +35,7 @@ public record ClientboundResultsPacket(long id, Collection<SearchResult> results
             ClientboundResultsPacket::id,
             SearchResult.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new)),
             ClientboundResultsPacket::results,
-            ByteBufCodecs.fromCodec(SearchRequest.CODEC),
+            ByteBufCodecs.fromCodecWithRegistries(SearchRequest.CODEC),
             ClientboundResultsPacket::request,
             ClientboundResultsPacket::new
     );

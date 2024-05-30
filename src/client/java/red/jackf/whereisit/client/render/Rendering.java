@@ -62,7 +62,7 @@ public class Rendering {
         WorldRenderEvents.END.register(context -> {
             if (results.isEmpty()) return;
 
-            var progress = Mth.clamp((getTicksSinceSearch() + context.tickDelta()) / WhereIsItConfig.INSTANCE.instance()
+            var progress = Mth.clamp((getTicksSinceSearch() + context.tickCounter().getGameTimeDeltaPartialTick(true)) / WhereIsItConfig.INSTANCE.instance()
                     .getCommon().fadeoutTimeTicks, 0f, 1f);
 
             if (context.world() == null || progress > 1f) {
@@ -176,10 +176,10 @@ public class Rendering {
 
         var bgBuffer = consumers.getBuffer(RenderType.textBackgroundSeeThrough());
         var bgColour = ((int) (Minecraft.getInstance().options.getBackgroundOpacity(0.25F) * 255F)) << 24;
-        bgBuffer.vertex(matrix4f, x - 1, -1f, 0).color(bgColour).uv2(LightTexture.FULL_BRIGHT).endVertex();
-        bgBuffer.vertex(matrix4f, x - 1, 10f, 0).color(bgColour).uv2(LightTexture.FULL_BRIGHT).endVertex();
-        bgBuffer.vertex(matrix4f, x + width, 10f, 0).color(bgColour).uv2(LightTexture.FULL_BRIGHT).endVertex();
-        bgBuffer.vertex(matrix4f, x + width, -1f, 0).color(bgColour).uv2(LightTexture.FULL_BRIGHT).endVertex();
+        bgBuffer.addVertex(matrix4f, x - 1, -1f, 0).setColor(bgColour).setLight(LightTexture.FULL_BRIGHT);
+        bgBuffer.addVertex(matrix4f, x - 1, 10f, 0).setColor(bgColour).setLight(LightTexture.FULL_BRIGHT);
+        bgBuffer.addVertex(matrix4f, x + width, 10f, 0).setColor(bgColour).setLight(LightTexture.FULL_BRIGHT);
+        bgBuffer.addVertex(matrix4f, x + width, -1f, 0).setColor(bgColour).setLight(LightTexture.FULL_BRIGHT);
 
         RenderSystem.disableDepthTest();
         RenderSystem.depthFunc(GL11.GL_ALWAYS);
@@ -208,19 +208,23 @@ public class Rendering {
 
         // from 100% to 50%
         var alpha = 1 - (progress / 2f);
-        var colour = CurrentGradientHolder.getColour(getBaseProgress(getTicksSinceSearch(), context.tickDelta()));
+        var colour = CurrentGradientHolder.getColour(getBaseProgress(getTicksSinceSearch(), context.tickCounter().getGameTimeDeltaPartialTick(true)));
         var scale = easingFunc(progress);
 
         var tesselator = Tesselator.getInstance();
-        var builder = tesselator.getBuilder();
+        var builder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        builder.defaultColor(
+        /*builder.defaultColor(
                 FastColor.ARGB32.red(colour),
                 FastColor.ARGB32.green(colour),
                 FastColor.ARGB32.blue(colour),
                 (int) (alpha * 255)
-        );
+        );*/
+
+        final int r = FastColor.ARGB32.red(colour);
+        final int g = FastColor.ARGB32.green(colour);
+        final int b = FastColor.ARGB32.blue(colour);
+        final int a = (int) (alpha * 255);
 
         for (SearchResult result : results.values()) {
             renderBox(
@@ -228,7 +232,11 @@ public class Rendering {
                     result.pos(),
                     builder,
                     pose,
-                    scale
+                    scale,
+                    r,
+                    g,
+                    b,
+                    a
             );
 
             for (BlockPos otherPos : result.otherPositions()) {
@@ -237,7 +245,11 @@ public class Rendering {
                         otherPos,
                         builder,
                         pose,
-                        scale
+                        scale,
+                        r,
+                        g,
+                        b,
+                        a
                 );
             }
         }
@@ -247,9 +259,10 @@ public class Rendering {
         RenderSystem.enableBlend();
         RenderSystem.depthFunc(GL11.GL_ALWAYS);
 
-        tesselator.end();
+        BufferUploader.drawWithShader(builder.buildOrThrow());
+        //tesselator.end();
 
-        builder.unsetDefaultColor();
+        //builder.unsetDefaultColor();
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
@@ -258,7 +271,12 @@ public class Rendering {
     }
 
     // render an individual box
-    private static void renderBox(Vec3 cameraPos, BlockPos pos, VertexConsumer consumer, PoseStack pose, float scale) {
+    private static void renderBox(Vec3 cameraPos,
+                                  BlockPos pos,
+                                  VertexConsumer consumer,
+                                  PoseStack pose,
+                                  float scale,
+                                  int r, int g, int b, int a) {
         pose.pushPose();
         // done here to fix floating point issues (e.g. at world border)
         final double xOffset = pos.getX() + (0.5 - cameraPos.x);
@@ -269,40 +287,40 @@ public class Rendering {
         var resultMatrix = pose.last().pose();
 
         // -Z
-        consumer.vertex(resultMatrix, -1, -1, -1).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, -1).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, -1).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, -1).endVertex();
+        consumer.addVertex(resultMatrix, -1, -1, -1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, -1, 1, -1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, 1, -1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, -1, -1).setColor(r, g, b, a);
 
         // +Z
-        consumer.vertex(resultMatrix, -1, -1, 1).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, 1).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, 1).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, 1).endVertex();
+        consumer.addVertex(resultMatrix, -1, -1, 1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, -1, 1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, 1, 1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, -1, 1, 1).setColor(r, g, b, a);
 
         // -Y
-        consumer.vertex(resultMatrix, -1, -1, -1).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, -1).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, 1).endVertex();
-        consumer.vertex(resultMatrix, -1, -1, 1).endVertex();
+        consumer.addVertex(resultMatrix, -1, -1, -1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, -1, -1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, -1, 1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, -1, -1, 1).setColor(r, g, b, a);
 
         // +Y
-        consumer.vertex(resultMatrix, -1, 1, -1).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, 1).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, 1).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, -1).endVertex();
+        consumer.addVertex(resultMatrix, -1, 1, -1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, -1, 1, 1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, 1, 1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, 1, -1).setColor(r, g, b, a);
 
         // -X
-        consumer.vertex(resultMatrix, -1, -1, -1).endVertex();
-        consumer.vertex(resultMatrix, -1, -1, 1).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, 1).endVertex();
-        consumer.vertex(resultMatrix, -1, 1, -1).endVertex();
+        consumer.addVertex(resultMatrix, -1, -1, -1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, -1, -1, 1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, -1, 1, 1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, -1, 1, -1).setColor(r, g, b, a);
 
         // +X
-        consumer.vertex(resultMatrix, 1, -1, -1).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, -1).endVertex();
-        consumer.vertex(resultMatrix, 1, 1, 1).endVertex();
-        consumer.vertex(resultMatrix, 1, -1, 1).endVertex();
+        consumer.addVertex(resultMatrix, 1, -1, -1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, 1, -1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, 1, 1).setColor(r, g, b, a);
+        consumer.addVertex(resultMatrix, 1, -1, 1).setColor(r, g, b, a);
 
         pose.popPose();
     }

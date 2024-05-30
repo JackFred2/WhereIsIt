@@ -20,7 +20,7 @@ public class WhereIsIt implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
 	public static final String MODID = "whereisit";
 	public static ResourceLocation id(String path) {
-		return new ResourceLocation(MODID, path);
+		return ResourceLocation.fromNamespaceAndPath(MODID, path);
 	}
 
 	@Override

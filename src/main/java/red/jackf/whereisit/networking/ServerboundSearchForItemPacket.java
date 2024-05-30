@@ -13,7 +13,7 @@ public record ServerboundSearchForItemPacket(long id, SearchRequest request) imp
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundSearchForItemPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_LONG,
             ServerboundSearchForItemPacket::id,
-            ByteBufCodecs.fromCodec(SearchRequest.CODEC),
+            ByteBufCodecs.fromCodecWithRegistries(SearchRequest.CODEC),
             //ByteBufCodecs.COMPOUND_TAG.map(SearchRequest::load, SearchRequest::pack),
             ServerboundSearchForItemPacket::request,
             ServerboundSearchForItemPacket::new

@@ -90,12 +90,12 @@ public class WhereIsCommand {
             argument("enchantment_id", ResourceArgument.resource(buildContext, Registries.ENCHANTMENT)).then(
                 argument("enchantment_level", IntegerArgumentType.integer(0))
                     .redirect(root, ctx -> {
-                        var enchantment = ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT).value();
+                        var enchantment = ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT);
                         var level = IntegerArgumentType.getInteger(ctx, "enchantment_level");
                         ESD.getCustom(ctx, CommandCriteria.DEFINITION).addCriterion(new EnchantmentCriterion(enchantment, level));
                         return ctx.getSource();
                     }).executes(ctx -> {
-                        var enchantment = ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT).value();
+                        var enchantment = ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT);
                         var level = IntegerArgumentType.getInteger(ctx, "enchantment_level");
                         ESD.getCustom(ctx, CommandCriteria.DEFINITION).addCriterion(new EnchantmentCriterion(enchantment, level));
                         doSearch(ctx);
@@ -104,11 +104,11 @@ public class WhereIsCommand {
             ).then(
                 literal("any")
                     .redirect(root, ctx -> {
-                        var enchantment = ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT).value();
+                        var enchantment = ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT);
                         ESD.getCustom(ctx, CommandCriteria.DEFINITION).addCriterion(new EnchantmentCriterion(enchantment, null));
                         return ctx.getSource();
                     }).executes(ctx -> {
-                        var enchantment = ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT).value();
+                        var enchantment = ResourceArgument.getResource(ctx, "enchantment_id", Registries.ENCHANTMENT);
                         ESD.getCustom(ctx, CommandCriteria.DEFINITION).addCriterion(new EnchantmentCriterion(enchantment, null));
                         doSearch(ctx);
                         return 0;

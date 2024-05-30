@@ -78,7 +78,7 @@ public interface SearchRequestPopulator {
                 ItemEnchantments enchantments = stack.get(EnchantmentHelper.getComponentType(stack));
                 if (enchantments != null) {
                     for (Object2IntMap.Entry<Holder<Enchantment>> entry : enchantments.entrySet()) {
-                        criterion.add(new EnchantmentCriterion(entry.getKey().value(), entry.getIntValue()));
+                        criterion.add(new EnchantmentCriterion(entry.getKey(), entry.getIntValue()));
                     }
                 }
 

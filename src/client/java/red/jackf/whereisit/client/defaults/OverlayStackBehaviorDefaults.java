@@ -3,8 +3,6 @@ package red.jackf.whereisit.client.defaults;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
@@ -14,8 +12,6 @@ import red.jackf.whereisit.api.criteria.builtin.EnchantmentCriterion;
 import red.jackf.whereisit.api.criteria.builtin.PotionEffectCriterion;
 import red.jackf.whereisit.client.api.events.OverlayStackBehavior;
 
-import java.util.Set;
-
 public class OverlayStackBehaviorDefaults {
     static void setup() {
         OverlayStackBehavior.EVENT.register((consumer, stack, alternate) -> {
@@ -23,7 +19,7 @@ public class OverlayStackBehaviorDefaults {
             if (enchantments == null) return false;
 
             for (Object2IntMap.Entry<Holder<Enchantment>> entry : enchantments.entrySet()) {
-                consumer.accept(new EnchantmentCriterion(entry.getKey().value(), alternate ? entry.getIntValue() : null));
+                consumer.accept(new EnchantmentCriterion(entry.getKey(), alternate ? entry.getIntValue() : null));
             }
 
             return true;
