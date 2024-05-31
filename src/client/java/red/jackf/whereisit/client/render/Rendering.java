@@ -169,7 +169,7 @@ public class Rendering {
         pose.translate(pos.x, pos.y, pos.z);
         pose.mulPose(camera.rotation());
         var factor = 0.025f * WhereIsItConfig.INSTANCE.instance().getClient().containerNameLabelScale;
-        pose.scale(-factor, -factor, factor);
+        pose.scale(factor, -factor, factor);
         var matrix4f = pose.last().pose();
         var width = Minecraft.getInstance().font.width(name);
         float x = (float) -width / 2;
