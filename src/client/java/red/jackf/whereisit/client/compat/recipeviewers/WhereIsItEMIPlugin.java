@@ -45,7 +45,7 @@ public class WhereIsItEMIPlugin implements EmiPlugin {
             try {
                 populate(request, screen, mouseX, mouseY);
             } catch (Exception ex) {
-                CompatUtils.LOGGER.error("Error in REI handler, disabling", ex);
+                CompatUtils.LOGGER.error("Error in EMI handler, disabling", ex);
                 hasErrored = true;
             }
         });
