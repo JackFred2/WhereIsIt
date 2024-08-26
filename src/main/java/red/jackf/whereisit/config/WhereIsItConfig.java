@@ -153,6 +153,9 @@ public class WhereIsItConfig {
 
             @SerialEntry(comment = "DEBUG: Whether to force all requests to use server-side highlighting, instead of just clients without Where Is It. This may disable features of other mods that can ask for search results, but may have better rendering compatibility.")
             public boolean forceServerSideHighlightsOnly = false;
+
+            @SerialEntry(comment = "DEBUG: Use see-through mode for labels.")
+            public boolean labelsAreSeeThrough = false;
         }
 
         public void validate() {

@@ -30,10 +30,25 @@ public interface RenderUtils {
     /**
      * Schedule a label to be rendered here on the next frame. Register here in order to have correct layering for labels.
      * This should be called every frame before {@link net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents#BEFORE_BLOCK_OUTLINE}.
+     *
      * @param pos Position to render the label at
      * @param name Label to render at said position
      */
     static void scheduleLabelRender(Vec3 pos, Component name) {
-        Rendering.scheduleLabel(pos, name);
+        scheduleLabelRender(pos, name, false);
+    }
+
+    /**
+     * Schedule a label to be rendered here on the next frame. Register here in order to have correct layering for labels.
+     * This should be called every frame before {@link net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents#BEFORE_BLOCK_OUTLINE}.
+     * <br />
+     * This variant lets you choose whether to show the text as an overlay, through all terrain instead of being occluded.
+     *
+     * @param pos Position to render the label at
+     * @param name Label to render at said position
+     * @param seeThrough Whether text should be seen through terrain fully.
+     */
+    static void scheduleLabelRender(Vec3 pos, Component name, boolean seeThrough) {
+        Rendering.scheduleLabel(pos, name, seeThrough);
     }
 }
