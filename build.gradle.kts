@@ -135,25 +135,8 @@ loom {
 
 	log4jConfigs.from(file("log4j2.xml"))
 
-	runs {
-		getByName("client") {
-			environment = "client"
-			configName = "Run Client"
-			runDir = "run"
-            programArgs.addAll("--username JackFred".split(" "))
-            source(sourceSets["client"])
-			ideConfigGenerated(true)
-			client()
-		}
-
-		getByName("server") {
-			environment = "server"
-			configName = "Run Server"
-			runDir = "runServer"
-			source(sourceSets["main"])
-			ideConfigGenerated(true)
-			server()
-		}
+	runs.forEach {
+		it.programArgs.addAll("--username JackFred".split(" "))
 	}
 
 	accessWidenerPath.set(file("src/main/resources/whereisit.accesswidener"))
