@@ -332,6 +332,17 @@ public class WhereIsItConfigScreenBuilder {
                                 .coloured(true)
                                 .yesNoFormatter())
                         .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(translatable("whereisit.config.debug.common.labelsAreSeeThrough"))
+                        .binding(
+                                defaults.getCommon().debug.labelsAreSeeThrough,
+                                () -> config.getCommon().debug.labelsAreSeeThrough,
+                                b -> config.getCommon().debug.labelsAreSeeThrough = b
+                        )
+                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                .coloured(true)
+                                .yesNoFormatter())
+                        .build())
                 .build();
     }
 

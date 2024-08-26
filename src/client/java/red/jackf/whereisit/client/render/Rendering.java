@@ -2,7 +2,6 @@ package red.jackf.whereisit.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -35,7 +34,9 @@ public class Rendering {
     private static final Map<BlockPos, SearchResult> results = new HashMap<>();
     private static final Map<BlockPos, SearchResult> namedResults = new HashMap<>();
 
-    private static final List<Pair<Vec3, Component>> scheduledLabels = new ArrayList<>();
+    private static final List<ScheduledLabel> scheduledLabels = new ArrayList<>();
+
+    private record ScheduledLabel(Vec3 position, Component text, boolean seeThrough) {}
 
     private static long ticksSinceSearch = 0;
     @Nullable
@@ -46,7 +47,7 @@ public class Rendering {
         WorldRenderEvents.START.register(context -> {
             if (!WhereIsItConfig.INSTANCE.instance().getClient().showContainerNamesInResults) return;
             for (SearchResult value : namedResults.values())
-                scheduleLabel(value.pos().getCenter().add(value.nameOffset()), value.name());
+                scheduleLabel(value.pos().getCenter().add(value.nameOffset()), value.name(), WhereIsItConfig.INSTANCE.instance().getCommon().debug.labelsAreSeeThrough);
         });
 
         // render scheduled labels
@@ -139,39 +140,36 @@ public class Rendering {
     ////////////////////
 
     // schedule a label to be rendered; should be called before BEFORE_BLOCK_OUTLINE every frame
-    public static void scheduleLabel(Vec3 pos, Component name) {
-        scheduledLabels.add(Pair.of(pos, name));
+    public static void scheduleLabel(Vec3 pos, Component name, boolean seeThrough) {
+        scheduledLabels.add(new ScheduledLabel(pos, name, seeThrough));
     }
 
     // does the rendering of labels at BEFORE_BLOCK_OUTLINE
     @SuppressWarnings("DataFlowIssue")
     private static void renderLabels(WorldRenderContext context) {
-        scheduledLabels.stream().sorted(Comparator.comparingDouble(pair ->
+        scheduledLabels.stream().sorted(Comparator.comparingDouble(label ->
                 // sort by furthest to camera inwards
-                -context.camera().rotation().transformInverse(pair.getFirst()
-                        //.subtract(context.camera().getPosition())
-                        .toVector3f()).z
-        )).forEach(pair ->
+                -context.camera().rotation().transformInverse(label.position.toVector3f()).z
+        )).forEach(label ->
                 renderLabel(
-                        pair.getFirst(),
-                        pair.getSecond(),
+                        label,
                         context.matrixStack(),
                         context.camera(),
                         context.consumers()));
     }
 
     // render an individual label
-    public static void renderLabel(Vec3 pos, Component name, PoseStack pose, Camera camera, MultiBufferSource consumers) {
+    private static void renderLabel(ScheduledLabel label, PoseStack pose, Camera camera, MultiBufferSource consumers) {
         pose.pushPose();
 
-        pos = pos.subtract(camera.getPosition());
+        Vec3 pos = label.position.subtract(camera.getPosition());
 
         pose.translate(pos.x, pos.y, pos.z);
         pose.mulPose(camera.rotation());
         var factor = 0.025f * WhereIsItConfig.INSTANCE.instance().getClient().containerNameLabelScale;
         pose.scale(-factor, -factor, factor);
         var matrix4f = pose.last().pose();
-        var width = Minecraft.getInstance().font.width(name);
+        var width = Minecraft.getInstance().font.width(label.text);
         float x = (float) -width / 2;
 
         var bgBuffer = consumers.getBuffer(RenderType.textBackgroundSeeThrough());
@@ -183,10 +181,20 @@ public class Rendering {
 
         RenderSystem.disableDepthTest();
         RenderSystem.depthFunc(GL11.GL_ALWAYS);
-        Minecraft.getInstance().font.drawInBatch(name, x, 0, 0x20_FFFFFF, false,
-                matrix4f, consumers, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
-        Minecraft.getInstance().font.drawInBatch(name, x, 0, 0xFF_FFFFFF, false,
-                matrix4f, consumers, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+
+        if (label.seeThrough) {
+            Minecraft.getInstance().font.drawInBatch(label.text, x, 0, 0xFF_FFFFFF, false,
+                    matrix4f, consumers, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
+
+            Minecraft.getInstance().font.drawInBatch(label.text, x, 0, 0xFF_FFFFFF, false,
+                    matrix4f, consumers, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+        } else {
+            Minecraft.getInstance().font.drawInBatch(label.text, x, 0, 0x20_FFFFFF, false,
+                    matrix4f, consumers, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
+
+            Minecraft.getInstance().font.drawInBatch(label.text, x, 0, 0xFF_FFFFFF, false,
+                    matrix4f, consumers, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+        }
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
         RenderSystem.enableDepthTest();
 
