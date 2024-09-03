@@ -9,7 +9,10 @@ import java.util.function.Predicate;
 /**
  * Search for nested ItemStacks. This should handle things like bundles, shulker boxes or backpacks, but not indirectly
  * contained stacks such as remote terminals.
+ *
+ * @deprecated Use {@link NestedItemsGrabber}
  */
+@Deprecated(forRemoval = true, since = "2.6.0")
 public interface NestedItemStackSearcher {
     Event<NestedItemStackSearcher> EVENT = EventFactory.createArrayBacked(NestedItemStackSearcher.class, listeners -> (source, predicate) -> {
         for (var listener : listeners)
