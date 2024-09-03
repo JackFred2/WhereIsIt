@@ -10,7 +10,7 @@ import org.jetbrains.annotations.ApiStatus;
 import red.jackf.whereisit.WhereIsIt;
 import red.jackf.whereisit.api.criteria.Criterion;
 import red.jackf.whereisit.api.criteria.builtin.AllOfCriterion;
-import red.jackf.whereisit.api.search.NestedItemStackSearcher;
+import red.jackf.whereisit.api.search.NestedItemsGrabber;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.ArrayList;
@@ -42,7 +42,15 @@ public class SearchRequest implements Consumer<Criterion> {
      * @return Whether this ItemStack or any sub-items if applicable matches the request
      */
     public static boolean check(ItemStack stack, SearchRequest request) {
-        return request.test(stack) || (WhereIsItConfig.INSTANCE.instance().getCommon().doNestedSearch && NestedItemStackSearcher.EVENT.invoker().check(stack, request::test));
+        if (request.test(stack)) return true;
+
+        if (WhereIsItConfig.INSTANCE.instance().getCommon().doNestedSearch) {
+            var nested = NestedItemsGrabber.get(stack);
+
+            return nested.anyMatch(request::test);
+        }
+
+        return false;
     }
 
     /**
