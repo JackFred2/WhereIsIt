@@ -8,6 +8,8 @@ public class WhereIsItDefaultPlugin implements WhereIsItPlugin {
         BuiltInCriteria.setup();
         DefaultBlockSearchers.setup();
         DefaultConnectedBlocksGrabbers.setup();
+        DefaultNestedItemsGrabbers.setup();
+
         DefaultNestedItemStackSearchers.setup();
     }
 }
