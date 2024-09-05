@@ -57,6 +57,14 @@ repositories {
 		}
 	}
 
+	maven {
+		name = "Nucleoid"
+		url = uri("https://maven.nucleoid.xyz/")
+		content {
+			includeGroup("eu.pb4")
+		}
+	}
+
 	// JEI
 	maven {
 		name = "Jared"
@@ -81,7 +89,7 @@ repositories {
 		name = "Xander Maven"
 		url = uri("https://maven.isxander.dev/releases")
 		content {
-			includeGroup("dev.isxander.yacl")
+			includeGroup("dev.isxander")
 			includeGroupAndSubgroups("org.quiltmc")
 		}
 	}
@@ -155,7 +163,7 @@ dependencies {
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
 	// Config
-	modImplementation("dev.isxander.yacl:yet-another-config-lib-fabric:${properties["yacl_version"]}") {
+	modImplementation("dev.isxander:yet-another-config-lib:${properties["yacl_version"]}") {
 		exclude(group = "com.terraformersmc", module = "modmenu")
 	}
 
