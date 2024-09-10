@@ -141,6 +141,7 @@ public class Rendering {
 
     // schedule a label to be rendered; should be called before BEFORE_BLOCK_OUTLINE every frame
     public static void scheduleLabel(Vec3 pos, Component name, boolean seeThrough) {
+        if (pos == null || name == null) return;
         scheduledLabels.add(new ScheduledLabel(pos, name, seeThrough));
     }
 
