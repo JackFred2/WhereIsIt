@@ -38,6 +38,9 @@ public class WhereIsItClient implements ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
     private static final KeyMapping SEARCH = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.whereisit.search", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y, "key.categories.whereisit"));
 
+    // only clear results after faded + this, so players can repeat the search by pressing the key
+    public static final int POST_FADEOUT_REPEAT_PERIOD_TICKS = 20 * 20;
+
     private boolean inGame = false;
     public static boolean closedScreenThisSearch = false;
 
@@ -54,8 +57,9 @@ public class WhereIsItClient implements ClientModInitializer {
 
         ScreenEvents.BEFORE_INIT.register((client, _screen, scaledWidth, scaledHeight) -> {
 			if (inGame) {
-                if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights)
+                if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights) {
                     ScreenEvents.afterRender(_screen).register(Rendering::renderSlotHighlight);
+                }
 
                 // listen for keypress in-GUI
                 ScreenKeyboardEvents.afterKeyPress(_screen).register((screen, key, scancode, modifiers) -> {
@@ -63,6 +67,8 @@ public class WhereIsItClient implements ClientModInitializer {
                         SearchRequest request = createRequest(client, screen);
                         if (request.hasCriteria()) {
                             SearchInvoker.doSearch(request);
+                        } else {
+                            Rendering.resetSearchTime();
                         }
                     }
                 });
@@ -78,20 +84,23 @@ public class WhereIsItClient implements ClientModInitializer {
 
         ClientTickEvents.START_WORLD_TICK.register(level -> {
             Rendering.incrementTicksSinceSearch();
-            if (Rendering.getTicksSinceSearch() > WhereIsItConfig.INSTANCE.instance().getCommon().fadeoutTimeTicks) {
+            if (Rendering.getTicksSinceSearch() > (WhereIsItConfig.INSTANCE.instance().getCommon().fadeoutTimeTicks + POST_FADEOUT_REPEAT_PERIOD_TICKS)) {
                 // clear rendered slots after time limit
                 clearResults();
             }
 
-            if (WhereIsItConfig.INSTANCE.instance().getClient().searchUsingItemInHand && Minecraft.getInstance().screen == null && SEARCH.consumeClick()) {
+            if (Minecraft.getInstance().screen == null && SEARCH.consumeClick()) {
                 var player = Minecraft.getInstance().player;
                 if (player == null) return;
                 ItemStack item = player.getItemInHand(InteractionHand.MAIN_HAND);
                 if (item.isEmpty()) item = player.getItemInHand(InteractionHand.OFF_HAND);
-                if (item.isEmpty()) return;
-                var request = new SearchRequest();
-                SearchRequestPopulator.addItemStack(request, item, SearchRequestPopulator.Context.inventory());
-                if (request.hasCriteria()) SearchInvoker.doSearch(request);
+                if (!item.isEmpty() && WhereIsItConfig.INSTANCE.instance().getClient().searchUsingItemInHand) {
+                    var request = new SearchRequest();
+                    SearchRequestPopulator.addItemStack(request, item, SearchRequestPopulator.Context.inventory());
+                    if (request.hasCriteria()) SearchInvoker.doSearch(request);
+                } else {
+                    Rendering.resetSearchTime();
+                }
             }
         });
 
