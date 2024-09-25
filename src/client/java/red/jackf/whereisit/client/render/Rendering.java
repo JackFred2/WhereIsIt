@@ -45,6 +45,7 @@ public class Rendering {
     public static void setup() {
         // schedule highlight label renders
         WorldRenderEvents.START.register(context -> {
+            if (!shouldBeRendering()) return;
             if (!WhereIsItConfig.INSTANCE.instance().getClient().showContainerNamesInResults) return;
             for (SearchResult value : namedResults.values())
                 scheduleLabel(value.pos().getCenter().add(value.nameOffset()), value.name(), WhereIsItConfig.INSTANCE.instance().getCommon().debug.labelsAreSeeThrough);
@@ -61,17 +62,22 @@ public class Rendering {
 
         // label boxes
         WorldRenderEvents.END.register(context -> {
+            if (!shouldBeRendering()) return;
+
             if (results.isEmpty()) return;
 
-            var progress = Mth.clamp((getTicksSinceSearch() + context.tickDelta()) / WhereIsItConfig.INSTANCE.instance()
-                    .getCommon().fadeoutTimeTicks, 0f, 1f);
+            if (context.world() == null) return;
 
-            if (context.world() == null || progress > 1f) {
-                return;
-            }
-
-            renderBoxes(context, progress);
+            renderBoxes(context, getRenderingProgress(context.tickDelta()));
         });
+    }
+
+    private static float getRenderingProgress(float tickDelta) {
+        return Mth.clamp((getTicksSinceSearch() + tickDelta) / WhereIsItConfig.INSTANCE.instance().getCommon().fadeoutTimeTicks, 0f, 1f);
+    }
+
+    private static boolean shouldBeRendering() {
+        return getTicksSinceSearch() <= WhereIsItConfig.INSTANCE.instance().getCommon().fadeoutTimeTicks;
     }
 
     // smooth scaling for the cube highlights
@@ -118,6 +124,8 @@ public class Rendering {
 
     // render a highlight behind an item
     public static void renderSlotHighlight(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float tickDelta) {
+        if (!shouldBeRendering()) return;
+
         if (screen instanceof AbstractContainerScreen<?> containerScreen) {
             var time = getBaseProgress(getTicksSinceSearch(), tickDelta);
             for (Slot slot : containerScreen.getMenu().slots) {
