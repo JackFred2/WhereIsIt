@@ -81,7 +81,7 @@ repositories {
 		name = "Xander Maven"
 		url = uri("https://maven.isxander.dev/releases")
 		content {
-			includeGroup("dev.isxander")
+			includeGroupAndSubgroups("dev.isxander")
 			includeGroupAndSubgroups("org.quiltmc")
 		}
 	}
