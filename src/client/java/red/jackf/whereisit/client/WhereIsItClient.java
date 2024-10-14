@@ -116,7 +116,7 @@ public class WhereIsItClient implements ClientModInitializer {
         if (WhereIsItConfig.INSTANCE.instance().getClient().debug.printSearchRequestsInChat && Minecraft.getInstance().player != null) {
             var text = TextUtil.prettyPrint(request.toTag());
             for (Component component : text)
-                Minecraft.getInstance().player.sendSystemMessage(component);
+                Minecraft.getInstance().player.displayClientMessage(component, false);
         }
 
         var anySucceeded = SearchInvoker.EVENT.invoker().search(request, WhereIsItClient::recieveResults);

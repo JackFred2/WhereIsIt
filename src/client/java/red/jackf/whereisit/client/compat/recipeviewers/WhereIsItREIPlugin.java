@@ -88,7 +88,7 @@ public class WhereIsItREIPlugin implements REIClientPlugin {
             // TODO support fluid tags
             if (slot instanceof EntryWidget entryWidget && entryWidget.tagMatch != null) {
                 var key = TagKey.create(Registries.ITEM, entryWidget.tagMatch);
-                if (BuiltInRegistries.ITEM.getTag(key).isPresent()) {
+                if (BuiltInRegistries.ITEM.get(key).isPresent()) {
                     request.accept(new ItemTagCriterion(key));
                 }
             } else {

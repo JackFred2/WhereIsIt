@@ -11,13 +11,10 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.Vec3;
@@ -238,9 +235,9 @@ public class Rendering {
                 (int) (alpha * 255)
         );*/
 
-        final int r = FastColor.ARGB32.red(colour);
-        final int g = FastColor.ARGB32.green(colour);
-        final int b = FastColor.ARGB32.blue(colour);
+        final int r = ARGB.red(colour);
+        final int g = ARGB.green(colour);
+        final int b = ARGB.blue(colour);
         final int a = (int) (alpha * 255);
 
         for (SearchResult result : results.values()) {
@@ -271,7 +268,7 @@ public class Rendering {
             }
         }
 
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(CoreShaders.POSITION_COLOR);
         RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
         RenderSystem.enableBlend();
         RenderSystem.depthFunc(GL11.GL_ALWAYS);

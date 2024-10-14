@@ -8,6 +8,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import red.jackf.jackfredlib.api.colour.Colour;
 import red.jackf.jackfredlib.api.colour.Colours;
@@ -224,7 +225,8 @@ public class WhereIsItConfigScreenBuilder {
                 graphics.pose().pushPose();
                 graphics.pose().translate(x, y, 0);
                 graphics.pose().scale(ratio, ratio, 1);
-                graphics.blit(WhereIsIt.id("textures/gui/config/show_container_names_example.png"),
+                graphics.blit(RenderType::guiTextured,
+                        WhereIsIt.id("textures/gui/config/show_container_names_example.png"),
                         0, 0, 0, 0,
                         imageWidth, imageHeight, imageWidth, imageHeight);
 
@@ -439,7 +441,7 @@ public class WhereIsItConfigScreenBuilder {
     private static Optional<ImageRenderer> getGradientPreview(ColourScheme scheme, Color solidColour) {
         var renderer = new ImageRenderer() {
             private static void blit(GuiGraphics graphics, int x, int y, int width, int height, int u, int v, int regionWidth, int regionHeight) {
-                graphics.blit(COLOUR_PREVIEW_BORDER, x, y, width, height, u, v, regionWidth, regionHeight, 24, 64);
+                graphics.blit(RenderType::guiTextured, COLOUR_PREVIEW_BORDER, x, y, width, height, u, v, regionWidth, regionHeight, 24, 64);
             }
 
             @Override

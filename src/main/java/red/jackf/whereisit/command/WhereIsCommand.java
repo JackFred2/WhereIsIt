@@ -32,9 +32,9 @@ public class WhereIsCommand {
         return (ctx, builder) ->
                 SharedSuggestionProvider.suggestResource(ctx.getSource()
                         .registryAccess()
-                        .registryOrThrow(registryKey)
-                        .getTagNames()
-                        .map(TagKey::location), builder);
+                        .lookupOrThrow(registryKey)
+                        .getTags()
+                        .map(named -> named.key().location()), builder);
     }
 
     private WhereIsCommand() {

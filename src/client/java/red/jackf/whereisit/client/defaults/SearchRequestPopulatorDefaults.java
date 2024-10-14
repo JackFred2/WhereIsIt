@@ -2,16 +2,18 @@ package red.jackf.whereisit.client.defaults;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
+import net.minecraft.client.gui.screens.recipebook.GhostSlots;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.world.item.ItemStack;
 import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.criteria.builtin.AnyOfCriterion;
 import red.jackf.whereisit.api.criteria.Criterion;
-import red.jackf.whereisit.api.criteria.builtin.ItemTagCriterion;
 import red.jackf.whereisit.client.api.events.SearchRequestPopulator;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Populates a request from the vanilla GUIs/recipe book
@@ -33,27 +35,16 @@ public class SearchRequestPopulatorDefaults {
             }
 
             // grab from recipe book highlights
-            if (WhereIsItConfig.INSTANCE.instance().getClient().compatibility.recipeBookSupport && containerScreen instanceof RecipeUpdateListener recipeBookHolder) {
-                var book = recipeBookHolder.getRecipeBookComponent();
-                if (book.ghostRecipe.getRecipe() != null) {
-                    for (var i = 0; i < book.ghostRecipe.size(); i++) {
-                        var ghost = book.ghostRecipe.get(i);
-                        var x = ghost.getX() + containerScreen.leftPos;
-                        var y = ghost.getY() + containerScreen.topPos;
-                        // ingredient hovered
-                        if (x <= mouseX && mouseX < x + 16 && y <= mouseY && mouseY < y + 16) {
-                            var criteria = new ArrayList<Criterion>();
-                            for (Ingredient.Value value : ghost.ingredient.values) {
-                                if (value instanceof Ingredient.ItemValue item) {
-                                    SearchRequestPopulator.addItemStack(criteria::add, item.item, SearchRequestPopulator.Context.RECIPE);
-                                } else if (value instanceof Ingredient.TagValue tag) {
-                                    criteria.add(new ItemTagCriterion(tag.tag));
-                                }
-                            }
-                            request.accept(new AnyOfCriterion(criteria).compact());
-                            break;
-                        }
+            if (WhereIsItConfig.INSTANCE.instance().getClient().compatibility.recipeBookSupport && containerScreen instanceof AbstractRecipeBookScreen<?> recipeBookScreen) {
+                RecipeBookComponent<?> book = recipeBookScreen.recipeBookComponent;
+                if (!book.ghostSlots.ingredients.isEmpty() && book.ghostSlots.ingredients.containsKey(recipeBookScreen.hoveredSlot)) {
+                    GhostSlots.GhostSlot hovered = book.ghostSlots.ingredients.get(recipeBookScreen.hoveredSlot);
+
+                    List<Criterion> criteria = new ArrayList<>();
+                    for (ItemStack stack : hovered.items()) {
+                        SearchRequestPopulator.addItemStack(criteria::add, stack, SearchRequestPopulator.Context.RECIPE);
                     }
+                    request.accept(new AnyOfCriterion(criteria).compact());
                 }
             }
         }

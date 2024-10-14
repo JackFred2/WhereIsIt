@@ -26,7 +26,7 @@ public record ItemTagCriterion(TagKey<Item> tag) implements Criterion {
 
     @Override
     public boolean valid() {
-        return BuiltInRegistries.ITEM.getTag(tag).isPresent();
+        return BuiltInRegistries.ITEM.get(tag).isPresent();
     }
 
     @Override
