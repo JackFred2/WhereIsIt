@@ -162,7 +162,7 @@ dependencies {
 
 	// COMPATIBILITY
 	modCompileOnly("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
-	//modLocalRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
+	modLocalRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
 
 	// Recipe Viewer APIs
 	// https://github.com/mezz/JustEnoughItems/issues/2891

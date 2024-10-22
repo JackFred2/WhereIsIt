@@ -31,7 +31,7 @@ import static net.minecraft.SharedConstants.TICKS_PER_SECOND;
 import static net.minecraft.network.chat.Component.translatable;
 
 public class WhereIsItConfigScreenBuilder {
-    private static final ResourceLocation COLOUR_PREVIEW_BORDER = WhereIsIt.id("textures/gui/config/colour_preview_border.png");
+    private static final ResourceLocation COLOUR_PREVIEW_BORDER = WhereIsIt.id("colour_preview_border");
 
     public static Screen build(Screen parent) {
         var instance = WhereIsItConfig.INSTANCE;
@@ -415,7 +415,7 @@ public class WhereIsItConfigScreenBuilder {
                         .build())
                 .controller(opt -> EnumControllerBuilder.create(opt)
                         .enumClass(ColourScheme.class))
-                .listener((opt, scheme) -> solidColourOption.setAvailable(scheme == ColourScheme.SOLID || scheme == ColourScheme.FLASHING))
+                .addListener((opt, event) -> solidColourOption.setAvailable(opt.pendingValue() == ColourScheme.SOLID || opt.pendingValue() == ColourScheme.FLASHING))
                 .build();
 
         var randomSchemeOption = Option.<Boolean>createBuilder()
@@ -429,9 +429,9 @@ public class WhereIsItConfigScreenBuilder {
                 .controller(opt -> BooleanControllerBuilder.create(opt)
                         .onOffFormatter()
                         .coloured(true))
-                .listener((opt, enabled) -> {
-                    solidColourOption.setAvailable(!enabled && (colourSchemeOption.pendingValue() == ColourScheme.SOLID || colourSchemeOption.pendingValue() == ColourScheme.FLASHING));
-                    colourSchemeOption.setAvailable(!enabled);
+                .addListener((opt, event) -> {
+                    solidColourOption.setAvailable(!opt.pendingValue() && (colourSchemeOption.pendingValue() == ColourScheme.SOLID || colourSchemeOption.pendingValue() == ColourScheme.FLASHING));
+                    colourSchemeOption.setAvailable(!opt.pendingValue());
                 })
                 .build();
 
@@ -440,10 +440,6 @@ public class WhereIsItConfigScreenBuilder {
 
     private static Optional<ImageRenderer> getGradientPreview(ColourScheme scheme, Color solidColour) {
         var renderer = new ImageRenderer() {
-            private static void blit(GuiGraphics graphics, int x, int y, int width, int height, int u, int v, int regionWidth, int regionHeight) {
-                graphics.blit(RenderType::guiTextured, COLOUR_PREVIEW_BORDER, x, y, width, height, u, v, regionWidth, regionHeight, 24, 64);
-            }
-
             @Override
             public int render(GuiGraphics graphics, int x, int y, int renderWidth, float tickDelta) {
                 int borderThickness = 8;
@@ -454,10 +450,7 @@ public class WhereIsItConfigScreenBuilder {
 
                 graphics.pose().pushPose();
                 graphics.pose().translate(x, y, 0);
-                blit(graphics, 0, 0, borderThickness, renderHeight, 0, 0, borderThickness, renderHeight); // left
-                blit(graphics, renderWidth - borderThickness, 0, borderThickness, renderHeight, 2 * borderThickness, 0, borderThickness, renderHeight); // right
-                blit(graphics, borderThickness, 0, width, borderThickness, borderThickness, 0, borderThickness, borderThickness); // top
-                blit(graphics, borderThickness, renderHeight - borderThickness, width, borderThickness, borderThickness, renderHeight - borderThickness, borderThickness, borderThickness); // bottom
+                graphics.blitSprite(RenderType::guiTextured, COLOUR_PREVIEW_BORDER, 0, 0, renderWidth, renderHeight);
                 Gradient previewScheme;
                 Colour solid = Colour.fromInt(solidColour.getRGB());
                 if (scheme == ColourScheme.SOLID) {
