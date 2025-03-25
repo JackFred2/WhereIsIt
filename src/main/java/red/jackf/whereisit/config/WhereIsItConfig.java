@@ -80,6 +80,10 @@ public class WhereIsItConfig {
         @SerialEntry(comment = "Visual scale of the container names in the range [0.25, 2].")
         public float containerNameLabelScale = 1f;
 
+        @SerialEntry(comment = "A list of container names that will not display as floating labels. Disable by removing all options.")
+        public List<String> labelBlacklist = new ArrayList<>(labelBlacklistDefault);
+        private static final List<String> labelBlacklistDefault = List.of();
+
         @SerialEntry(comment = "Whether to use a random pride colour scheme each search.")
         public boolean randomScheme = true;
 
