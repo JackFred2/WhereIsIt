@@ -40,6 +40,19 @@ public class WhereIsItConfigScreenBuilder {
                 .category(ConfigCategory.createBuilder()
                         .name(translatable("whereisit.config.title"))
                         .group(makeClientGroup(instance.defaults(), instance.instance()))
+                        .group(ListOption.<String>createBuilder()
+                                .name(translatable("whereisit.config.client.labelBlacklist"))
+                                .description(OptionDescription.of(
+                                        translatable("whereisit.config.client.labelBlacklist.description")
+                                ))
+                                .controller(StringControllerBuilder::create)
+                                .binding(
+                                        instance.defaults().getClient().labelBlacklist,
+                                        () -> instance.instance().getClient().labelBlacklist,
+                                        l -> instance.instance().getClient().labelBlacklist = l
+                                ).initial("")
+                                .insertEntriesAtEnd(true)
+                                .build())
                         .group(makeCommonGroup(instance.defaults(), instance.instance()))
                         .group(ListOption.<String>createBuilder()
                                 .name(translatable("whereisit.config.common.commandAliases"))

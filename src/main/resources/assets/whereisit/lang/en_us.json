@@ -21,6 +21,8 @@
   "whereisit.config.client.showContainerNamesInResults": "Show Container Names for Results",
   "whereisit.config.client.containerNameLabelScale": "Container Name Text Scale",
   "whereisit.config.client.containerNameLabelScale.slider": "Container Name Text Scale",
+  "whereisit.config.client.labelBlacklist": "Container label blacklist",
+  "whereisit.config.client.labelBlacklist.description": "A list of container names that will not display as floating labels. Disable by removing all options.",
   "whereisit.config.client.randomScheme": "Random Colour Scheme",
   "whereisit.config.client.randomScheme.description": "Whether to use a random pride colour scheme each search.",
   "whereisit.config.client.colourScheme": "Highlight Colour Scheme",
