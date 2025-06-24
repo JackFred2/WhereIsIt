@@ -2,6 +2,7 @@ package red.jackf.whereisit.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
+import dev.architectury.event.events.client.ClientGuiEvent;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -58,7 +59,8 @@ public class WhereIsItClient implements ClientModInitializer {
         ScreenEvents.BEFORE_INIT.register((client, _screen, scaledWidth, scaledHeight) -> {
 			if (inGame) {
                 if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights) {
-                    ScreenEvents.afterRender(_screen).register(Rendering::renderSlotHighlight);
+                    //ScreenEvents.afterRender(_screen).register(Rendering::renderSlotHighlight);
+                    ClientGuiEvent.RENDER_CONTAINER_BACKGROUND.register(Rendering::renderSlotHighlight);
                 }
 
                 // listen for keypress in-GUI

@@ -155,6 +155,8 @@ dependencies {
 
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
+	modImplementation("dev.architectury:architectury-fabric:${properties["architectury_version"]}")
+
 	// Config
 	modImplementation("dev.isxander:yet-another-config-lib:${properties["yacl_version"]}") {
 		exclude(group = "com.terraformersmc", module = "modmenu")

@@ -1,11 +1,8 @@
 package red.jackf.whereisit.client.render;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.shaders.ShaderType;
-import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -15,7 +12,9 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
@@ -29,7 +28,6 @@ import red.jackf.whereisit.api.SearchRequest;
 import red.jackf.whereisit.api.SearchResult;
 import red.jackf.whereisit.config.WhereIsItConfig;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 
 @SuppressWarnings("resource") // i really don't want to call ClientLevel#close() thanks
@@ -73,6 +71,7 @@ public class Rendering {
 
             renderBoxes(context, getRenderingProgress(context.tickCounter().getGameTimeDeltaPartialTick(true)));
         });
+
     }
 
     private static float getRenderingProgress(float tickDelta) {
@@ -288,20 +287,18 @@ public class Rendering {
         pose.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
         pose.mulPose(Axis.YP.rotationDegrees(camera.getYRot() - 180f));
 
-        // Calculate alpha and color based on progress
-        var alpha = 1 - (progress / 2f);
         var colour = CurrentGradientHolder.getColour(getBaseProgress(getTicksSinceSearch(), context.tickCounter().getGameTimeDeltaPartialTick(true)));
         var scale = easingFunc(progress);
 
         var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
         // Prepare the builder to start collecting vertex data
-        var builder = bufferSource.getBuffer(RenderType.guiOverlay());
+        var builder = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
 
 
         final int r = ARGB.red(colour);
         final int g = ARGB.green(colour);
         final int b = ARGB.blue(colour);
-        final int a = (int) (alpha * 255);
+        final int a = 75;
 
         // Loop through each result and render the boxes
         for (SearchResult result : results.values()) {
@@ -331,14 +328,7 @@ public class Rendering {
                 );
             }
         }
-
-        // Set the color for the shader
-        RenderSystem.setShaderColor(1f, 1f, 1f, alpha); // Apply the alpha for the color
-
         bufferSource.endBatch();
-
-        // Reset shader color and rendering options back to default
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f); // Reset color to white
     }
 
 
