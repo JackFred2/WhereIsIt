@@ -10,7 +10,9 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -36,7 +38,14 @@ import java.util.function.Supplier;
 
 public class WhereIsItClient implements ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
-    private static final KeyMapping SEARCH = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.whereisit.search", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y, "key.categories.whereisit"));
+    private static final KeyMapping SEARCH = KeyBindingHelper.registerKeyBinding(
+            new KeyMapping(
+                    "key.whereisit.search",
+                    InputConstants.Type.KEYSYM,
+                    GLFW.GLFW_KEY_Y,
+                    KeyMapping.Category.MISC
+            )
+    );
 
     // only clear results after faded + this, so players can repeat the search by pressing the key
     public static final int POST_FADEOUT_REPEAT_PERIOD_TICKS = 20 * 20;
@@ -58,12 +67,15 @@ public class WhereIsItClient implements ClientModInitializer {
         ScreenEvents.BEFORE_INIT.register((client, _screen, scaledWidth, scaledHeight) -> {
 			if (inGame) {
                 if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights) {
-                    ScreenEvents.afterRender(_screen).register(Rendering::renderSlotHighlight);
+                    if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights) {
+                        ScreenEvents.afterRender(_screen).register(Rendering::renderSlotHighlight);
+                    }
+
                 }
 
                 // listen for keypress in-GUI
-                ScreenKeyboardEvents.afterKeyPress(_screen).register((screen, key, scancode, modifiers) -> {
-                    if (SEARCH.matches(key, scancode) && !ShouldIgnoreKey.EVENT.invoker().shouldIgnoreKey()) {
+                ScreenKeyboardEvents.afterKeyPress(_screen).register((screen, event) -> {
+                    if (SEARCH.matches(event) && !ShouldIgnoreKey.EVENT.invoker().shouldIgnoreKey()) {
                         SearchRequest request = createRequest(client, screen);
                         if (request.hasCriteria()) {
                             SearchInvoker.doSearch(request);

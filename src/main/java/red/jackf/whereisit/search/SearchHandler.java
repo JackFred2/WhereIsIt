@@ -47,7 +47,7 @@ public class SearchHandler {
 
         // empty requests
         if (!request.hasCriteria()) {
-            WhereIsIt.LOGGER.warn("Empty request from {}", player.getGameProfile().getName());
+            WhereIsIt.LOGGER.warn("Empty request from {}", player.getGameProfile().name());
             return;
         }
 

@@ -3,6 +3,7 @@ package red.jackf.whereisit.client.api.events;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
@@ -125,11 +126,11 @@ public interface SearchRequestPopulator {
         FAVOURITE;
 
         public static Context inventory() {
-            return Screen.hasShiftDown() ? INVENTORY_PRECISE : INVENTORY;
+            return Minecraft.getInstance().options.keyShift.isDown() ? INVENTORY_PRECISE : INVENTORY;
         }
 
         public static Context overlay() {
-            return Screen.hasShiftDown() ? OVERLAY_ALTERNATE : OVERLAY;
+            return Minecraft.getInstance().options.keyShift.isDown() ? OVERLAY_ALTERNATE : OVERLAY;
         }
     }
 }

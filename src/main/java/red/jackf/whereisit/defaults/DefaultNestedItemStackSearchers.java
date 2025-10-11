@@ -6,9 +6,10 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.component.ItemContainerContents;
-import red.jackf.whereisit.api.search.NestedItemStackSearcher;
+import red.jackf.whereisit.api.search.NestedItemsGrabber;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class DefaultNestedItemStackSearchers {
     static void setup() {
@@ -17,25 +18,24 @@ public class DefaultNestedItemStackSearchers {
     }
 
     private static void setupShulkerBoxes() {
-        NestedItemStackSearcher.EVENT.register((source, predicate) -> {
+        NestedItemsGrabber.EVENT.register(source -> {
             ItemContainerContents contents = source.get(DataComponents.CONTAINER);
 
             if (contents != null) {
-                return contents.stream().anyMatch(predicate);
-            } else {
-                return false;
+                return contents.stream();
             }
+            return Stream.empty();
         });
     }
 
     private static void setupBundles() {
-        NestedItemStackSearcher.EVENT.register((source, predicate) -> {
-            BundleContents contents = source.get(DataComponents.BUNDLE_CONTENTS);
+        NestedItemsGrabber.EVENT.register((source) -> {
+            ItemContainerContents contents = source.get(DataComponents.CONTAINER);
 
             if (contents != null) {
-                return contents.itemCopyStream().anyMatch(predicate);
+                return contents.stream();
             }
-            return false;
+            return Stream.empty();
         });
     }
 }
