@@ -104,21 +104,22 @@ repositories {
 			includeGroup("maven.modrinth")
 		}
 	}
-
-	// JackFredLib
-	maven {
-		name = "JackFredMaven"
-		url = uri("https://maven.jackf.red/releases")
-		content {
-			includeGroupAndSubgroups("red.jackf")
-		}
-	}
+    // JackFredLib
+    /*maven {
+        name = "JackFredMaven"
+        url = uri("https://maven.jackf.red/releases")
+        content {
+            includeGroupAndSubgroups("red.jackf")
+        }
+    }*/
+    flatDir {
+        dirs("libs")
+    }
 }
 
 java {
 	withSourcesJar()
 }
-
 tasks.withType<JavaCompile> {
 	options.release.set(21)
 }
@@ -150,10 +151,10 @@ dependencies {
 		parchment("org.parchmentmc.data:parchment-${properties["parchment_version"]}@zip")
 	})
 	modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
-
-	include(modApi("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")!!)
-
-	modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
+    modImplementation(fileTree("libs") {
+        include("*.jar")
+    })
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
 	// Config
 	modImplementation("dev.isxander:yet-another-config-lib:${properties["yacl_version"]}") {
