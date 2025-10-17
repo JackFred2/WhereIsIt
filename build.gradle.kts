@@ -128,7 +128,7 @@ loom {
     }
 }
 
-// ✅ Конфигурация для JackFredLib
+// Configure for JackFredLib
 val embedJackFredLib by configurations.creating {
     isTransitive = false
     isCanBeResolved = true
@@ -143,7 +143,7 @@ dependencies {
     })
     modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
-    // ✅ JackFredLib - главный JAR из mavenLocal
+    // JackFredLib
     val jackfredlibVersion = properties["jackfredlib_version"]
 
     modCompileOnly("red.jackf.jackfredlib:jackfredlib:${jackfredlibVersion}")
@@ -195,13 +195,12 @@ tasks.named<Jar>("sourcesJar") {
     from(sourceSets.main.get().allSource)
 }
 
+// JackFredLib integration
 val extractJackFredLib = tasks.register<Copy>("extractJackFredLib") {
     from({
         embedJackFredLib.resolve().map { mainJar ->
-            // Распаковываем главный JAR
             val mainTree = zipTree(mainJar)
 
-            // Ищем вложенные JAR'ы в META-INF/jars
             val metaInfJars = mainTree.matching {
                 include("META-INF/jars/*.jar")
             }.files
@@ -220,7 +219,7 @@ val extractJackFredLib = tasks.register<Copy>("extractJackFredLib") {
         "META-INF/MANIFEST.MF",
         "META-INF/jars/**",
         "**/module-info.class",
-        "fabric.mod.json"  // ✅ Исключаем fabric.mod.json JackFredLib
+        "fabric.mod.json"
     )
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -229,16 +228,13 @@ val extractJackFredLib = tasks.register<Copy>("extractJackFredLib") {
 tasks.named<Jar>("jar") {
     dependsOn(extractJackFredLib)
 
-    // ✅ Добавлена стратегия дубликатов для всего JAR
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from("LICENSE") {
         rename { "${it}_${properties["archivesBaseName"]}"}
     }
 
-    // ✅ Встраиваем распакованные классы JackFredLib
     from(extractJackFredLib.map { it.destinationDir }) {
-        // Исключаем fabric.mod.json из JackFredLib - используем только свой
         exclude("fabric.mod.json")
     }
 
@@ -249,7 +245,7 @@ tasks.named<Jar>("jar") {
         if (refmapSrc.exists()) {
             refmapDest.parentFile.mkdirs()
             refmapSrc.copyTo(refmapDest, overwrite = true)
-            println("✅ Copied refmap: ${refmapSrc.name}")
+            println("Copied refmap: ${refmapSrc.name}")
         }
     }
 }
