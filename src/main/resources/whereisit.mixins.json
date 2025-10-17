@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "red.jackf.whereisit.client.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "whereisit.refmap.json",
+  "client": [
+    "LevelRendererMixin",
+    "AbstractContainerScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -10,9 +10,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -68,9 +66,17 @@ public class WhereIsItClient implements ClientModInitializer {
 			if (inGame) {
                 if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights) {
                     if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights) {
-                        ScreenEvents.afterRender(_screen).register(Rendering::renderSlotHighlight);
+                        ScreenKeyboardEvents.afterKeyPress(_screen).register((screen, event) -> {
+                            if (SEARCH.matches(event) && !ShouldIgnoreKey.EVENT.invoker().shouldIgnoreKey()) {
+                                SearchRequest request = createRequest(client, screen);
+                                if (request.hasCriteria()) {
+                                    SearchInvoker.doSearch(request);
+                                } else {
+                                    Rendering.resetSearchTime();
+                                }
+                            }
+                        });
                     }
-
                 }
 
                 // listen for keypress in-GUI
@@ -141,6 +147,12 @@ public class WhereIsItClient implements ClientModInitializer {
 
     public static void recieveResults(Collection<SearchResult> results) {
         WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
+
+        // ИСПРАВЛЕНО: добавляем результаты в Rendering для отображения боксов!
+        if (!results.isEmpty()) {
+            Rendering.addResults(results);
+        }
+
         if (WhereIsItConfig.INSTANCE.instance().getClient().closeGuiOnFoundResults && !closedScreenThisSearch) {
             closedScreenThisSearch = true;
             if (Minecraft.getInstance().screen != null && Minecraft.getInstance().player != null)
@@ -149,7 +161,9 @@ public class WhereIsItClient implements ClientModInitializer {
         OnResult.EVENT.invoker().onResults(results);
     }
 
+
     private static void clearResults() {
+        Rendering.clearResults();
         OnResultsCleared.EVENT.invoker().onResultsCleared();
     }
 

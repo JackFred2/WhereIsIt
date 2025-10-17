@@ -1,0 +1,14 @@
+{
+  "mappings": {
+    "red/jackf/whereisit/client/mixin/AbstractContainerScreenMixin": {
+      "renderContents(Lnet/minecraft/client/gui/GuiGraphics;IIF)V": "Lnet/minecraft/class_465;method_25394(Lnet/minecraft/class_332;IIF)V"
+    }
+  },
+  "data": {
+    "named:intermediary": {
+      "red/jackf/whereisit/client/mixin/AbstractContainerScreenMixin": {
+        "renderContents(Lnet/minecraft/client/gui/GuiGraphics;IIF)V": "Lnet/minecraft/class_465;method_25394(Lnet/minecraft/class_332;IIF)V"
+      }
+    }
+  }
+}

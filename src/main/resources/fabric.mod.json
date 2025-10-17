@@ -13,7 +13,10 @@
 		"issues": "https://github.com/JackFred2/WhereIsIt/issues"
 	},
 	"license": "LGPL-3.0-only",
-	"icon": "assets/whereisit/icon.png",
+    "mixins": [
+      "whereisit.mixins.json"
+    ],
+    "icon": "assets/whereisit/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -40,10 +43,9 @@
 		"emi": [
 			"red.jackf.whereisit.client.compat.recipeviewers.WhereIsItEMIPlugin"
 		]
-	},
-	"mixins": [],
-	"accessWidener": "whereisit.accesswidener",
-	"depends": {
+    },
+  "accessWidener": "whereisit.accesswidener",
+  "depends": {
 		"fabricloader": ">=0.15.0",
 		"minecraft": ">=1.21",
 		"fabric-api": "*",
