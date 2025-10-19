@@ -216,7 +216,7 @@ publishing {
             from(components["java"]!!)
 
             pom {
-                name.set(properties["mod_name"].toString())
+                name.set(project.properties["mod_name"].toString())
                 description.set("Search for items in nearby inventories")
                 url.set("https://github.com/ponuing/WhereIsIt")
                 licenses {
