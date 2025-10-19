@@ -34,7 +34,7 @@ on:
         type: boolean
 
 permissions:
-  # packages: write
+  packages: write
   contents: write
 
 jobs:
@@ -156,41 +156,35 @@ jobs:
         if: ${{ inputs.createNewTag == true }}
         run: git fetch --tags
 
-      - name: Publish to JackFred Maven
+      - name: Publish to GitHub Packages
         if: ${{ inputs.publishToMaven == true }}
         run: ./gradlew generateChangelog publish -PchangelogHeaderAddon="${{ inputs.changelogHeader }}"
         env:
           RELEASE: true
-          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JACKFRED_MAVEN_USER: ${{ secrets.JACKFRED_MAVEN_USER }}
-          JACKFRED_MAVEN_PASS: ${{ secrets.JACKFRED_MAVEN_PASS }}
 
       - name: Publish as GitHub Release
         if: ${{ inputs.publishToGitHub == true }}
         run: ./gradlew generateChangelog githubRelease -PchangelogHeaderAddon="${{ inputs.changelogHeader }}"
         env:
           RELEASE: true
-          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JACKFRED_MAVEN_USER: ${{ secrets.JACKFRED_MAVEN_USER }}
-          JACKFRED_MAVEN_PASS: ${{ secrets.JACKFRED_MAVEN_PASS }}
 
       - name: Publish to Modrinth and Curseforge
         run: ./gradlew generateChangelog publishMods
         if: ${{ inputs.publishToModDistributors == true }}
         env:
           RELEASE: true
-          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JACKFRED_MAVEN_USER: ${{ secrets.JACKFRED_MAVEN_USER }}
-          JACKFRED_MAVEN_PASS: ${{ secrets.JACKFRED_MAVEN_PASS }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
 
       - name: Capture build artifacts
         if: ${{ runner.os == 'Linux' && matrix.java == '17' }} # Only upload artifacts built from LTS java on one OS
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Artifacts
           path: |

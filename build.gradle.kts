@@ -4,7 +4,6 @@ import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import me.modmuss50.mpp.ReleaseType
 import net.fabricmc.loom.task.RemapJarTask
 import org.ajoberstar.grgit.Grgit
-import org.gradle.jvm.tasks.Jar
 import red.jackf.GenerateChangelogTask
 import red.jackf.UpdateDependenciesTask
 
@@ -38,8 +37,7 @@ if (System.getenv().containsKey("NEW_TAG")) {
 }
 
 repositories {
-    mavenLocal()
-
+    // Parchment Mappings
     maven {
         name = "ParchmentMC"
         url = uri("https://maven.parchmentmc.org")
@@ -48,6 +46,7 @@ repositories {
         }
     }
 
+    // Mod Menu, EMI
     maven {
         name = "TerraformersMC"
         url = uri("https://maven.terraformersmc.com/releases/")
@@ -57,6 +56,7 @@ repositories {
         }
     }
 
+    // JEI
     maven {
         name = "Jared"
         url = uri("https://maven.blamejared.com/")
@@ -65,6 +65,7 @@ repositories {
         }
     }
 
+    // REI
     maven {
         name = "Shedaniel"
         url = uri("https://maven.shedaniel.me")
@@ -74,6 +75,7 @@ repositories {
         }
     }
 
+    // YACL
     maven {
         name = "Xander Maven"
         url = uri("https://maven.isxander.dev/releases")
@@ -83,6 +85,7 @@ repositories {
         }
     }
 
+    // YACL Snapshots
     maven {
         name = "Xander Snapshot Maven"
         url = uri("https://maven.isxander.dev/snapshots")
@@ -92,6 +95,7 @@ repositories {
         }
     }
 
+    // JEI
     maven {
         name = "Modrinth"
         url = uri("https://api.modrinth.com/maven")
@@ -99,10 +103,24 @@ repositories {
             includeGroup("maven.modrinth")
         }
     }
+
+    // JackFredLib
+    maven {
+        name = "JackFredLib-GitHub"
+        url = uri("https://maven.pkg.github.com/ponuing/JackFredLib")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 java {
     withSourcesJar()
+}
+
+tasks.withType<JavaCompile> {
+    options.release.set(21)
 }
 
 loom {
@@ -122,20 +140,10 @@ loom {
     }
 
     accessWidenerPath.set(file("src/main/resources/whereisit.accesswidener"))
-
-    mixin {
-        defaultRefmapName.set("whereisit.refmap.json")
-    }
-}
-
-// Configure for JackFredLib
-val embedJackFredLib by configurations.creating {
-    isTransitive = false
-    isCanBeResolved = true
-    isCanBeConsumed = false
 }
 
 dependencies {
+    // To change the versions see the gradle.properties file
     minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
     mappings(loom.layered {
         officialMojangMappings()
@@ -143,25 +151,38 @@ dependencies {
     })
     modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
 
-    // JackFredLib
-    val jackfredlibVersion = properties["jackfredlib_version"]
-
-    modCompileOnly("red.jackf.jackfredlib:jackfredlib:${jackfredlibVersion}")
-    modLocalRuntime("red.jackf.jackfredlib:jackfredlib:${jackfredlibVersion}")
-    embedJackFredLib("red.jackf.jackfredlib:jackfredlib:${jackfredlibVersion}")
+    include(modApi("red.jackf.jackfredlib:jackfredlib:${properties["jackfredlib_version"]}")!!)
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric-api_version"]}")
 
+    // Config
     modImplementation("dev.isxander:yet-another-config-lib:${properties["yacl_version"]}") {
         exclude(group = "com.terraformersmc", module = "modmenu")
     }
 
+    // COMPATIBILITY
     modCompileOnly("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
     modLocalRuntime("com.terraformersmc:modmenu:${properties["modmenu_version"]}")
 
+    // Recipe Viewer APIs
+    // https://github.com/mezz/JustEnoughItems/issues/2891
+    // modCompileOnlyApi("mezz.jei:jei-${properties["minecraft_version"]}-common-api:${properties["jei_version"]}")
+    // modCompileOnlyApi("mezz.jei:jei-${properties["minecraft_version"]}-fabric-api:${properties["jei_version"]}")
     modCompileOnly("maven.modrinth:jei:${properties["jei_modrinth_id"]}")
+
+    // modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${properties["rei_version"]}")
+    // modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${properties["rei_version"]}")
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}")
+
+    //modCompileOnly("dev.emi:emi-fabric:${properties["emi_version"]}:api")
     modCompileOnly("dev.emi:emi-fabric:${properties["emi_version"]}")
+
+    // Recipe Viewer Runtimes
+    //modLocalRuntime("mezz.jei:jei-${properties["minecraft_version"]}-fabric:${properties["jei_version"]}")
+    /*modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${properties["rei_version"]}") {
+        exclude(group = "net.fabricmc.fabric-api", module = "fabric-api")
+    }*/
+    //modLocalRuntime("dev.emi:emi-fabric:${properties["emi_version"]}")
 }
 
 tasks.withType<ProcessResources>().configureEach {
@@ -173,20 +194,7 @@ tasks.withType<ProcessResources>().configureEach {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(21)
-    options.encoding = "UTF-8"
-
-    options.compilerArgs.addAll(listOf(
-        "-Xmaxerrs", "1000"
-    ))
-
-    options.compilerArgumentProviders.add(CommandLineArgumentProvider {
-        listOf(
-            "-AreobfTsrgFile=${project.projectDir}/.gradle/loom-cache/mixin-map-${properties["minecraft_version"]}.tsrg",
-            "-AoutRefMapFile=${layout.buildDirectory.get()}/tmp/compileJava/whereisit.refmap.json",
-            "-AdefaultObfuscationEnv=named:intermediary"
-        )
-    })
+    options.release.set(17)
 }
 
 tasks.named<Jar>("sourcesJar") {
@@ -195,82 +203,54 @@ tasks.named<Jar>("sourcesJar") {
     from(sourceSets.main.get().allSource)
 }
 
-// JackFredLib integration
-val extractJackFredLib = tasks.register<Copy>("extractJackFredLib") {
-    from({
-        embedJackFredLib.resolve().map { mainJar ->
-            val mainTree = zipTree(mainJar)
-
-            val metaInfJars = mainTree.matching {
-                include("META-INF/jars/*.jar")
-            }.files
-
-            // Распаковываем вложенные JAR'ы
-            metaInfJars.map { zipTree(it) } + mainTree
-        }.flatten()
-    })
-
-    into(layout.buildDirectory.dir("jackfredlib-extracted"))
-
-    exclude(
-        "META-INF/*.SF",
-        "META-INF/*.DSA",
-        "META-INF/*.RSA",
-        "META-INF/MANIFEST.MF",
-        "META-INF/jars/**",
-        "**/module-info.class",
-        "fabric.mod.json"
-    )
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-tasks.named<Jar>("jar") {
-    dependsOn(extractJackFredLib)
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
+tasks.jar {
     from("LICENSE") {
         rename { "${it}_${properties["archivesBaseName"]}"}
     }
-
-    from(extractJackFredLib.map { it.destinationDir }) {
-        exclude("fabric.mod.json")
-    }
-
-    doFirst {
-        val refmapSrc = file("${layout.buildDirectory.get()}/tmp/compileJava/whereisit.refmap.json")
-        val refmapDest = file("${layout.buildDirectory.get()}/resources/main/whereisit.refmap.json")
-
-        if (refmapSrc.exists()) {
-            refmapDest.parentFile.mkdirs()
-            refmapSrc.copyTo(refmapDest, overwrite = true)
-            println("Copied refmap: ${refmapSrc.name}")
-        }
-    }
 }
 
-
+// configure the maven publication
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"]!!)
+
+            pom {
+                name.set(properties["mod_name"]?.toString())
+                description.set("Search for items in nearby inventories")
+                url.set("https://github.com/ponuing/WhereIsIt")
+                licenses {
+                    license {
+                        name.set("LGPL-3.0")
+                        url.set("https://opensource.org/license/lgpl-3-0/")
+                    }
+                }
+                developers {
+                    developer {
+                        name.set("ponuing")
+                        url.set("https://github.com/ponuing")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/ponuing/WhereIsIt.git")
+                    developerConnection.set("scm:git:git://github.com/ponuing/WhereIsIt.git")
+                    url.set("https://github.com/ponuing/WhereIsIt")
+                }
+            }
         }
     }
 
     repositories {
-        if (!System.getenv().containsKey("CI")) repositories.mavenLocal()
+        // if not in CI we publish to maven local
+        if (!System.getenv().containsKey("CI")) mavenLocal()
 
         if (canPublish) {
             maven {
-                name = "JackFredMaven"
-                url = uri("https://maven.jackf.red/releases/")
-                content {
-                    includeGroupByRegex("red.jackf.*")
-                }
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/ponuing/WhereIsIt")
                 credentials {
-                    username = properties["jfmaven.user"]?.toString() ?: System.getenv("JACKFRED_MAVEN_USER")
-                    password = properties["jfmaven.key"]?.toString() ?: System.getenv("JACKFRED_MAVEN_PASS")
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
                 }
             }
         }
@@ -283,11 +263,19 @@ if (canPublish) {
 
     var generateChangelogTask: TaskProvider<GenerateChangelogTask>? = null
 
+    // Changelog Generation
     if (lastTag != null) {
         val changelogHeader = if (properties.containsKey("changelogHeaderAddon")) {
             val addonProp: String = properties["changelogHeaderAddon"]!!.toString()
-            if (addonProp.isNotBlank()) addonProp + "\n\n" else ""
-        } else ""
+
+            if (addonProp.isNotBlank()) {
+                addonProp + "\n\n"
+            } else {
+                ""
+            }
+        } else {
+            ""
+        }
 
         generateChangelogTask = tasks.register<GenerateChangelogTask>("generateChangelog") {
             this.lastTag.set(lastTag)
@@ -295,19 +283,25 @@ if (canPublish) {
             githubUrl.set(properties["github_url"]!!.toString())
             prefixFilters.set(properties["changelog_filter"]!!.toString().split(","))
 
+            // Add a bundled block for each module version
             prologue.set(changelogHeader + """
-             |Bundled:
-             |  - JackFredLib: ${properties["jackfredlib_version"]}
-             |  """.trimMargin())
+				|Bundled:
+				|  - JackFredLib: ${properties["jackfredlib_version"]}
+				|  """.trimMargin())
         }
     }
 
-    val changelogTextProvider = generateChangelogTask?.let { task ->
+    val changelogTextProvider = if (generateChangelogTask != null) {
         provider {
-            task.get().changelogFile.get().asFile.readText()
+            generateChangelogTask!!.get().changelogFile.get().asFile.readText()
         }
-    } ?: provider { "No Changelog Generated" }
+    } else {
+        provider {
+            "No Changelog Generated"
+        }
+    }
 
+    // GitHub Release
     tasks.named<GithubReleaseTask>("githubRelease") {
         generateChangelogTask?.let { dependsOn(it) }
 
@@ -331,6 +325,7 @@ if (canPublish) {
         body = changelogTextProvider
     }
 
+    // Mod Platforms
     if (listOf("CURSEFORGE_TOKEN", "MODRINTH_TOKEN").any { System.getenv().containsKey(it) }) {
         publishMods {
             changelog.set(changelogTextProvider)
@@ -352,10 +347,14 @@ if (canPublish) {
                     }
                     displayName.set("${properties["prefix"]!!} ${properties["mod_name"]!!} ${version.get()}")
                     listOf("fabric-api", "yacl").forEach {
-                        requires { slug.set(it) }
+                        requires {
+                            slug.set(it)
+                        }
                     }
                     listOf("emi", "jei", "roughly-enough-items", "modmenu").forEach {
-                        optional { slug.set(it) }
+                        optional {
+                            slug.set(it)
+                        }
                     }
                 }
             }
@@ -369,10 +368,14 @@ if (canPublish) {
                     }
                     displayName.set("${properties["mod_name"]!!} ${version.get()}")
                     listOf("fabric-api", "yacl").forEach {
-                        requires { slug.set(it) }
+                        requires {
+                            slug.set(it)
+                        }
                     }
                     listOf("emi", "jei", "rei", "modmenu").forEach {
-                        optional { slug.set(it) }
+                        optional {
+                            slug.set(it)
+                        }
                     }
                 }
             }
