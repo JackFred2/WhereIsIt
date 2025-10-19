@@ -65,18 +65,16 @@ public class WhereIsItClient implements ClientModInitializer {
         ScreenEvents.BEFORE_INIT.register((client, _screen, scaledWidth, scaledHeight) -> {
 			if (inGame) {
                 if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights) {
-                    if (WhereIsItConfig.INSTANCE.instance().getClient().showSlotHighlights) {
-                        ScreenKeyboardEvents.afterKeyPress(_screen).register((screen, event) -> {
-                            if (SEARCH.matches(event) && !ShouldIgnoreKey.EVENT.invoker().shouldIgnoreKey()) {
-                                SearchRequest request = createRequest(client, screen);
-                                if (request.hasCriteria()) {
-                                    SearchInvoker.doSearch(request);
-                                } else {
-                                    Rendering.resetSearchTime();
-                                }
+                    ScreenKeyboardEvents.afterKeyPress(_screen).register((screen, event) -> {
+                        if (SEARCH.matches(event) && !ShouldIgnoreKey.EVENT.invoker().shouldIgnoreKey()) {
+                            SearchRequest request = createRequest(client, screen);
+                            if (request.hasCriteria()) {
+                                SearchInvoker.doSearch(request);
+                            } else {
+                                Rendering.resetSearchTime();
                             }
-                        });
-                    }
+                        }
+                    });
                 }
 
                 // listen for keypress in-GUI
@@ -148,7 +146,6 @@ public class WhereIsItClient implements ClientModInitializer {
     public static void recieveResults(Collection<SearchResult> results) {
         WhereIsItClient.LOGGER.debug("Search results: %s".formatted(results));
 
-        // ИСПРАВЛЕНО: добавляем результаты в Rendering для отображения боксов!
         if (!results.isEmpty()) {
             Rendering.addResults(results);
         }

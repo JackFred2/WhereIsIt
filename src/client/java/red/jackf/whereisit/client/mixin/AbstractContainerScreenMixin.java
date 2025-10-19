@@ -10,8 +10,6 @@ import red.jackf.whereisit.client.render.Rendering;
 
 @Mixin(AbstractContainerScreen.class)
 public class AbstractContainerScreenMixin {
-
-    // ✅ ИСПРАВЛЕНО: используем полную сигнатуру из refmap
     @Inject(
             method = "renderContents(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
             at = @At(

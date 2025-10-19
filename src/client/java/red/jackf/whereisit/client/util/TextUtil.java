@@ -22,6 +22,7 @@ public class TextUtil {
         if (root instanceof CompoundTag compound) {
             prettyPrintCompound(text::add, null, 0, compound);
         } else {
+            // wrap for ease
             CompoundTag wrapped = new CompoundTag();
             wrapped.put("request", root);
             prettyPrintCompound(text::add, null, 0, wrapped);
@@ -53,7 +54,7 @@ public class TextUtil {
 
     private static void prettyPrintCompound(Consumer<Component> consumer, @Nullable MutableComponent firstPrefix, int indentLevel, CompoundTag tag) {
         final boolean[] doneFirst = {false};
-        tag.entrySet().stream() // заменяем getKeys() на entrySet()
+        tag.entrySet().stream() // replace getKeys() with entrySet()
                 .sorted((e1, e2) -> {
                     String s1 = e1.getKey();
                     String s2 = e2.getKey();
