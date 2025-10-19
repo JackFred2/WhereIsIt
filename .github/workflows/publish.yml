@@ -139,6 +139,9 @@ jobs:
 
       - name: build & run tests
         run: ./gradlew check build
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create version tag
         if: ${{ inputs.createNewTag == true }}
