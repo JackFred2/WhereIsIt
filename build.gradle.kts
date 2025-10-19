@@ -136,6 +136,10 @@ loom {
         }
     }
 
+    mixin {
+        defaultRefmapName.set("whereisit.refmap.json")
+    }
+
     log4jConfigs.from(file("log4j2.xml"))
 
     runs.forEach {
@@ -197,7 +201,22 @@ tasks.withType<ProcessResources>().configureEach {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(17)
+    options.release.set(21)
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll(listOf(
+        "-Xmaxerrs", "1000"
+    ))
+
+    val sourceSetName = this.name.replace("compile", "").replace("Java", "").toLowerCase()
+    if (sourceSetName.isNotEmpty()) {
+        options.compilerArgumentProviders.add(CommandLineArgumentProvider {
+            listOf(
+                "-AreobfTsrgFile=${project.projectDir}/.gradle/loom-cache/mixin-map-${properties["minecraft_version"]}.tsrg",
+                "-AoutRefMapFile=${layout.buildDirectory.get()}/tmp/${this.name}/whereisit.refmap.json",
+                "-AdefaultObfuscationEnv=named:intermediary"
+            )
+        })
+    }
 }
 
 tasks.named<Jar>("sourcesJar") {
@@ -209,6 +228,23 @@ tasks.named<Jar>("sourcesJar") {
 tasks.jar {
     from("LICENSE") {
         rename { "${it}_${properties["archivesBaseName"]}"}
+    }
+
+    doFirst {
+        val refmapSrc = listOf(
+            file("${layout.buildDirectory.get()}/tmp/compileClientJava/whereisit.refmap.json"),
+            file("${layout.buildDirectory.get()}/tmp/compileJava/whereisit.refmap.json")
+        ).firstOrNull { it.exists() }
+
+        val refmapDest = file("${layout.buildDirectory.get()}/resources/main/whereisit.refmap.json")
+
+        if (refmapSrc != null) {
+            refmapDest.parentFile.mkdirs()
+            refmapSrc.copyTo(refmapDest, overwrite = true)
+            println("Copied refmap from: ${refmapSrc.absolutePath}")
+        } else {
+            println("WARNING: refmap not found!")
+        }
     }
 }
 

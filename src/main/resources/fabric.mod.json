@@ -14,7 +14,10 @@
 	},
 	"license": "LGPL-3.0-only",
     "mixins": [
-      "whereisit.mixins.json"
+      {
+        "config": "whereisit.mixins.json",
+        "environment": "client"
+      }
     ],
     "icon": "assets/whereisit/icon.png",
 	"environment": "*",
