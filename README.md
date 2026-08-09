@@ -1,3 +1,7 @@
+# Archival Notice
+
+https://gist.github.com/JackFred2/58d267bd7043fd92442a451315bbd6d5
+
 # Where Is It
 
 ![Modrinth Downloads](https://img.shields.io/modrinth/dt/FCTyEqkn?style=flat-square&label=Modrinth&color=%2316AF54)
